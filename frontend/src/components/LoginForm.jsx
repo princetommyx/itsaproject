@@ -38,7 +38,11 @@ export default function LoginForm({
         navigate(`/${user.role}`)
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid credentials. Please try again.')
+      if (err.response) {
+        setError(err.response.data?.message || 'Invalid credentials. Please try again.')
+      } else {
+        setError('Could not reach the server. It may be offline, misconfigured, or blocked by your network — this is not a wrong-password error.')
+      }
     } finally {
       setSubmitting(false)
     }
