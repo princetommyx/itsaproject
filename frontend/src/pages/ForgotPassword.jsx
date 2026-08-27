@@ -52,7 +52,7 @@ export default function ForgotPassword() {
           </Link>
         </p>
         <p className="mt-2 text-center text-sm text-slate-500">
-          <Link to="/login" className="text-upsa-blue hover:underline">
+          <Link to="/login/student" className="text-upsa-blue hover:underline">
             Back to login
           </Link>
         </p>

@@ -2,7 +2,9 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
-import Login from './pages/Login'
+import LoginChoice from './pages/LoginChoice'
+import StudentLogin from './pages/StudentLogin'
+import StaffLogin from './pages/StaffLogin'
 import ChangePassword from './pages/ChangePassword'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
@@ -25,7 +27,9 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<HomeRedirect />} />
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<LoginChoice />} />
+          <Route path="/login/student" element={<StudentLogin />} />
+          <Route path="/login/staff" element={<StaffLogin />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/change-password" element={<ChangePassword />} />

@@ -1,10 +1,18 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Alert, Button, Card, Input } from '../components/ui'
+import { Alert, Button, Card, Input } from './ui'
 
-export default function Login() {
-  const { login } = useAuth()
+export default function LoginForm({
+  subtitle,
+  identifierLabel,
+  identifierPlaceholder,
+  identifierAutoComplete,
+  allowedRoles,
+  wrongRoleMessage,
+  children,
+}) {
+  const { login, logout } = useAuth()
   const navigate = useNavigate()
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
@@ -17,6 +25,13 @@ export default function Login() {
     setSubmitting(true)
     try {
       const user = await login(identifier, password)
+
+      if (allowedRoles && !allowedRoles.includes(user.role)) {
+        await logout()
+        setError(wrongRoleMessage)
+        return
+      }
+
       if (user.is_first_login) {
         navigate('/change-password')
       } else {
@@ -37,14 +52,15 @@ export default function Login() {
             U
           </div>
           <h1 className="text-lg font-semibold text-slate-800">UPSA Final Year Project Portal</h1>
-          <p className="text-sm text-slate-500">Sign in with your Index Number or staff email</p>
+          <p className="text-sm text-slate-500">{subtitle}</p>
         </div>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           {error && <Alert>{error}</Alert>}
           <Input
-            label="Index Number or Email"
-            placeholder="e.g. UPSA/1234567 or j.ofoeda@upsa.edu.gh"
+            label={identifierLabel}
+            placeholder={identifierPlaceholder}
+            autoComplete={identifierAutoComplete}
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             required
@@ -53,6 +69,7 @@ export default function Login() {
           <Input
             label="Password"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -62,11 +79,7 @@ export default function Login() {
           </Button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-slate-500">
-          <Link to="/forgot-password" className="text-upsa-blue hover:underline">
-            Forgot your password?
-          </Link>
-        </p>
+        {children}
       </Card>
     </div>
   )

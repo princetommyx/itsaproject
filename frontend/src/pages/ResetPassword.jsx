@@ -23,7 +23,7 @@ export default function ResetPassword() {
         password,
         password_confirmation: confirmation,
       })
-      navigate('/login')
+      navigate('/login/student')
     } catch (err) {
       const messages = err.response?.data?.errors
       setError(messages ? Object.values(messages).flat().join(' ') : 'Could not reset password.')
@@ -64,7 +64,7 @@ export default function ResetPassword() {
         </form>
 
         <p className="mt-4 text-center text-sm text-slate-500">
-          <Link to="/login" className="text-upsa-blue hover:underline">
+          <Link to="/login/student" className="text-upsa-blue hover:underline">
             Back to login
           </Link>
         </p>
