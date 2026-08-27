@@ -8,7 +8,7 @@ services:
     rootDir: backend
     envVars:
       - key: APP_NAME
-        value: "Laravel"
+        value: "UPSA Final Year Project Management System"
       - key: APP_ENV
         value: "production"
       - key: APP_DEBUG
@@ -17,18 +17,41 @@ services:
         value: "https://itsaproject-backend.onrender.com" # Update if you have a custom domain
       - key: APP_KEY
         generateValue: true # Generates a random secure string. Ensure your Laravel app can use this base64 formatted key or set it manually in Dashboard.
-      # If using Postgres on Render:
-      #- key: DB_CONNECTION
-      #  value: pgsql
-      #- key: DB_HOST
-      #  value: dpg-xxxx-a.oregon-postgres.render.com
-      #- key: DB_PORT
-      #  value: 5432
-      #- key: DB_DATABASE
-      #  value: your_db_name
-      #- key: DB_USERNAME
-      #  value: your_db_user
-      #- key: DB_PASSWORD
-      #  value: your_db_password
-      #- key: DATABASE_URL
-      #  value: postgres://user:pass@host/db # Example URL
+
+      # REQUIRED: the deployed frontend's origin, for CORS. Without this,
+      # every request from the browser will be silently rejected even if
+      # the backend itself is healthy.
+      - key: FRONTEND_URL
+        value: "https://itsaproject.vercel.app" # Update to match your actual Vercel URL
+
+      # REQUIRED: a real database. Render has no managed MySQL, so the
+      # simplest option is Render's own Postgres (create one from the
+      # Render dashboard, then paste its connection details below) —
+      # Laravel's migrations here use portable column types and run fine
+      # on Postgres. If you'd rather use MySQL, point these at an
+      # external provider (PlanetScale, Railway, Aiven, etc.) instead
+      # and change DB_CONNECTION to mysql.
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: REPLACE_ME # e.g. dpg-xxxx-a.oregon-postgres.render.com
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: REPLACE_ME
+      - key: DB_USERNAME
+        value: REPLACE_ME
+      - key: DB_PASSWORD
+        value: REPLACE_ME
+        sync: false # marks it sensitive so Render doesn't echo it back in the dashboard
+
+      # Safe defaults for a single-web-process deployment (no separate
+      # queue worker running).
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: MAIL_MAILER
+        value: log # switch to smtp + real credentials to actually deliver password-reset emails
