@@ -1,0 +1,15 @@
+/vendor
+/node_modules
+/public/build
+/public/hot
+/storage/*.key
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.editorconfig
+/tests
+.github
+.phpunit.cache
+*.log

@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: itsaproject-backend
+    runtime: docker
+    region: oregon # Update to your preferred region (e.g., frankfurt, ohio, singapore)
+    plan: free # Can be starter, standard, etc.
+    # To deploy from a sub-directory, specify the root
+    rootDir: backend
+    envVars:
+      - key: APP_NAME
+        value: "Laravel"
+      - key: APP_ENV
+        value: "production"
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: "https://itsaproject-backend.onrender.com" # Update if you have a custom domain
+      - key: APP_KEY
+        generateValue: true # Generates a random secure string. Ensure your Laravel app can use this base64 formatted key or set it manually in Dashboard.
+      # If using Postgres on Render:
+      #- key: DB_CONNECTION
+      #  value: pgsql
+      #- key: DB_HOST
+      #  value: dpg-xxxx-a.oregon-postgres.render.com
+      #- key: DB_PORT
+      #  value: 5432
+      #- key: DB_DATABASE
+      #  value: your_db_name
+      #- key: DB_USERNAME
+      #  value: your_db_user
+      #- key: DB_PASSWORD
+      #  value: your_db_password
+      #- key: DATABASE_URL
+      #  value: postgres://user:pass@host/db # Example URL
