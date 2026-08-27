@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-upsa-blue: #0b4f8a;
+  --color-upsa-blue-dark: #073a66;
+  --color-upsa-gold: #f2a900;
+}
+
+body {
+  margin: 0;
+  background-color: #f4f6f9;
+  color: #1f2937;
+}
