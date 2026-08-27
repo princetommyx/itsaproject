@@ -28,16 +28,18 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        // Dummy student for testing. is_first_login stays true (the
-        // factory default) so the first-login password-change guard can
-        // be exercised too; the password matches the blueprint's own
-        // convention of hashing the DOB as YYYYMMDD.
+        // Dummy student for testing. is_first_login is set to false so
+        // this seeded account can be used to log straight into the
+        // dashboard for quick manual testing, skipping the forced
+        // password-change screen. That guard is still fully enforced for
+        // real students created via CSV import (see AdminController).
         User::factory()->student()->create([
             'name' => 'Ama Boateng',
             'university_id' => 'UPSA/1000001',
             'student_email' => 'ama.boateng@example.com',
             'dob' => '2001-03-15',
             'password' => Hash::make('20010315'),
+            'is_first_login' => false,
         ]);
     }
 }
