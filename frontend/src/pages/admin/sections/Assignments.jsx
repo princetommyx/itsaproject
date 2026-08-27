@@ -45,15 +45,15 @@ export default function Assignments() {
         projects.map((project) => (
           <Card key={project.id}>
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
+              <div className="min-w-0">
                 <h3 className="font-semibold text-slate-800">{project.title}</h3>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 break-words">
                   {project.students.map((s) => s.name).join(', ')}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                 <select
-                  className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                  className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm sm:w-auto"
                   value={selection[project.id] || ''}
                   onChange={(e) => setSelection({ ...selection, [project.id]: e.target.value })}
                 >
@@ -64,7 +64,9 @@ export default function Assignments() {
                     </option>
                   ))}
                 </select>
-                <Button onClick={() => assign(project.id)}>Assign</Button>
+                <Button className="w-full sm:w-auto" onClick={() => assign(project.id)}>
+                  Assign
+                </Button>
               </div>
             </div>
           </Card>

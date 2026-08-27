@@ -45,8 +45,8 @@ export default function ProjectReview() {
       </Link>
 
       <Card>
-        <div className="mb-4 flex items-start justify-between">
-          <h1 className="text-xl font-semibold text-slate-800">{project.title}</h1>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <h1 className="min-w-0 break-words text-xl font-semibold text-slate-800">{project.title}</h1>
           <Badge status={project.status} />
         </div>
         <p className="whitespace-pre-wrap text-sm text-slate-600">{project.description}</p>
@@ -71,7 +71,7 @@ export default function ProjectReview() {
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
             />
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button variant="success" onClick={() => decide('approved')} disabled={submitting}>
                 Approve
               </Button>

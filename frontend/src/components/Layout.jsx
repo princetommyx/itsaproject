@@ -13,20 +13,21 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-slate-100">
       <header className="bg-upsa-blue shadow-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-upsa-gold font-bold text-upsa-blue-dark">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-y-2 px-4 py-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-upsa-gold font-bold text-upsa-blue-dark">
               U
             </div>
-            <div>
-              <p className="text-sm font-semibold text-white leading-tight">
-                UPSA Final Year Project Portal
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-white leading-tight">
+                <span className="hidden sm:inline">UPSA Final Year Project Portal</span>
+                <span className="sm:hidden">UPSA Portal</span>
               </p>
               <p className="text-xs text-blue-100 leading-tight capitalize">{user?.role}</p>
             </div>
           </div>
 
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-3 sm:gap-4">
             {(NAV_LINKS[user?.role] || []).map((link) => (
               <NavLink
                 key={link.to}
@@ -39,10 +40,10 @@ export default function Layout() {
                 {link.label}
               </NavLink>
             ))}
-            <span className="text-sm text-white/80">{user?.name}</span>
+            <span className="hidden text-sm text-white/80 sm:inline">{user?.name}</span>
             <button
               onClick={logout}
-              className="rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/20"
+              className="shrink-0 rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium text-white hover:bg-white/20"
             >
               Log out
             </button>
@@ -50,7 +51,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
         <Outlet />
       </main>
     </div>

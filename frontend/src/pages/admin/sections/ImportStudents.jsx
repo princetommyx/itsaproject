@@ -41,7 +41,7 @@ export default function ImportStudents() {
 
       {error && <Alert>{error}</Alert>}
 
-      <form className="mt-4 flex items-end gap-3" onSubmit={handleSubmit}>
+      <form className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
         <input
           type="file"
           accept=".csv"
@@ -49,7 +49,7 @@ export default function ImportStudents() {
           className="text-sm"
           required
         />
-        <Button type="submit" disabled={submitting || !file}>
+        <Button type="submit" className="sm:shrink-0" disabled={submitting || !file}>
           {submitting ? 'Importing...' : 'Import'}
         </Button>
       </form>

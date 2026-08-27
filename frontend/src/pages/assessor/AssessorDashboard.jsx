@@ -25,8 +25,8 @@ export default function AssessorDashboard() {
           {projects.map((project) => (
             <Link key={project.id} to={`/assessor/projects/${project.id}`}>
               <Card className="h-full transition hover:shadow-md">
-                <div className="mb-2 flex items-start justify-between">
-                  <h2 className="font-semibold text-slate-800">{project.title}</h2>
+                <div className="mb-2 flex items-start justify-between gap-3">
+                  <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>
                   <Badge status={project.status} />
                 </div>
                 <p className="line-clamp-3 text-sm text-slate-500">{project.description}</p>

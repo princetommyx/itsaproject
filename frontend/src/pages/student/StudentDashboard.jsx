@@ -85,9 +85,9 @@ function ProjectPanel({ project, user, onChange, onError }) {
   return (
     <div className="space-y-6">
       <Card>
-        <div className="mb-4 flex items-start justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-800">{project.title}</h2>
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold break-words text-slate-800">{project.title}</h2>
             <p className="mt-1 text-sm text-slate-500">{project.description}</p>
           </div>
           <Badge status={project.status} />
@@ -164,7 +164,7 @@ function AddMemberForm({ projectId, onChange, onError }) {
   }
 
   return (
-    <form className="mt-4 flex items-end gap-2" onSubmit={handleSubmit}>
+    <form className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={handleSubmit}>
       <Input
         label="Add Member by Index Number"
         value={universityId}
@@ -172,7 +172,7 @@ function AddMemberForm({ projectId, onChange, onError }) {
         className="flex-1"
         required
       />
-      <Button type="submit" variant="secondary" disabled={submitting}>
+      <Button type="submit" variant="secondary" className="sm:shrink-0" disabled={submitting}>
         {submitting ? 'Adding...' : 'Add'}
       </Button>
     </form>
@@ -216,7 +216,7 @@ function EditAndSubmit({ project, onChange, onError }) {
       <h3 className="text-sm font-semibold text-slate-700">Edit Project</h3>
       <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
       <Textarea label="Description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button type="submit" variant="secondary" disabled={submitting}>
           Save Changes
         </Button>
