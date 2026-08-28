@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
-import { Button, Card, StatCard } from '../../../components/ui'
+import { Button, Card, HeroStatCard, StatCard } from '../../../components/ui'
 
 const METRICS = [
-  { key: 'total_submitted', label: 'Total Submitted', variant: 'pink' },
   { key: 'unassigned', label: 'Awaiting Assignment', variant: 'gold' },
   { key: 'pending', label: 'Under Review', variant: 'blue' },
   { key: 'approved', label: 'Approved', variant: 'violet' },
@@ -40,7 +39,11 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <h1 className="text-2xl font-semibold text-slate-800">Dashboard</h1>
+
+      <HeroStatCard label="Total Projects Submitted" value={stats.total_submitted} caption="All-time" />
+
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         {METRICS.map((m) => (
           <StatCard key={m.key} label={m.label} value={stats[m.key]} variant={m.variant} />
         ))}

@@ -35,7 +35,8 @@ export default function Assignments() {
   if (projects === null) return <p className="text-slate-500">Loading...</p>
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold text-slate-800">Assign Assessors</h1>
       {error && <Alert>{error}</Alert>}
       {projects.length === 0 ? (
         <Card>

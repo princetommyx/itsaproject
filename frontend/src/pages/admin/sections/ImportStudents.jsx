@@ -29,48 +29,51 @@ export default function ImportStudents() {
   }
 
   return (
-    <Card>
-      <h2 className="mb-2 text-lg font-semibold text-slate-800">Import Students via CSV</h2>
-      <p className="mb-4 text-sm text-slate-500">
-        CSV columns: <code className="rounded bg-slate-100 px-1">Student Name</code>,{' '}
-        <code className="rounded bg-slate-100 px-1">Index Number</code>,{' '}
-        <code className="rounded bg-slate-100 px-1">Email</code>,{' '}
-        <code className="rounded bg-slate-100 px-1">Date of Birth</code>. The hashed DOB (YYYYMMDD) becomes
-        each student's initial password.
-      </p>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold text-slate-800">Import Students</h1>
+      <Card>
+        <h2 className="mb-2 text-lg font-semibold text-slate-800">Import Students via CSV</h2>
+        <p className="mb-4 text-sm text-slate-500">
+          CSV columns: <code className="rounded bg-slate-100 px-1">Student Name</code>,{' '}
+          <code className="rounded bg-slate-100 px-1">Index Number</code>,{' '}
+          <code className="rounded bg-slate-100 px-1">Email</code>,{' '}
+          <code className="rounded bg-slate-100 px-1">Date of Birth</code>. The hashed DOB (YYYYMMDD) becomes
+          each student's initial password.
+        </p>
 
-      {error && <Alert>{error}</Alert>}
+        {error && <Alert>{error}</Alert>}
 
-      <form className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
-        <input
-          type="file"
-          accept=".csv"
-          onChange={(e) => setFile(e.target.files[0])}
-          className="text-sm"
-          required
-        />
-        <Button type="submit" className="sm:shrink-0" disabled={submitting || !file}>
-          {submitting ? 'Importing...' : 'Import'}
-        </Button>
-      </form>
+        <form className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="text-sm"
+            required
+          />
+          <Button type="submit" className="sm:shrink-0" disabled={submitting || !file}>
+            {submitting ? 'Importing...' : 'Import'}
+          </Button>
+        </form>
 
-      {result && (
-        <div className="mt-6 space-y-3">
-          <Alert variant="success">{result.created.length} student(s) imported successfully.</Alert>
-          {result.errors.length > 0 && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              <p className="mb-1 font-semibold">Rows with errors:</p>
-              <ul className="list-inside list-disc">
-                {result.errors.map((e, i) => (
-                  <li key={i}>
-                    Row {e.row}: {e.errors.join(', ')}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-    </Card>
+        {result && (
+          <div className="mt-6 space-y-3">
+            <Alert variant="success">{result.created.length} student(s) imported successfully.</Alert>
+            {result.errors.length > 0 && (
+              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                <p className="mb-1 font-semibold">Rows with errors:</p>
+                <ul className="list-inside list-disc">
+                  {result.errors.map((e, i) => (
+                    <li key={i}>
+                      Row {e.row}: {e.errors.join(', ')}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+      </Card>
+    </div>
   )
 }

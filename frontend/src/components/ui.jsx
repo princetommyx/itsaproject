@@ -116,6 +116,20 @@ export function StatCard({ label, value, variant = 'blue' }) {
   )
 }
 
+export function HeroStatCard({ label, value, caption }) {
+  return (
+    <div className="rounded-2xl bg-gradient-to-br from-upsa-blue to-upsa-blue-dark p-6 text-white">
+      <div className="flex items-end justify-between gap-4">
+        <p className="text-lg font-semibold">{label}</p>
+        <div className="text-right">
+          <p className="text-4xl font-bold">{value}</p>
+          {caption && <p className="mt-1 text-sm text-white/70">{caption}</p>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function Alert({ children, variant = 'error' }) {
   const variants = {
     error: 'bg-red-50 text-red-700 border-red-200',
