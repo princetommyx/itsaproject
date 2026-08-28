@@ -20,8 +20,8 @@ export default function Layout({ children }) {
             </div>
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-white leading-tight">
-                <span className="hidden sm:inline">UPSA Final Year Project Portal</span>
-                <span className="sm:hidden">UPSA Portal</span>
+                <span className="hidden sm:inline">UPSA Final Year Project Management System</span>
+                <span className="sm:hidden">UPSA FYP System</span>
               </p>
               <p className="text-xs text-blue-100 leading-tight capitalize">{user?.role}</p>
             </div>
