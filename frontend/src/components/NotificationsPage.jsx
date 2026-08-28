@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../api/client'
 import { Button, Card, EmptyState, PageHeading, stagger } from './ui'
 import { SkeletonList } from './Skeleton'
@@ -48,7 +49,15 @@ function formatTime(iso) {
 
 export default function NotificationsPage({ apiPrefix, role }) {
   const navigate = useNavigate()
-  const [notifications, setNotifications] = useState(null)
+  const { data: rawNotifications, error: swrError, mutate } = useSWR(`${apiPrefix}/notifications`)
+  
+  const notifications = useMemo(() => {
+    if (!rawNotifications) return null
+    return rawNotifications.filter((n) => describeNotification(n) !== null)
+  }, [rawNotifications])
+
+  const isLoading = !rawNotifications && !swrError
+
   const [filter, setFilter] = useState('all')
   const introKey = `fyp_notif_intro_dismissed_${role}`
   const [showIntro, setShowIntro] = useState(() => {
@@ -58,19 +67,6 @@ export default function NotificationsPage({ apiPrefix, role }) {
       return false
     }
   })
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  function load() {
-    // Skip any notification whose kind this build doesn't know how to render
-    // (e.g. a legacy row from before a kind existed) rather than counting it
-    // as unread with nothing visible to show for it.
-    client.get(`${apiPrefix}/notifications`).then((res) => {
-      setNotifications(res.data.filter((n) => describeNotification(n) !== null))
-    })
-  }
 
   function dismissIntro(permanent) {
     try {
@@ -86,7 +82,10 @@ export default function NotificationsPage({ apiPrefix, role }) {
     const info = describeNotification(n)
     if (!n.read_at) {
       await client.post(`${apiPrefix}/notifications/${n.id}/read`)
-      setNotifications((prev) => prev.map((x) => (x.id === n.id ? { ...x, read_at: new Date().toISOString() } : x)))
+      mutate(
+        (prev) => prev?.map((x) => (x.id === n.id ? { ...x, read_at: new Date().toISOString() } : x)),
+        { revalidate: false }
+      )
     }
     if (info?.link) navigate(info.link)
   }
@@ -142,7 +141,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
       </div>
 
       <Card>
-        {notifications === null ? (
+        {isLoading ? (
           <SkeletonList rows={3} />
         ) : visible.length === 0 ? (
           <EmptyState
