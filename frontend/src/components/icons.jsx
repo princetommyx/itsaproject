@@ -77,3 +77,31 @@ export function FolderIcon() {
     </svg>
   )
 }
+
+export function UploadCloudIcon() {
+  return (
+    <svg {...base}>
+      <path d="M7 18a4.5 4.5 0 0 1-.5-8.97A5.5 5.5 0 0 1 17.2 8.06 4 4 0 0 1 17 16" />
+      <path d="M12 12v7" />
+      <path d="M9.5 14.5 12 12l2.5 2.5" />
+    </svg>
+  )
+}
+
+export function FileSpreadsheetIcon() {
+  return (
+    <svg {...base}>
+      <path d="M6 2h9l4 4v15a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1Z" />
+      <path d="M15 2v4h4" />
+      <path d="M8 13h8M8 17h8M8 9h2" />
+    </svg>
+  )
+}
+
+export function XIcon() {
+  return (
+    <svg {...base}>
+      <path d="M6 6l12 12M18 6L6 18" />
+    </svg>
+  )
+}

@@ -1,26 +1,64 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import client from '../../../api/client'
 import { Alert, Button, Card } from '../../../components/ui'
+import { FileSpreadsheetIcon, UploadCloudIcon, XIcon } from '../../../components/icons'
+
+function formatSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 
 export default function ImportStudents() {
   const [file, setFile] = useState(null)
+  const [dragging, setDragging] = useState(false)
+  const [progress, setProgress] = useState(0)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const inputRef = useRef(null)
 
-  async function handleSubmit(e) {
+  function pickFile(candidate) {
+    if (!candidate) return
+    if (!candidate.name.toLowerCase().endsWith('.csv')) {
+      setError('Please choose a .csv file.')
+      return
+    }
+    setError('')
+    setResult(null)
+    setFile(candidate)
+  }
+
+  function handleDrop(e) {
     e.preventDefault()
+    setDragging(false)
+    pickFile(e.dataTransfer.files[0])
+  }
+
+  function discard() {
+    setFile(null)
+    setProgress(0)
+    setResult(null)
+    setError('')
+    if (inputRef.current) inputRef.current.value = ''
+  }
+
+  async function handleImport() {
     if (!file) return
     setError('')
     setResult(null)
     setSubmitting(true)
+    setProgress(0)
     try {
       const formData = new FormData()
       formData.append('file', file)
       const res = await client.post('/admin/students/import', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
+        onUploadProgress: (e) => setProgress(Math.round((e.loaded / e.total) * 100)),
       })
       setResult(res.data)
+      setFile(null)
+      if (inputRef.current) inputRef.current.value = ''
     } catch (err) {
       setError(err.response?.data?.message || 'Import failed.')
     } finally {
@@ -31,30 +69,85 @@ export default function ImportStudents() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-slate-800">Import Students</h1>
-      <Card>
-        <h2 className="mb-2 text-lg font-semibold text-slate-800">Import Students via CSV</h2>
-        <p className="mb-4 text-sm text-slate-500">
-          CSV columns: <code className="rounded bg-slate-100 px-1">Student Name</code>,{' '}
-          <code className="rounded bg-slate-100 px-1">Index Number</code>,{' '}
-          <code className="rounded bg-slate-100 px-1">Email</code>,{' '}
-          <code className="rounded bg-slate-100 px-1">Date of Birth</code>. The hashed DOB (YYYYMMDD) becomes
-          each student's initial password.
-        </p>
+      <Card className="max-w-xl">
+        <h2 className="text-lg font-semibold text-slate-800">Upload CSV File</h2>
+        <p className="mb-4 text-sm text-slate-500">Bulk-create student accounts from a CSV file.</p>
 
         {error && <Alert>{error}</Alert>}
 
-        <form className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center" onSubmit={handleSubmit}>
+        <div
+          onDragOver={(e) => {
+            e.preventDefault()
+            setDragging(true)
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+          onClick={() => inputRef.current?.click()}
+          className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
+            dragging ? 'border-upsa-blue bg-blue-50' : 'border-slate-300 hover:border-slate-400'
+          }`}
+        >
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-upsa-blue">
+            <UploadCloudIcon />
+          </span>
+          <div>
+            <p className="text-sm font-medium text-slate-700">Drag CSV here</p>
+            <p className="text-xs text-slate-400">or, click to browse (4 MB max)</p>
+          </div>
           <input
+            ref={inputRef}
             type="file"
             accept=".csv"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="text-sm"
-            required
+            className="hidden"
+            onChange={(e) => pickFile(e.target.files[0])}
           />
-          <Button type="submit" className="sm:shrink-0" disabled={submitting || !file}>
-            {submitting ? 'Importing...' : 'Import'}
+        </div>
+
+        <p className="mt-3 text-xs text-slate-400">
+          Columns required: <code className="rounded bg-slate-100 px-1">Student Name</code>,{' '}
+          <code className="rounded bg-slate-100 px-1">Index Number</code>,{' '}
+          <code className="rounded bg-slate-100 px-1">Email</code>,{' '}
+          <code className="rounded bg-slate-100 px-1">Date of Birth</code>. The hashed DOB (YYYYMMDD)
+          becomes each student's initial password.
+        </p>
+
+        {file && (
+          <div className="mt-4 flex items-center gap-3 rounded-lg border border-slate-200 p-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+              <FileSpreadsheetIcon />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-slate-700">{file.name}</p>
+              <p className="text-xs text-slate-400">{formatSize(file.size)}</p>
+              {submitting && (
+                <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-100">
+                  <div
+                    className="h-1.5 rounded-full bg-upsa-blue transition-all"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              )}
+            </div>
+            {!submitting && (
+              <button
+                onClick={discard}
+                aria-label="Remove file"
+                className="shrink-0 rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+              >
+                <XIcon />
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="mt-6 flex justify-end gap-2">
+          <Button variant="secondary" onClick={discard} disabled={!file || submitting}>
+            Discard
           </Button>
-        </form>
+          <Button onClick={handleImport} disabled={!file || submitting}>
+            {submitting ? `Importing... ${progress}%` : 'Import'}
+          </Button>
+        </div>
 
         {result && (
           <div className="mt-6 space-y-3">
