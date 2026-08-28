@@ -48,6 +48,27 @@ it('rejects invalid credentials', function () {
     ])->assertUnprocessable();
 });
 
+it('transparently upgrades a password hashed at an old, more expensive bcrypt cost on next login', function () {
+    $student = User::factory()->student()->create(['university_id' => 'UPSA/3000001']);
+
+    // Simulate a hash created back when BCRYPT_ROUNDS was 12, written
+    // directly so it bypasses the model's "hashed" cast — that cast
+    // rejects assigning a hash costlier than the current config, which is
+    // exactly the pre-existing-data scenario this test needs to set up.
+    DB::table('users')->where('id', $student->id)->update([
+        'password' => password_hash('20000101', PASSWORD_BCRYPT, ['cost' => 12]),
+    ]);
+
+    $this->postJson('/api/login', [
+        'identifier' => 'UPSA/3000001',
+        'password' => '20000101',
+    ])->assertOk();
+
+    $student->refresh();
+    expect(Hash::needsRehash($student->password))->toBeFalse();
+    expect(Hash::check('20000101', $student->password))->toBeTrue();
+});
+
 it('rejects login for an identifier that does not exist, same as a wrong password', function () {
     $this->postJson('/api/login', [
         'identifier' => 'UPSA/9999999',

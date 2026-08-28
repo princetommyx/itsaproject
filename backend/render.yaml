@@ -35,6 +35,13 @@ services:
       - key: APP_KEY
         generateValue: true # Generates a random secure string. Ensure your Laravel app can use this base64 formatted key or set it manually in Dashboard.
 
+      # bcrypt cost for password hashing. 10 rather than Laravel's default
+      # of 12 — cost 12 can take 1-3s per login on this free plan's
+      # constrained CPU, since bcrypt is deliberately slow. 10 is still a
+      # normal production-grade cost.
+      - key: BCRYPT_ROUNDS
+        value: "10"
+
       # REQUIRED: the deployed frontend's origin, for CORS. Without this,
       # every request from the browser will be silently rejected even if
       # the backend itself is healthy.

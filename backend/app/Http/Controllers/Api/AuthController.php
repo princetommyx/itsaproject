@@ -47,6 +47,16 @@ class AuthController extends Controller
             ]);
         }
 
+        // Passwords hashed before BCRYPT_ROUNDS was lowered (e.g. by the CSV
+        // import) still carry the old, slower cost — bcrypt encodes its own
+        // cost in the stored hash, so Hash::check keeps honoring whatever
+        // cost a hash was made with until it's rehashed. Opportunistically
+        // upgrade it here so every account migrates to the cheaper cost the
+        // next time it logs in successfully, instead of staying slow forever.
+        if (Hash::needsRehash($user->password)) {
+            $user->forceFill(['password' => Hash::make($validated['password'])])->save();
+        }
+
         $token = $user->createToken('auth-token')->plainTextToken;
 
         LoginLog::create([
