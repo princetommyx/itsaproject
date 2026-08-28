@@ -42,3 +42,19 @@ body {
 .animate-toast-out {
   animation: toast-out 0.18s ease-in forwards;
 }
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-dot-pulse {
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
