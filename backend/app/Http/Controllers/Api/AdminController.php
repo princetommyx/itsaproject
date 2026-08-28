@@ -22,14 +22,23 @@ class AdminController extends Controller
      */
     public function dashboard()
     {
+        $projectCounts = Project::selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $userCounts = User::selectRaw('role, count(*) as count')
+            ->whereIn('role', ['student', 'assessor'])
+            ->groupBy('role')
+            ->pluck('count', 'role');
+
         return response()->json([
-            'total_submitted' => Project::where('status', '!=', 'draft')->count(),
-            'pending' => Project::where('status', 'pending')->count(),
-            'unassigned' => Project::where('status', 'submitted_unassigned')->count(),
-            'approved' => Project::where('status', 'approved')->count(),
-            'refine' => Project::where('status', 'refine')->count(),
-            'total_students' => User::where('role', 'student')->count(),
-            'total_assessors' => User::where('role', 'assessor')->count(),
+            'total_submitted' => $projectCounts->except('draft')->sum(),
+            'pending' => $projectCounts->get('pending', 0),
+            'unassigned' => $projectCounts->get('submitted_unassigned', 0),
+            'approved' => $projectCounts->get('approved', 0),
+            'refine' => $projectCounts->get('refine', 0),
+            'total_students' => $userCounts->get('student', 0),
+            'total_assessors' => $userCounts->get('assessor', 0),
         ]);
     }
 

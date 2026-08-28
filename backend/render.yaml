@@ -2,8 +2,25 @@ services:
   - type: web
     name: itsaproject-backend
     runtime: docker
-    region: oregon # Update to your preferred region (e.g., frankfurt, ohio, singapore)
-    plan: free # Can be starter, standard, etc.
+    region: oregon # Update to your preferred region (e.g., frankfurt, ohio, singapore) — pick one close to your database to cut per-query latency; see the DB_HOST note below.
+    # NOTE on the "long time to load dashboard / long time to log in" complaint:
+    # the free plan spins the service down after ~15 minutes with no traffic.
+    # The next request has to boot the whole container again, which routinely
+    # takes 30-60+ seconds before the login/dashboard call even starts — that's
+    # almost certainly what's being felt as slowness, not a bug in the app.
+    # Two ways to fix it for real:
+    #   1. Upgrade this service to at least the "starter" plan ($7/mo) — it
+    #      never spins down, so every request just hits a warm process.
+    #   2. Stay on free and ping https://<this-service>.onrender.com/up every
+    #      10-14 minutes from an external scheduler (e.g. cron-job.org) to
+    #      keep it warm. This works but is a workaround, not a fix — it still
+    #      cold-starts after Render's periodic maintenance restarts, and Render
+    #      may throttle services it detects are being kept artificially warm.
+    # A same-region choice above also matters even once it's warm: every DB
+    # query pays a network round trip to Supabase, so put this service in the
+    # same region as your Supabase project rather than leaving it at the
+    # oregon default if your database is elsewhere.
+    plan: free # Can be starter, standard, etc. — see the cold-start note above.
     # To deploy from a sub-directory, specify the root
     rootDir: backend
     envVars:
