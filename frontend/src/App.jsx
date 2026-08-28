@@ -15,6 +15,7 @@ import StudentProfile from './pages/student/StudentProfile'
 import StudentDocuments from './pages/student/StudentDocuments'
 import AssessorDashboard from './pages/assessor/AssessorDashboard'
 import ProjectReview from './pages/assessor/ProjectReview'
+import AssessorProfile from './pages/assessor/AssessorProfile'
 import Overview from './pages/admin/sections/Overview'
 import AllProjects from './pages/admin/sections/AllProjects'
 import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
@@ -23,6 +24,7 @@ import ImportStudents from './pages/admin/sections/ImportStudents'
 import StaffManagement from './pages/admin/sections/StaffManagement'
 import LoginLogs from './pages/admin/sections/LoginLogs'
 import Complaints from './pages/admin/sections/Complaints'
+import AdminProfile from './pages/admin/sections/AdminProfile'
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -58,6 +60,7 @@ export default function App() {
               <Route element={<Layout />}>
                 <Route path="/assessor" element={<AssessorDashboard />} />
                 <Route path="/assessor/projects/:id" element={<ProjectReview />} />
+                <Route path="/assessor/profile" element={<AssessorProfile />} />
               </Route>
             </Route>
 
@@ -71,6 +74,7 @@ export default function App() {
                 <Route path="staff" element={<StaffManagement />} />
                 <Route path="logs" element={<LoginLogs />} />
                 <Route path="complaints" element={<Complaints />} />
+                <Route path="profile" element={<AdminProfile />} />
               </Route>
             </Route>
 

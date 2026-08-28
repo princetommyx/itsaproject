@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import upsaLogo from '../assets/upsa-logo.png'
+import { Avatar } from './ui'
 import {
   BellIcon,
   BuildingIcon,
+  ChevronDownIcon,
   ClipboardIcon,
   DashboardIcon,
   FileSpreadsheetIcon,
   FolderIcon,
   LogIcon,
+  LogOutIcon,
   MessageIcon,
   UserCircleIcon,
   UsersIcon,
@@ -25,7 +28,10 @@ const NAV_LINKS = {
     { to: '/student/support', label: 'Support Tickets', icon: MessageIcon },
     { to: '/student/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
-  assessor: [{ to: '/assessor', label: 'Assigned Projects', icon: ClipboardIcon }],
+  assessor: [
+    { to: '/assessor', label: 'Assigned Projects', icon: ClipboardIcon },
+    { to: '/assessor/profile', label: 'My Profile', icon: UserCircleIcon },
+  ],
   admin: [
     { to: '/admin', label: 'Dashboard', icon: DashboardIcon },
     { section: 'Projects' },
@@ -37,7 +43,78 @@ const NAV_LINKS = {
     { section: 'System' },
     { to: '/admin/logs', label: 'Login Logs', icon: LogIcon },
     { to: '/admin/complaints', label: 'Complaints', icon: MessageIcon },
+    { to: '/admin/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
+}
+
+const PROFILE_PATH = {
+  student: '/student/profile',
+  assessor: '/assessor/profile',
+  admin: '/admin/profile',
+}
+
+function UserMenu({ user, onLogout }) {
+  const [open, setOpen] = useState(false)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false)
+    }
+    function handleKey(e) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    document.addEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleClick)
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [open])
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className="flex items-center gap-1.5 rounded-full py-0.5 pr-1.5 pl-0.5 hover:bg-slate-100"
+      >
+        <Avatar name={user?.name} className="h-8 w-8 text-[11px]" />
+        <span className={`text-slate-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}>
+          <ChevronDownIcon />
+        </span>
+      </button>
+
+      {open && (
+        <div
+          role="menu"
+          className="absolute top-full right-0 z-[60] mt-2 w-48 overflow-hidden rounded-2xl border border-slate-200/80 bg-white py-1.5 shadow-lg shadow-slate-900/10"
+        >
+          <Link
+            to={PROFILE_PATH[user?.role] || '/'}
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            <UserCircleIcon />
+            Profile
+          </Link>
+          <div className="mx-3 my-1 border-t border-slate-100" />
+          <button
+            onClick={() => {
+              setOpen(false)
+              onLogout()
+            }}
+            className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            <LogOutIcon />
+            Sign Out
+          </button>
+        </div>
+      )}
+    </div>
+  )
 }
 
 function MenuIcon() {
@@ -163,13 +240,16 @@ export default function Layout({ children }) {
         >
           <div className="flex items-center justify-between rounded-full bg-white px-4 py-2.5 shadow-md shadow-slate-200/70">
             <img src={upsaLogo} alt="UPSA" className="h-8 w-auto" />
-            <button
-              onClick={() => setDrawerOpen(true)}
-              aria-label="Open menu"
-              className="rounded-full p-2 text-slate-600 hover:bg-slate-100"
-            >
-              <MenuIcon />
-            </button>
+            <div className="flex items-center gap-1">
+              <UserMenu user={user} onLogout={handleLogout} />
+              <button
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Open menu"
+                className="rounded-full p-2 text-slate-600 hover:bg-slate-100"
+              >
+                <MenuIcon />
+              </button>
+            </div>
           </div>
         </header>
 
