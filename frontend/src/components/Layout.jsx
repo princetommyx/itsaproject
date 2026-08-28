@@ -4,7 +4,7 @@ import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
-import upsaLogo from '../assets/upsa-logo.png'
+import upsaLogoCompact from '../assets/upsa-logo-compact.png'
 import { Avatar } from './ui'
 import {
   BellIcon,
@@ -176,7 +176,7 @@ export default function Layout({ children }) {
         }`}
       >
         <div className="relative flex items-center gap-3 border-b border-white/10 px-5 py-4">
-          <img src={upsaLogo} alt="UPSA" className="h-8 w-auto shrink-0 rounded bg-white p-1" />
+          <img src={upsaLogoCompact} alt="UPSA" className="h-8 w-auto shrink-0 rounded bg-white p-1" />
           <div className="min-w-0 pr-8 md:pr-0">
             <p className="truncate text-sm font-semibold text-white leading-tight capitalize">{user?.role}</p>
           </div>
@@ -250,7 +250,7 @@ export default function Layout({ children }) {
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
         >
           <div className="flex items-center justify-between rounded-full bg-white px-4 py-2.5 shadow-md shadow-slate-200/70">
-            <img src={upsaLogo} alt="UPSA" className="h-8 w-auto" />
+            <img src={upsaLogoCompact} alt="UPSA" className="h-8 w-auto" />
             <div className="flex items-center gap-1">
               <UserMenu user={user} onLogout={handleLogout} />
               <button
