@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import client from '../../../api/client'
+import { useToast } from '../../../context/ToastContext'
 import { Alert, Button, Card } from '../../../components/ui'
 import { FileSpreadsheetIcon, UploadCloudIcon, XIcon } from '../../../components/icons'
 
@@ -10,6 +11,7 @@ function formatSize(bytes) {
 }
 
 export default function ImportStudents() {
+  const toast = useToast()
   const [file, setFile] = useState(null)
   const [dragging, setDragging] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -57,6 +59,7 @@ export default function ImportStudents() {
         onUploadProgress: (e) => setProgress(Math.round((e.loaded / e.total) * 100)),
       })
       setResult(res.data)
+      toast.success(`${res.data.created.length} student(s) imported.`)
       setFile(null)
       if (inputRef.current) inputRef.current.value = ''
     } catch (err) {

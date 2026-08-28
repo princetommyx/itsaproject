@@ -1,5 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import StudentLogin from './pages/StudentLogin'
@@ -29,42 +30,44 @@ function HomeRedirect() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/" element={<HomeRedirect />} />
-          <Route path="/login" element={<StudentLogin />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/change-password" element={<ChangePassword />} />
+      <ToastProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<HomeRedirect />} />
+            <Route path="/login" element={<StudentLogin />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/change-password" element={<ChangePassword />} />
 
-          <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-            <Route element={<Layout />}>
-              <Route path="/student" element={<StudentDashboard />} />
-              <Route path="/student/support" element={<StudentSupport />} />
+            <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+              <Route element={<Layout />}>
+                <Route path="/student" element={<StudentDashboard />} />
+                <Route path="/student/support" element={<StudentSupport />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route element={<ProtectedRoute allowedRoles={['assessor']} />}>
-            <Route element={<Layout />}>
-              <Route path="/assessor" element={<AssessorDashboard />} />
-              <Route path="/assessor/projects/:id" element={<ProjectReview />} />
+            <Route element={<ProtectedRoute allowedRoles={['assessor']} />}>
+              <Route element={<Layout />}>
+                <Route path="/assessor" element={<AssessorDashboard />} />
+                <Route path="/assessor/projects/:id" element={<ProjectReview />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route path="/admin" element={<AdminEntry />}>
-            <Route element={<Layout />}>
-              <Route index element={<Overview />} />
-              <Route path="assignments" element={<Assignments />} />
-              <Route path="import" element={<ImportStudents />} />
-              <Route path="staff" element={<StaffManagement />} />
-              <Route path="logs" element={<LoginLogs />} />
-              <Route path="complaints" element={<Complaints />} />
+            <Route path="/admin" element={<AdminEntry />}>
+              <Route element={<Layout />}>
+                <Route index element={<Overview />} />
+                <Route path="assignments" element={<Assignments />} />
+                <Route path="import" element={<ImportStudents />} />
+                <Route path="staff" element={<StaffManagement />} />
+                <Route path="logs" element={<LoginLogs />} />
+                <Route path="complaints" element={<Complaints />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AuthProvider>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </AuthProvider>
+      </ToastProvider>
     </BrowserRouter>
   )
 }

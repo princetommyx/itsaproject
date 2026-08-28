@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import client from '../../api/client'
+import { useToast } from '../../context/ToastContext'
 import { Badge, Button, Card, Input, Textarea } from '../../components/ui'
 
 export default function StudentSupport() {
+  const toast = useToast()
   const [complaints, setComplaints] = useState(null)
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
@@ -21,6 +23,7 @@ export default function StudentSupport() {
     setSubmitting(true)
     try {
       await client.post('/student/complaints', { subject, message })
+      toast.success('Support ticket submitted.')
       setSubject('')
       setMessage('')
       load()

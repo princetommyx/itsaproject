@@ -1,24 +1,24 @@
 import { useState } from 'react'
 import client from '../../../api/client'
+import { useToast } from '../../../context/ToastContext'
 import { Alert, Button, Card, Input } from '../../../components/ui'
 
 export default function StaffManagement() {
+  const toast = useToast()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('assessor')
   const [password, setPassword] = useState('')
-  const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    setMessage('')
     setSubmitting(true)
     try {
       await client.post('/admin/staff', { name, email, role, password })
-      setMessage(`${role === 'admin' ? 'Administrator' : 'Assessor'} account created for ${email}.`)
+      toast.success(`${role === 'admin' ? 'Administrator' : 'Assessor'} account created for ${email}.`)
       setName('')
       setEmail('')
       setPassword('')
@@ -39,7 +39,6 @@ export default function StaffManagement() {
         </p>
 
         {error && <Alert>{error}</Alert>}
-        {message && <Alert variant="success">{message}</Alert>}
 
         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
           <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} required />

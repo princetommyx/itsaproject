@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
+import { useToast } from '../../../context/ToastContext'
 import { Button, Card, HeroStatCard, StatCard } from '../../../components/ui'
 
 const METRICS = [
@@ -12,6 +13,7 @@ const METRICS = [
 ]
 
 export default function Overview() {
+  const toast = useToast()
   const [stats, setStats] = useState(null)
   const [exporting, setExporting] = useState(false)
 
@@ -30,6 +32,7 @@ export default function Overview() {
       document.body.appendChild(link)
       link.click()
       link.remove()
+      toast.success('Project mapping exported.')
     } finally {
       setExporting(false)
     }

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
+import { useToast } from '../../context/ToastContext'
 import { Alert, Button, Card, Input, StatCard, Textarea, STATUS_LABELS, STATUS_VARIANTS } from '../../components/ui'
 
 export default function StudentDashboard() {
@@ -35,6 +36,7 @@ export default function StudentDashboard() {
 }
 
 function CreateProjectForm({ onCreated, onError }) {
+  const toast = useToast()
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -45,6 +47,7 @@ function CreateProjectForm({ onCreated, onError }) {
     setSubmitting(true)
     try {
       await client.post('/student/projects', { title, description })
+      toast.success('Project draft created.')
       onCreated()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not create project.')
@@ -77,6 +80,7 @@ function CreateProjectForm({ onCreated, onError }) {
 }
 
 function ProjectPanel({ project, user, onChange, onError }) {
+  const toast = useToast()
   const members = project.members
   const isLeader = members.some((m) => m.student_id === user.id && m.is_leader)
   const editable = ['draft', 'refine'].includes(project.status)
@@ -126,7 +130,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
                 {isLeader && editable && !m.is_leader && (
                   <button
                     className="shrink-0 text-xs text-red-600 hover:underline"
-                    onClick={() => removeMember(project.id, m.id, onChange, onError)}
+                    onClick={() => removeMember(project.id, m.id, onChange, onError, toast)}
                   >
                     Remove
                   </button>
@@ -136,27 +140,30 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </ul>
         </div>
 
-        {isLeader && editable && <AddMemberForm projectId={project.id} onChange={onChange} onError={onError} />}
+        {isLeader && editable && (
+          <AddMemberForm projectId={project.id} onChange={onChange} onError={onError} toast={toast} />
+        )}
 
         {isLeader && editable && (
-          <EditAndSubmit project={project} onChange={onChange} onError={onError} />
+          <EditAndSubmit project={project} onChange={onChange} onError={onError} toast={toast} />
         )}
       </Card>
     </div>
   )
 }
 
-async function removeMember(projectId, memberId, onChange, onError) {
+async function removeMember(projectId, memberId, onChange, onError, toast) {
   onError('')
   try {
     await client.delete(`/student/projects/${projectId}/members/${memberId}`)
+    toast.success('Group member removed.')
     onChange()
   } catch (err) {
     onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not remove member.')
   }
 }
 
-function AddMemberForm({ projectId, onChange, onError }) {
+function AddMemberForm({ projectId, onChange, onError, toast }) {
   const [universityId, setUniversityId] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const inputRef = useRef(null)
@@ -167,6 +174,7 @@ function AddMemberForm({ projectId, onChange, onError }) {
     setSubmitting(true)
     try {
       await client.post(`/student/projects/${projectId}/members`, { university_id: universityId })
+      toast.success(`Added ${universityId} to the group.`)
       setUniversityId('')
       onChange()
       inputRef.current?.focus()
@@ -202,7 +210,7 @@ function AddMemberForm({ projectId, onChange, onError }) {
   )
 }
 
-function EditAndSubmit({ project, onChange, onError }) {
+function EditAndSubmit({ project, onChange, onError, toast }) {
   const [title, setTitle] = useState(project.title)
   const [description, setDescription] = useState(project.description)
   const [submitting, setSubmitting] = useState(false)
@@ -213,6 +221,7 @@ function EditAndSubmit({ project, onChange, onError }) {
     setSubmitting(true)
     try {
       await client.put(`/student/projects/${project.id}`, { title, description })
+      toast.success('Changes saved.')
       onChange()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not save changes.')
@@ -226,6 +235,7 @@ function EditAndSubmit({ project, onChange, onError }) {
     setSubmitting(true)
     try {
       await client.post(`/student/projects/${project.id}/submit`)
+      toast.success('Project submitted for review.')
       onChange()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not submit project.')

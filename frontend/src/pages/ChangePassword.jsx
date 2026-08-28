@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
 
@@ -19,6 +20,7 @@ function Field({ label, ...props }) {
 
 export default function ChangePassword() {
   const { user, updateUser, logout } = useAuth()
+  const toast = useToast()
   const navigate = useNavigate()
   const [currentPassword, setCurrentPassword] = useState('')
   const [password, setPassword] = useState('')
@@ -37,6 +39,7 @@ export default function ChangePassword() {
         password_confirmation: confirmation,
       })
       updateUser({ is_first_login: false })
+      toast.success('Password updated.')
       navigate(`/${user.role}`)
     } catch (err) {
       const messages = err.response?.data?.errors

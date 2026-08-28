@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
+import { useToast } from '../../../context/ToastContext'
 import { Alert, Button, Card } from '../../../components/ui'
 
 export default function Assignments() {
+  const toast = useToast()
   const [projects, setProjects] = useState(null)
   const [assessors, setAssessors] = useState([])
   const [selection, setSelection] = useState({})
@@ -26,6 +28,8 @@ export default function Assignments() {
     }
     try {
       await client.post(`/admin/projects/${projectId}/assign`, { assessor_id: assessorId })
+      const assessorName = assessors.find((a) => String(a.id) === String(assessorId))?.name
+      toast.success(assessorName ? `Assessor ${assessorName} assigned.` : 'Assessor assigned.')
       load()
     } catch (err) {
       setError(err.response?.data?.message || 'Could not assign assessor.')

@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import client from '../../api/client'
+import { useToast } from '../../context/ToastContext'
 import { Alert, Badge, Button, Card, Textarea } from '../../components/ui'
 
 export default function ProjectReview() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const toast = useToast()
   const [project, setProject] = useState(null)
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
@@ -28,6 +30,7 @@ export default function ProjectReview() {
     setSubmitting(true)
     try {
       await client.post(`/assessor/projects/${id}/decide`, { decision, feedback })
+      toast.success(decision === 'approved' ? 'Project approved.' : 'Project sent back for refinement.')
       navigate('/assessor')
     } catch (err) {
       setError(err.response?.data?.message || 'Could not submit decision.')

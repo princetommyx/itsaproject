@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
-import { Badge, Card } from '../../../components/ui'
+import { useToast } from '../../../context/ToastContext'
+import { Badge, Card, STATUS_LABELS } from '../../../components/ui'
 
 const STATUSES = ['open', 'in_progress', 'resolved']
 
 export default function Complaints() {
+  const toast = useToast()
   const [complaints, setComplaints] = useState(null)
 
   useEffect(() => {
@@ -17,6 +19,7 @@ export default function Complaints() {
 
   async function updateStatus(id, status) {
     await client.put(`/admin/complaints/${id}`, { status })
+    toast.success(`Ticket marked ${STATUS_LABELS[status] || status}.`)
     load()
   }
 

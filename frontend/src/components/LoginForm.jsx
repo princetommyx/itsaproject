@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import AuthShell from './AuthShell'
 import { Alert } from './ui'
 
@@ -26,6 +27,7 @@ export default function LoginForm({
   children,
 }) {
   const { login, commitSession, discardSession } = useAuth()
+  const toast = useToast()
   const navigate = useNavigate()
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
@@ -50,6 +52,7 @@ export default function LoginForm({
       if (user.is_first_login) {
         navigate('/change-password')
       } else {
+        toast.success(`Welcome back, ${user.name.split(' ')[0]}.`)
         navigate(`/${user.role}`)
       }
     } catch (err) {

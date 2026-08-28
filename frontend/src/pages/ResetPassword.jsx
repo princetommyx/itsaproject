@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import client from '../api/client'
+import { useToast } from '../context/ToastContext'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
 
@@ -18,6 +19,7 @@ function Field({ label, ...props }) {
 
 export default function ResetPassword() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [universityId, setUniversityId] = useState('')
   const [token, setToken] = useState('')
   const [password, setPassword] = useState('')
@@ -36,6 +38,7 @@ export default function ResetPassword() {
         password,
         password_confirmation: confirmation,
       })
+      toast.success('Password reset. Please sign in.')
       navigate('/login')
     } catch (err) {
       const messages = err.response?.data?.errors
