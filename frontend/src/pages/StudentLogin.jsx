@@ -4,7 +4,7 @@ import LoginForm from '../components/LoginForm'
 export default function StudentLogin() {
   return (
     <LoginForm
-      heading="Welcome to UPSA Student Portal"
+      heading="Welcome to UPSA FYP System"
       identifierLabel="Index Number"
       identifierPlaceholder=""
       identifierAutoComplete="username"

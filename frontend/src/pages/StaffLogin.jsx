@@ -4,7 +4,7 @@ import LoginForm from '../components/LoginForm'
 export default function StaffLogin() {
   return (
     <LoginForm
-      heading="Welcome to UPSA Staff Portal"
+      heading="Welcome to UPSA FYP System"
       identifierLabel="Official Email"
       identifierPlaceholder="e.g. j.ofoeda@upsa.edu.gh"
       identifierAutoComplete="username"
