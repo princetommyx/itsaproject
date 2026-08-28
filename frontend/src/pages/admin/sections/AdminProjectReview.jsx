@@ -4,6 +4,7 @@ import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Alert, Avatar, Badge, Button, Card, Textarea } from '../../../components/ui'
 import { Skeleton, SkeletonCard } from '../../../components/Skeleton'
+import StatusTimeline from '../../../components/StatusTimeline'
 
 export default function AdminProjectReview() {
   const { id } = useParams()
@@ -61,6 +62,10 @@ export default function AdminProjectReview() {
           <Badge status={project.status} />
         </div>
         <p className="whitespace-pre-wrap text-sm text-slate-600">{project.description}</p>
+
+        <div className="mt-5 border-t border-slate-100 pt-5">
+          <StatusTimeline status={project.status} />
+        </div>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <div>

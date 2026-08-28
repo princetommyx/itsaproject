@@ -12,6 +12,7 @@ import {
   FolderIcon,
   LogIcon,
   MessageIcon,
+  UserCircleIcon,
   UsersIcon,
 } from './icons'
 
@@ -20,6 +21,7 @@ const NAV_LINKS = {
     { to: '/student', label: 'My Project', icon: FolderIcon },
     { to: '/student/notifications', label: 'Notifications', icon: BellIcon },
     { to: '/student/support', label: 'Support Tickets', icon: MessageIcon },
+    { to: '/student/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
   assessor: [{ to: '/assessor', label: 'Assigned Projects', icon: ClipboardIcon }],
   admin: [

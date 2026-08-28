@@ -15,6 +15,7 @@ import {
   STATUS_VARIANTS,
 } from '../../components/ui'
 import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skeleton'
+import StatusTimeline from '../../components/StatusTimeline'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -120,7 +121,11 @@ function ProjectPanel({ project, user, onChange, onError }) {
           <p className="mt-1 text-sm text-slate-500">{project.description}</p>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="mt-5 border-t border-slate-100 pt-5">
+          <StatusTimeline status={project.status} />
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
           <StatCard
             label="Status"
             value={STATUS_LABELS[project.status] || project.status}

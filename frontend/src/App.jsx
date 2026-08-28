@@ -11,6 +11,7 @@ import ResetPassword from './pages/ResetPassword'
 import StudentDashboard from './pages/student/StudentDashboard'
 import StudentSupport from './pages/student/StudentSupport'
 import StudentNotifications from './pages/student/StudentNotifications'
+import StudentProfile from './pages/student/StudentProfile'
 import AssessorDashboard from './pages/assessor/AssessorDashboard'
 import ProjectReview from './pages/assessor/ProjectReview'
 import Overview from './pages/admin/sections/Overview'
@@ -47,6 +48,7 @@ export default function App() {
                 <Route path="/student" element={<StudentDashboard />} />
                 <Route path="/student/notifications" element={<StudentNotifications />} />
                 <Route path="/student/support" element={<StudentSupport />} />
+                <Route path="/student/profile" element={<StudentProfile />} />
               </Route>
             </Route>
 

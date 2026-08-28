@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Button, HeroStatCard, PageHeading, StatCard } from '../../../components/ui'
+import { Button, Card, HeroStatCard, PageHeading, StatCard } from '../../../components/ui'
 import { SkeletonCard, SkeletonHero, SkeletonStatCards } from '../../../components/Skeleton'
+import StatusBreakdownChart from '../../../components/StatusBreakdownChart'
 
-const METRICS = [
+const STATUS_ROWS = [
   { key: 'unassigned', label: 'Awaiting Assignment', variant: 'gold' },
   { key: 'pending', label: 'Under Review', variant: 'blue' },
   { key: 'approved', label: 'Approved', variant: 'violet' },
   { key: 'refine', label: 'Needs Refinement', variant: 'pink' },
+]
+
+const PEOPLE_METRICS = [
   { key: 'total_students', label: 'Total Students', variant: 'gold' },
   { key: 'total_assessors', label: 'Total Assessors', variant: 'blue' },
 ]
@@ -69,11 +73,16 @@ export default function Overview() {
 
       <HeroStatCard label="Total Projects Submitted" value={stats.total_submitted} caption="All-time" />
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {METRICS.map((m) => (
+      <div className="grid gap-4 sm:grid-cols-2">
+        {PEOPLE_METRICS.map((m) => (
           <StatCard key={m.key} label={m.label} value={stats[m.key]} variant={m.variant} />
         ))}
       </div>
+
+      <Card>
+        <h2 className="mb-4 text-lg font-semibold text-slate-800">Projects by Status</h2>
+        <StatusBreakdownChart rows={STATUS_ROWS.map((r) => ({ ...r, value: stats[r.key] }))} />
+      </Card>
     </div>
   )
 }
