@@ -92,7 +92,7 @@ export default function LoginForm({
         {submitting && (
           <div className="flex flex-col items-center gap-2 pt-2" aria-live="polite">
             <DotSpinner size={44} />
-            <p className="text-xs text-slate-400">Checking your details...</p>
+            <p className="text-xs text-slate-400">Logging you in...</p>
           </div>
         )}
       </form>
