@@ -1,13 +1,11 @@
 import { createContext, useCallback, useContext, useRef, useState } from 'react'
 
 const ToastContext = createContext(null)
-const ToastActiveContext = createContext(false)
 
 let nextId = 1
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
-  const hasVisibleToast = toasts.some((t) => !t.leaving)
   const autoTimers = useRef({})
   const removeTimers = useRef({})
 
@@ -48,7 +46,7 @@ export function ToastProvider({ children }) {
 
   return (
     <ToastContext.Provider value={toast}>
-      <ToastActiveContext.Provider value={hasVisibleToast}>{children}</ToastActiveContext.Provider>
+      {children}
       <ToastViewport toasts={toasts} onDismiss={dismiss} />
     </ToastContext.Provider>
   )
@@ -158,11 +156,4 @@ export function useToast() {
   const ctx = useContext(ToastContext)
   if (!ctx) throw new Error('useToast must be used within ToastProvider')
   return ctx
-}
-
-// Lets layouts reserve just enough extra space for the toast viewport while
-// a toast is actually showing, instead of permanently padding every page for
-// a gap that's empty almost all the time.
-export function useHasVisibleToast() {
-  return useContext(ToastActiveContext)
 }
