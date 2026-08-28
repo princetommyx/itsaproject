@@ -128,17 +128,19 @@ export default function Layout({ children }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header
-          className="flex items-center gap-3 border-b border-slate-200 bg-white px-4 py-3 md:hidden"
+          className="sticky top-0 z-20 bg-slate-100 px-4 pb-3 md:hidden"
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
         >
-          <button
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Open menu"
-            className="rounded-md p-2 text-slate-600 hover:bg-slate-100"
-          >
-            <MenuIcon />
-          </button>
-          <span className="text-sm font-semibold text-slate-800">UPSA FYP System</span>
+          <div className="flex items-center justify-between rounded-full bg-white px-4 py-2.5 shadow-md shadow-slate-200/70">
+            <img src={upsaLogo} alt="UPSA" className="h-8 w-auto" />
+            <button
+              onClick={() => setDrawerOpen(true)}
+              aria-label="Open menu"
+              className="rounded-full p-2 text-slate-600 hover:bg-slate-100"
+            >
+              <MenuIcon />
+            </button>
+          </div>
         </header>
 
         <main className="flex-1 px-4 py-6 sm:py-8">
