@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { describeNotification } from '../constants/notifications'
 import upsaLogo from '../assets/upsa-logo.png'
 import { Avatar } from './ui'
 import {
@@ -30,6 +31,7 @@ const NAV_LINKS = {
   ],
   assessor: [
     { to: '/assessor', label: 'Assigned Projects', icon: ClipboardIcon },
+    { to: '/assessor/notifications', label: 'Notifications', icon: BellIcon },
     { to: '/assessor/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
   admin: [
@@ -43,6 +45,7 @@ const NAV_LINKS = {
     { section: 'System' },
     { to: '/admin/logs', label: 'Login Logs', icon: LogIcon },
     { to: '/admin/complaints', label: 'Complaints', icon: MessageIcon },
+    { to: '/admin/notifications', label: 'Notifications', icon: BellIcon },
     { to: '/admin/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
 }
@@ -52,6 +55,14 @@ const PROFILE_PATH = {
   assessor: '/assessor/profile',
   admin: '/admin/profile',
 }
+
+const NOTIFICATIONS_PATH = {
+  student: '/student/notifications',
+  assessor: '/assessor/notifications',
+  admin: '/admin/notifications',
+}
+
+const API_PREFIX = { student: '/student', assessor: '/assessor', admin: '/admin' }
 
 function UserMenu({ user, onLogout }) {
   const [open, setOpen] = useState(false)
@@ -142,9 +153,9 @@ export default function Layout({ children }) {
   const links = NAV_LINKS[user?.role] || []
 
   useEffect(() => {
-    if (user?.role !== 'student') return
-    client.get('/student/notifications').then((res) => {
-      setUnreadCount(res.data.filter((n) => !n.read_at).length)
+    if (!user?.role || !API_PREFIX[user.role]) return
+    client.get(`${API_PREFIX[user.role]}/notifications`).then((res) => {
+      setUnreadCount(res.data.filter((n) => !n.read_at && describeNotification(n) !== null).length)
     })
   }, [user?.role, location.pathname])
 
@@ -210,7 +221,7 @@ export default function Layout({ children }) {
                       <link.icon />
                     </span>
                     <span className="flex-1">{link.label}</span>
-                    {link.to === '/student/notifications' && unreadCount > 0 && (
+                    {link.to === NOTIFICATIONS_PATH[user?.role] && unreadCount > 0 && (
                       <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-upsa-gold px-1 text-xs font-semibold text-upsa-blue-dark">
                         {unreadCount}
                       </span>

@@ -142,3 +142,32 @@ export function LogOutIcon() {
     </svg>
   )
 }
+
+export function CheckCircleIcon() {
+  return (
+    <svg {...base}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M8.5 12.5l2.5 2.5 5-5.5" />
+    </svg>
+  )
+}
+
+export function RefreshCwIcon() {
+  return (
+    <svg {...base}>
+      <path d="M3 12a9 9 0 0 1 15.4-6.4L21 8" />
+      <path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15.4 6.4L3 16" />
+      <path d="M3 21v-5h5" />
+    </svg>
+  )
+}
+
+export function InboxIcon() {
+  return (
+    <svg {...base}>
+      <path d="M3 12h4.5l1.5 3h6l1.5-3H21" />
+      <path d="M5.5 6h13l2.5 6v7a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 19v-7Z" />
+    </svg>
+  )
+}

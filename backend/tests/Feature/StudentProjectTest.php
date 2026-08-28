@@ -208,6 +208,46 @@ it('notifies the student in-app when their project is sent back for refinement',
     expect($response->json()[0]['read_at'])->toBeNull();
 });
 
+it('notifies every admin in-app when a project is submitted for the first time', function () {
+    $admin = User::factory()->admin()->create();
+    $otherAdmin = User::factory()->admin()->create();
+    $leader = studentUser();
+
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'draft']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/submit")
+        ->assertOk();
+
+    expect($admin->notifications()->count())->toBe(1);
+    expect($admin->notifications()->first()->data)->toMatchArray(['type' => 'project_submitted', 'kind' => 'submitted']);
+    expect($otherAdmin->notifications()->count())->toBe(1);
+});
+
+it('notifies the previous assessor in-app when a student resubmits after refine', function () {
+    $assessor = User::factory()->assessor()->create();
+    $admin = User::factory()->admin()->create();
+    $leader = studentUser();
+
+    $project = Project::create([
+        'title' => 'T',
+        'description' => 'D',
+        'status' => 'refine',
+        'assessor_id' => $assessor->id,
+    ]);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/submit")
+        ->assertOk();
+
+    expect($assessor->notifications()->count())->toBe(1);
+    expect($assessor->notifications()->first()->data)->toMatchArray(['type' => 'project_resubmitted', 'kind' => 'resubmitted']);
+    // A resubmission is routed back to the same assessor, not broadcast to admins.
+    expect($admin->notifications()->count())->toBe(0);
+});
+
 it('lets a student mark a notification as read', function () {
     $assessor = User::factory()->assessor()->create();
     $student = studentUser();

@@ -15,7 +15,7 @@ class ProjectAssignedNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -26,5 +26,15 @@ class ProjectAssignedNotification extends Notification
             ->line('A new project has been assigned to you for assessment.')
             ->line('Title: '.$this->project->title)
             ->action('Review Project', config('app.frontend_url', config('app.url')).'/assessor/projects/'.$this->project->id);
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'type' => 'project_assigned',
+            'kind' => 'assigned',
+            'project_id' => $this->project->id,
+            'project_title' => $this->project->title,
+        ];
     }
 }

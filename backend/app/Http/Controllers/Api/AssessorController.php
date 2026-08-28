@@ -49,6 +49,19 @@ class AssessorController extends Controller
         return response()->json($project->fresh()->load('members.student'));
     }
 
+    public function notifications(Request $request)
+    {
+        return $request->user()->notifications()->latest()->get();
+    }
+
+    public function markNotificationRead(Request $request, string $notificationId)
+    {
+        $notification = $request->user()->notifications()->where('id', $notificationId)->firstOrFail();
+        $notification->markAsRead();
+
+        return response()->json($notification->fresh());
+    }
+
     private function authorizeAssessor(Request $request, Project $project): void
     {
         if ($project->assessor_id !== $request->user()->id) {

@@ -43,6 +43,7 @@ class ProjectDecisionNotification extends Notification
     {
         return [
             'type' => 'project_decision',
+            'kind' => $this->project->status === 'approved' ? 'approved' : 'refine',
             'project_id' => $this->project->id,
             'project_title' => $this->project->title,
             'status' => $this->project->status,

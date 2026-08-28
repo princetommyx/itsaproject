@@ -39,6 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/projects', [AssessorController::class, 'assigned']);
             Route::get('/projects/{project}', [AssessorController::class, 'show']);
             Route::post('/projects/{project}/decide', [AssessorController::class, 'decide']);
+            Route::get('/notifications', [AssessorController::class, 'notifications']);
+            Route::post('/notifications/{notificationId}/read', [AssessorController::class, 'markNotificationRead']);
         });
 
         Route::middleware('is.admin')->prefix('admin')->group(function () {
@@ -55,6 +57,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/login-logs', [AdminController::class, 'loginLogs']);
             Route::get('/complaints', [AdminController::class, 'complaints']);
             Route::put('/complaints/{complaint}', [AdminController::class, 'updateComplaint']);
+            Route::get('/notifications', [AdminController::class, 'notifications']);
+            Route::post('/notifications/{notificationId}/read', [AdminController::class, 'markNotificationRead']);
         });
     });
 });

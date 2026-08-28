@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectMember;
+use App\Models\User;
+use App\Notifications\ProjectResubmittedNotification;
+use App\Notifications\ProjectSubmittedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -137,10 +140,21 @@ class StudentController extends Controller
             ]);
         }
 
+        $isResubmission = $project->status === 'refine';
+        $previousAssessor = $isResubmission ? $project->assessor : null;
+
         $project->update([
             'status' => 'submitted_unassigned',
             'assessor_id' => null,
         ]);
+
+        if ($previousAssessor) {
+            $previousAssessor->notify(new ProjectResubmittedNotification($project));
+        } else {
+            foreach (User::where('role', 'admin')->get() as $admin) {
+                $admin->notify(new ProjectSubmittedNotification($project));
+            }
+        }
 
         return response()->json($project->fresh()->load('members.student'));
     }

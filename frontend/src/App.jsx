@@ -16,6 +16,7 @@ import StudentDocuments from './pages/student/StudentDocuments'
 import AssessorDashboard from './pages/assessor/AssessorDashboard'
 import ProjectReview from './pages/assessor/ProjectReview'
 import AssessorProfile from './pages/assessor/AssessorProfile'
+import AssessorNotifications from './pages/assessor/AssessorNotifications'
 import Overview from './pages/admin/sections/Overview'
 import AllProjects from './pages/admin/sections/AllProjects'
 import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
@@ -25,6 +26,7 @@ import StaffManagement from './pages/admin/sections/StaffManagement'
 import LoginLogs from './pages/admin/sections/LoginLogs'
 import Complaints from './pages/admin/sections/Complaints'
 import AdminProfile from './pages/admin/sections/AdminProfile'
+import AdminNotifications from './pages/admin/sections/AdminNotifications'
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -60,6 +62,7 @@ export default function App() {
               <Route element={<Layout />}>
                 <Route path="/assessor" element={<AssessorDashboard />} />
                 <Route path="/assessor/projects/:id" element={<ProjectReview />} />
+                <Route path="/assessor/notifications" element={<AssessorNotifications />} />
                 <Route path="/assessor/profile" element={<AssessorProfile />} />
               </Route>
             </Route>
@@ -74,6 +77,7 @@ export default function App() {
                 <Route path="staff" element={<StaffManagement />} />
                 <Route path="logs" element={<LoginLogs />} />
                 <Route path="complaints" element={<Complaints />} />
+                <Route path="notifications" element={<AdminNotifications />} />
                 <Route path="profile" element={<AdminProfile />} />
               </Route>
             </Route>

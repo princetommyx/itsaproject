@@ -244,4 +244,17 @@ class AdminController extends Controller
 
         return response()->json($complaint);
     }
+
+    public function notifications(Request $request)
+    {
+        return $request->user()->notifications()->latest()->get();
+    }
+
+    public function markNotificationRead(Request $request, string $notificationId)
+    {
+        $notification = $request->user()->notifications()->where('id', $notificationId)->firstOrFail();
+        $notification->markAsRead();
+
+        return response()->json($notification->fresh());
+    }
 }
