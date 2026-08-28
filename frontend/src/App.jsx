@@ -1,5 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { SWRConfig } from 'swr'
+import client from './api/client'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -42,8 +44,14 @@ function HomeRedirect() {
 export default function App() {
   return (
     <BrowserRouter>
-      <ToastProvider>
-        <AuthProvider>
+      <SWRConfig 
+        value={{
+          fetcher: (url) => client.get(url).then(res => res.data),
+          revalidateOnFocus: false, // Optional: customize defaults here
+        }}
+      >
+        <ToastProvider>
+          <AuthProvider>
           <Suspense fallback={<PageLoader />}>
             <Routes>
               <Route path="/" element={<HomeRedirect />} />
@@ -91,6 +99,7 @@ export default function App() {
           </Suspense>
         </AuthProvider>
       </ToastProvider>
+      </SWRConfig>
     </BrowserRouter>
   )
 }

@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
@@ -22,18 +23,13 @@ import { CORE_SUBMISSION_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/doc
 
 export default function StudentDashboard() {
   const { user } = useAuth()
-  const [project, setProject] = useState(undefined)
+  const { data: projectData, error: swrError, mutate } = useSWR('/student/project')
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    load()
-  }, [])
+  const project = projectData?.project
+  const isLoading = !projectData && !swrError
 
-  function load() {
-    client.get('/student/project').then((res) => setProject(res.data.project))
-  }
-
-  if (project === undefined) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <PageHeading>My Project</PageHeading>
@@ -58,9 +54,9 @@ export default function StudentDashboard() {
       {error && <Alert>{error}</Alert>}
 
       {!project ? (
-        <CreateProjectForm onCreated={load} onError={setError} />
+        <CreateProjectForm onCreated={() => mutate()} onError={setError} />
       ) : (
-        <ProjectPanel project={project} user={user} onChange={load} onError={setError} />
+        <ProjectPanel project={project} user={user} onChange={() => mutate()} onError={setError} />
       )}
     </div>
   )

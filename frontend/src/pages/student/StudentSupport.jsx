@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { Badge, Button, Card, EmptyState, Input, PageHeading, Textarea } from '../../components/ui'
@@ -7,18 +8,10 @@ import { MessageIcon } from '../../components/icons'
 
 export default function StudentSupport() {
   const toast = useToast()
-  const [complaints, setComplaints] = useState(null)
+  const { data: complaints, mutate } = useSWR('/student/complaints')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
   const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  function load() {
-    client.get('/student/complaints').then((res) => setComplaints(res.data))
-  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -28,7 +21,7 @@ export default function StudentSupport() {
       toast.success('Support ticket submitted.')
       setSubject('')
       setMessage('')
-      load()
+      mutate()
     } finally {
       setSubmitting(false)
     }
@@ -51,7 +44,7 @@ export default function StudentSupport() {
 
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Your Tickets</h2>
-        {complaints === null ? (
+        {!complaints ? (
           <SkeletonList rows={3} />
         ) : complaints.length === 0 ? (
           <EmptyState icon={MessageIcon} title="No support tickets filed yet" />

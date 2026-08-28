@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { Avatar, Badge, Card, Input } from '../../components/ui'
@@ -9,11 +9,10 @@ import StatusTimeline from '../../components/StatusTimeline'
 
 export default function StudentProfile() {
   const { user } = useAuth()
-  const [project, setProject] = useState(undefined)
-
-  useEffect(() => {
-    client.get('/student/project').then((res) => setProject(res.data.project))
-  }, [])
+  const { data: projectData, error: swrError } = useSWR('/student/project')
+  
+  const project = projectData?.project
+  const isLoading = !projectData && !swrError
 
   return (
     <ProfileShell homePath="/student" homeLabel="My Project">
@@ -48,7 +47,7 @@ export default function StudentProfile() {
 
         <Card>
           <h2 className="mb-4 text-lg font-semibold text-slate-800">Project Information</h2>
-          {project === undefined ? (
+          {isLoading ? (
             <SkeletonCard lines={2} />
           ) : project ? (
             <div className="space-y-5">

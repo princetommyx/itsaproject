@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { downloadDocument, formatFileSize } from '../../lib/downloadDocument'
@@ -13,7 +14,7 @@ import { FileSpreadsheetIcon, UploadCloudIcon } from '../../components/icons'
 
 export default function StudentDocuments() {
   const toast = useToast()
-  const [project, setProject] = useState(undefined)
+  const { data: projectData, error: swrError, mutate } = useSWR('/student/project')
   const [type, setType] = useState(DOCUMENT_TYPES[0].key)
   const [dragging, setDragging] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -22,13 +23,8 @@ export default function StudentDocuments() {
   const [expandedType, setExpandedType] = useState(null)
   const inputRef = useRef(null)
 
-  useEffect(() => {
-    load()
-  }, [])
-
-  function load() {
-    client.get('/student/project').then((res) => setProject(res.data.project))
-  }
+  const project = projectData?.project
+  const isLoading = !projectData && !swrError
 
   function pickFile(file) {
     if (!file) return
@@ -71,7 +67,7 @@ export default function StudentDocuments() {
       toast.success('Document uploaded successfully', {
         description: `${DOCUMENT_TYPE_LABELS[type]} has been added to your project.`,
       })
-      load()
+      mutate()
     } catch (err) {
       const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
       setError(message || 'Could not upload document.')
@@ -97,13 +93,13 @@ export default function StudentDocuments() {
     try {
       await client.delete(`/student/projects/${project.id}/documents/${document.id}`)
       toast.success('Document removed successfully')
-      load()
+      mutate()
     } catch {
       toast.error('Unable to remove this document', { description: 'Please try again.' })
     }
   }
 
-  if (project === undefined) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <PageHeading>My Documents</PageHeading>
