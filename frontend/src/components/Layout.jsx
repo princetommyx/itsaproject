@@ -22,6 +22,7 @@ const NAV_LINKS = {
   admin: [
     { to: '/admin', label: 'Dashboard', icon: DashboardIcon },
     { section: 'Projects' },
+    { to: '/admin/projects', label: 'All Projects', icon: FolderIcon },
     { to: '/admin/assignments', label: 'Assign Assessors', icon: ClipboardIcon },
     { section: 'People' },
     { to: '/admin/import', label: 'Import Students', icon: UsersIcon },

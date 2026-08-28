@@ -58,3 +58,49 @@ it('returns aggregate dashboard stats', function () {
 
     $response->assertOk()->assertJsonPath('approved', 1)->assertJsonPath('pending', 1);
 });
+
+it('lists all submitted projects for admin oversight, excluding drafts', function () {
+    $admin = User::factory()->admin()->create();
+
+    Project::create(['title' => 'Draft', 'description' => 'D', 'status' => 'draft']);
+    Project::create(['title' => 'Pending', 'description' => 'D', 'status' => 'pending']);
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/projects');
+
+    $response->assertOk();
+    expect($response->json())->toHaveCount(1);
+    expect($response->json()[0]['title'])->toBe('Pending');
+});
+
+it('lets an admin approve a pending project as a backup to the assessor', function () {
+    Notification::fake();
+
+    $admin = User::factory()->admin()->create();
+    $assessor = User::factory()->assessor()->create();
+    $student = User::factory()->student()->create(['is_first_login' => false]);
+
+    $project = Project::create([
+        'title' => 'T',
+        'description' => 'D',
+        'status' => 'pending',
+        'assessor_id' => $assessor->id,
+    ]);
+    $project->members()->create(['university_id' => $student->university_id, 'student_id' => $student->id, 'is_leader' => true]);
+
+    $response = $this->actingAs($admin, 'sanctum')
+        ->postJson("/api/admin/projects/{$project->id}/decide", ['decision' => 'approved']);
+
+    $response->assertOk();
+    expect($project->fresh()->status)->toBe('approved');
+    Notification::assertSentTo($student, \App\Notifications\ProjectDecisionNotification::class);
+});
+
+it('prevents an admin from deciding on a project that is not pending', function () {
+    $admin = User::factory()->admin()->create();
+
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'submitted_unassigned']);
+
+    $this->actingAs($admin, 'sanctum')
+        ->postJson("/api/admin/projects/{$project->id}/decide", ['decision' => 'approved'])
+        ->assertUnprocessable();
+});

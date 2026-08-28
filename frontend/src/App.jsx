@@ -13,6 +13,8 @@ import StudentSupport from './pages/student/StudentSupport'
 import AssessorDashboard from './pages/assessor/AssessorDashboard'
 import ProjectReview from './pages/assessor/ProjectReview'
 import Overview from './pages/admin/sections/Overview'
+import AllProjects from './pages/admin/sections/AllProjects'
+import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
 import Assignments from './pages/admin/sections/Assignments'
 import ImportStudents from './pages/admin/sections/ImportStudents'
 import StaffManagement from './pages/admin/sections/StaffManagement'
@@ -56,6 +58,8 @@ export default function App() {
             <Route path="/admin" element={<AdminEntry />}>
               <Route element={<Layout />}>
                 <Route index element={<Overview />} />
+                <Route path="projects" element={<AllProjects />} />
+                <Route path="projects/:id" element={<AdminProjectReview />} />
                 <Route path="assignments" element={<Assignments />} />
                 <Route path="import" element={<ImportStudents />} />
                 <Route path="staff" element={<StaffManagement />} />

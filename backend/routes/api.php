@@ -39,9 +39,12 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/students/import', [AdminController::class, 'importStudents']);
             Route::post('/staff', [AdminController::class, 'createStaff']);
             Route::get('/assessors', [AdminController::class, 'assessors']);
+            Route::get('/projects', [AdminController::class, 'allProjects']);
             Route::get('/projects/unassigned', [AdminController::class, 'unassignedProjects']);
-            Route::post('/projects/{project}/assign', [AdminController::class, 'assignAssessor']);
             Route::get('/projects/export', [AdminController::class, 'exportProjects']);
+            Route::get('/projects/{project}', [AdminController::class, 'showProject']);
+            Route::post('/projects/{project}/assign', [AdminController::class, 'assignAssessor']);
+            Route::post('/projects/{project}/decide', [AdminController::class, 'decideProject']);
             Route::get('/login-logs', [AdminController::class, 'loginLogs']);
             Route::get('/complaints', [AdminController::class, 'complaints']);
             Route::put('/complaints/{complaint}', [AdminController::class, 'updateComplaint']);

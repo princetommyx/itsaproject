@@ -8,6 +8,7 @@ use App\Models\Complaint;
 use App\Models\LoginLog;
 use App\Models\Project;
 use App\Models\User;
+use App\Notifications\ProjectDecisionNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -101,6 +102,49 @@ class AdminController extends Controller
             'created' => $created,
             'errors' => $errors,
         ]);
+    }
+
+    /**
+     * All submitted projects, for the admin's oversight/review list.
+     */
+    public function allProjects()
+    {
+        return Project::with(['members.student', 'assessor'])
+            ->where('status', '!=', 'draft')
+            ->orderByDesc('updated_at')
+            ->get();
+    }
+
+    public function showProject(Project $project)
+    {
+        return $project->load(['members.student', 'assessor']);
+    }
+
+    /**
+     * Admins can approve/refine any pending project, as a backup to the
+     * assigned assessor (e.g. if the assessor is unavailable).
+     */
+    public function decideProject(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'decision' => ['required', 'in:approved,refine'],
+            'feedback' => ['required_if:decision,refine', 'nullable', 'string'],
+        ]);
+
+        if ($project->status !== 'pending') {
+            abort(422, 'This project is not awaiting a decision.');
+        }
+
+        $project->update([
+            'status' => $validated['decision'],
+            'feedback' => $validated['decision'] === 'refine' ? $validated['feedback'] : null,
+        ]);
+
+        foreach ($project->students as $student) {
+            $student->notify(new ProjectDecisionNotification($project));
+        }
+
+        return response()->json($project->fresh()->load(['members.student', 'assessor']));
     }
 
     /**
