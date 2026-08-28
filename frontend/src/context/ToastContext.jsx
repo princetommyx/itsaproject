@@ -60,7 +60,7 @@ function ToastViewport({ toasts, onDismiss }) {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 sm:top-6 sm:right-6">
+    <div className="fixed top-[max(4.5rem,calc(env(safe-area-inset-top)+3.5rem))] right-4 z-50 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2 md:top-6 md:right-6">
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} onDismiss={() => onDismiss(t.id)} />
       ))}
