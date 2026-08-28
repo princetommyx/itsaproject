@@ -24,26 +24,27 @@ services:
       - key: FRONTEND_URL
         value: "https://itsaproject.vercel.app" # Update to match your actual Vercel URL
 
-      # REQUIRED: a real database. Render has no managed MySQL, so the
-      # simplest option is Render's own Postgres (create one from the
-      # Render dashboard, then paste its connection details below) —
-      # Laravel's migrations here use portable column types and run fine
-      # on Postgres. If you'd rather use MySQL, point these at an
-      # external provider (PlanetScale, Railway, Aiven, etc.) instead
-      # and change DB_CONNECTION to mysql.
+      # REQUIRED: a real database. Render's free plan no longer includes a
+      # permanent free Postgres instance, so use an external free Postgres
+      # provider instead — Supabase or Neon both work well and need no
+      # code changes here, just real values below. Laravel's migrations
+      # use portable column types, so MySQL works too if you change
+      # DB_CONNECTION to mysql and DB_PORT to 3306.
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_HOST
-        value: REPLACE_ME # e.g. dpg-xxxx-a.oregon-postgres.render.com
+        value: REPLACE_ME # e.g. db.xxxxxxxxxxxx.supabase.co, or ep-xxxx.neon.tech
       - key: DB_PORT
         value: "5432"
       - key: DB_DATABASE
-        value: REPLACE_ME
+        value: REPLACE_ME # usually "postgres" on Supabase
       - key: DB_USERNAME
-        value: REPLACE_ME
+        value: REPLACE_ME # usually "postgres" on Supabase
       - key: DB_PASSWORD
         value: REPLACE_ME
         sync: false # marks it sensitive so Render doesn't echo it back in the dashboard
+      - key: DB_SSLMODE
+        value: require # both Supabase and Neon require SSL on external connections
 
       # Safe defaults for a single-web-process deployment (no separate
       # queue worker running).
