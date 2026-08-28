@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Avatar, Badge, Card, EmptyState, PageHeading, STATUS_LABELS } from '../../../components/ui'
@@ -9,20 +9,13 @@ const STATUSES = ['open', 'in_progress', 'resolved']
 
 export default function Complaints() {
   const toast = useToast()
-  const [complaints, setComplaints] = useState(null)
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  function load() {
-    client.get('/admin/complaints').then((res) => setComplaints(res.data))
-  }
+  const { data: complaints, error: swrError, mutate } = useSWR('/admin/complaints')
+  const isLoading = !complaints && !swrError
 
   async function updateStatus(id, status) {
     await client.put(`/admin/complaints/${id}`, { status })
     toast.success(`Ticket marked ${STATUS_LABELS[status] || status}.`)
-    load()
+    mutate()
   }
 
   return (
@@ -30,7 +23,7 @@ export default function Complaints() {
       <PageHeading description="Support tickets filed by students, all in one place.">Complaints</PageHeading>
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Student Complaints</h2>
-        {complaints === null ? (
+        {isLoading ? (
           <SkeletonList rows={4} />
         ) : complaints.length === 0 ? (
           <EmptyState icon={MessageIcon} title="No complaints have been filed" />

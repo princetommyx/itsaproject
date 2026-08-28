@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import client from '../../../api/client'
+import useSWR from 'swr'
 import { Avatar, Badge, Card, EmptyState, PageHeading, stagger } from '../../../components/ui'
 import { SkeletonCardGrid } from '../../../components/Skeleton'
 import { FolderIcon } from '../../../components/icons'
@@ -14,12 +14,9 @@ const FILTERS = [
 ]
 
 export default function AllProjects() {
-  const [projects, setProjects] = useState(null)
+  const { data: projects, error: swrError } = useSWR('/admin/projects')
+  const isLoading = !projects && !swrError
   const [filter, setFilter] = useState('all')
-
-  useEffect(() => {
-    client.get('/admin/projects').then((res) => setProjects(res.data))
-  }, [])
 
   const visible = projects?.filter((p) => filter === 'all' || p.status === filter) ?? []
 
@@ -51,7 +48,7 @@ export default function AllProjects() {
         <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-slate-100 to-transparent sm:hidden" />
       </div>
 
-      {projects === null ? (
+      {isLoading ? (
         <SkeletonCardGrid />
       ) : visible.length === 0 ? (
         <Card>

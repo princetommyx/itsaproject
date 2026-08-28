@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { Alert, Avatar, Badge, Button, Card, Textarea } from '../../components/ui'
@@ -11,18 +12,13 @@ export default function ProjectReview() {
   const { id } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
-  const [project, setProject] = useState(null)
+  
+  const { data: project, error: swrError } = useSWR(`/assessor/projects/${id}`)
+  const isLoading = !project && !swrError
+
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    load()
-  }, [id])
-
-  function load() {
-    client.get(`/assessor/projects/${id}`).then((res) => setProject(res.data))
-  }
 
   async function decide(decision) {
     setError('')
@@ -54,7 +50,7 @@ export default function ProjectReview() {
     }
   }
 
-  if (!project) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-4 w-40" />
@@ -62,6 +58,8 @@ export default function ProjectReview() {
       </div>
     )
   }
+  
+  if (!project) return null;
 
   return (
     <div className="space-y-6">

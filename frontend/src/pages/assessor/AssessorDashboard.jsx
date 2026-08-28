@@ -1,16 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { Badge, Card, EmptyState, PageHeading, StatCard, stagger } from '../../components/ui'
 import { SkeletonCardGrid, SkeletonStatCards } from '../../components/Skeleton'
 import { ClipboardIcon } from '../../components/icons'
 
 export default function AssessorDashboard() {
-  const [projects, setProjects] = useState(null)
-
-  useEffect(() => {
-    client.get('/assessor/projects').then((res) => setProjects(res.data))
-  }, [])
+  const { data: projects, error: swrError } = useSWR('/assessor/projects')
+  const isLoading = !projects && !swrError
 
   const counts = projects && {
     pending: projects.filter((p) => p.status === 'pending').length,
@@ -22,7 +20,7 @@ export default function AssessorDashboard() {
     <div className="space-y-6">
       <PageHeading description="Projects assigned to you for review.">Assigned Projects</PageHeading>
 
-      {projects === null ? (
+      {isLoading ? (
         <>
           <SkeletonStatCards count={4} />
           <SkeletonCardGrid />

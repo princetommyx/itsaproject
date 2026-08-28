@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import client from '../../../api/client'
 import { useAuth } from '../../../context/AuthContext'
 import { Avatar, Card, Input, StatCard } from '../../../components/ui'
@@ -7,11 +7,8 @@ import ProfileShell from '../../../components/ProfileShell'
 
 export default function AdminProfile() {
   const { user } = useAuth()
-  const [stats, setStats] = useState(null)
-
-  useEffect(() => {
-    client.get('/admin/dashboard').then((res) => setStats(res.data))
-  }, [])
+  const { data: stats, error: swrError } = useSWR('/admin/dashboard')
+  const isLoading = !stats && !swrError
 
   return (
     <ProfileShell homePath="/admin" homeLabel="Dashboard">
@@ -37,7 +34,7 @@ export default function AdminProfile() {
 
         <Card>
           <h2 className="mb-4 text-lg font-semibold text-slate-800">System Overview</h2>
-          {stats === null ? (
+          {isLoading ? (
             <SkeletonStatCards count={3} />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

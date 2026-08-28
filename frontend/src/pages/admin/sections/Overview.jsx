@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Button, Card, HeroStatCard, PageHeading, StatCard, stagger } from '../../../components/ui'
@@ -19,12 +20,9 @@ const PEOPLE_METRICS = [
 
 export default function Overview() {
   const toast = useToast()
-  const [stats, setStats] = useState(null)
+  const { data: stats, error: swrError } = useSWR('/admin/dashboard')
+  const isLoading = !stats && !swrError
   const [exporting, setExporting] = useState(false)
-
-  useEffect(() => {
-    client.get('/admin/dashboard').then((res) => setStats(res.data))
-  }, [])
 
   async function handleExport() {
     setExporting(true)
@@ -45,7 +43,7 @@ export default function Overview() {
     }
   }
 
-  if (!stats) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <PageHeading description="Plan, assign, and track every final year project in one place.">

@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { Avatar, Card, Input, StatCard } from '../../components/ui'
@@ -7,11 +8,8 @@ import ProfileShell from '../../components/ProfileShell'
 
 export default function AssessorProfile() {
   const { user } = useAuth()
-  const [projects, setProjects] = useState(null)
-
-  useEffect(() => {
-    client.get('/assessor/projects').then((res) => setProjects(res.data))
-  }, [])
+  const { data: projects, error: swrError } = useSWR('/assessor/projects')
+  const isLoading = !projects && !swrError
 
   const studentCount = projects
     ? new Set(projects.flatMap((p) => p.members.map((m) => m.student_id ?? m.university_id))).size
@@ -42,7 +40,7 @@ export default function AssessorProfile() {
 
         <Card>
           <h2 className="mb-4 text-lg font-semibold text-slate-800">Assigned Work</h2>
-          {projects === null ? (
+          {isLoading ? (
             <SkeletonStatCards count={3} />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

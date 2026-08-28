@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
+import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Alert, Avatar, Badge, Button, Card, Textarea } from '../../../components/ui'
@@ -11,22 +12,16 @@ export default function AdminProjectReview() {
   const { id } = useParams()
   const navigate = useNavigate()
   const toast = useToast()
-  const [project, setProject] = useState(null)
-  const [assessors, setAssessors] = useState([])
+  
+  const { data: project, error: projectError, mutate: mutateProject } = useSWR(`/admin/projects/${id}`)
+  const { data: assessors, error: assessorsError } = useSWR('/admin/assessors')
+  const isLoading = !project && !projectError
+
   const [selectedAssessor, setSelectedAssessor] = useState('')
   const [assigning, setAssigning] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    load()
-    client.get('/admin/assessors').then((res) => setAssessors(res.data))
-  }, [id])
-
-  function load() {
-    client.get(`/admin/projects/${id}`).then((res) => setProject(res.data))
-  }
 
   async function assign() {
     setError('')
@@ -37,11 +32,11 @@ export default function AdminProjectReview() {
     setAssigning(true)
     try {
       await client.post(`/admin/projects/${id}/assign`, { assessor_id: selectedAssessor })
-      const assessorName = assessors.find((a) => String(a.id) === String(selectedAssessor))?.name
+      const assessorName = (assessors || []).find((a) => String(a.id) === String(selectedAssessor))?.name
       toast.success('Project assigned successfully', {
         description: assessorName ? `${assessorName} has been assigned to review this project.` : undefined,
       })
-      load()
+      mutateProject()
     } catch (err) {
       const message = err.response?.data?.message
       setError(message || 'Could not assign assessor.')
@@ -76,7 +71,7 @@ export default function AdminProjectReview() {
     }
   }
 
-  if (!project) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-4 w-40" />
@@ -84,6 +79,8 @@ export default function AdminProjectReview() {
       </div>
     )
   }
+  
+  if (!project) return null;
 
   const awaitingDecision = ['pending', 'submitted_unassigned'].includes(project.status)
 
@@ -155,7 +152,7 @@ export default function AdminProjectReview() {
                     onChange={(e) => setSelectedAssessor(e.target.value)}
                   >
                     <option value="">Select assessor...</option>
-                    {assessors.map((a) => (
+                    {(assessors || []).map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.name}
                       </option>

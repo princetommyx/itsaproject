@@ -1,22 +1,20 @@
-import { useEffect, useState } from 'react'
+import useSWR from 'swr'
 import client from '../../../api/client'
 import { Avatar, Card, EmptyState, PageHeading } from '../../../components/ui'
 import { SkeletonTable } from '../../../components/Skeleton'
 import { LogIcon } from '../../../components/icons'
 
 export default function LoginLogs() {
-  const [logs, setLogs] = useState(null)
-
-  useEffect(() => {
-    client.get('/admin/login-logs').then((res) => setLogs(res.data.data))
-  }, [])
+  const { data: logsData, error: swrError } = useSWR('/admin/login-logs')
+  const logs = logsData?.data
+  const isLoading = !logsData && !swrError
 
   return (
     <div className="space-y-6">
       <PageHeading description="A record of every sign-in across the system.">Login Logs</PageHeading>
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Login Audit Trail</h2>
-        {logs === null ? (
+        {isLoading ? (
           <SkeletonTable rows={6} cols={5} />
         ) : logs.length === 0 ? (
           <EmptyState icon={LogIcon} title="No login activity yet" />

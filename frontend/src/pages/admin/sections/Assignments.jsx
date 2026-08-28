@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Alert, Button, Card, EmptyState, PageHeading } from '../../../components/ui'
@@ -28,20 +29,14 @@ function AssignmentsSkeleton() {
 
 export default function Assignments() {
   const toast = useToast()
-  const [projects, setProjects] = useState(null)
-  const [assessors, setAssessors] = useState([])
+  
+  const { data: projects, error: projectsError, mutate: mutateProjects } = useSWR('/admin/projects/unassigned')
+  const { data: assessors, error: assessorsError } = useSWR('/admin/assessors')
+  const isLoading = !projects && !projectsError
+
   const [selection, setSelection] = useState({})
   const [error, setError] = useState('')
   const [assigningId, setAssigningId] = useState(null)
-
-  useEffect(() => {
-    load()
-    client.get('/admin/assessors').then((res) => setAssessors(res.data))
-  }, [])
-
-  function load() {
-    client.get('/admin/projects/unassigned').then((res) => setProjects(res.data))
-  }
 
   async function assign(projectId) {
     setError('')
@@ -53,11 +48,11 @@ export default function Assignments() {
     setAssigningId(projectId)
     try {
       await client.post(`/admin/projects/${projectId}/assign`, { assessor_id: assessorId })
-      const assessorName = assessors.find((a) => String(a.id) === String(assessorId))?.name
+      const assessorName = (assessors || []).find((a) => String(a.id) === String(assessorId))?.name
       toast.success('Project assigned successfully', {
         description: assessorName ? `${assessorName} has been assigned to review this project.` : undefined,
       })
-      load()
+      mutateProjects()
     } catch (err) {
       const message = err.response?.data?.message
       setError(message || 'Could not assign assessor.')
@@ -67,7 +62,7 @@ export default function Assignments() {
     }
   }
 
-  if (projects === null) {
+  if (isLoading) {
     return (
       <div className="space-y-6">
         <PageHeading>Assign Assessors</PageHeading>
@@ -105,7 +100,7 @@ export default function Assignments() {
                   onChange={(e) => setSelection({ ...selection, [project.id]: e.target.value })}
                 >
                   <option value="">Select assessor...</option>
-                  {assessors.map((a) => (
+                  {(assessors || []).map((a) => (
                     <option key={a.id} value={a.id}>
                       {a.name}
                     </option>
