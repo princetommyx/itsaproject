@@ -36,7 +36,7 @@ it('lets an admin assign an assessor to an unassigned project', function () {
     $leader = User::factory()->student()->create();
 
     $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'submitted_unassigned']);
-    $project->students()->attach($leader->id, ['is_leader' => true]);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
 
     $response = $this->actingAs($admin, 'sanctum')
         ->postJson("/api/admin/projects/{$project->id}/assign", ['assessor_id' => $assessor->id]);

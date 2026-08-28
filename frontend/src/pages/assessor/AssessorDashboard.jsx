@@ -31,7 +31,7 @@ export default function AssessorDashboard() {
                 </div>
                 <p className="line-clamp-3 text-sm text-slate-500">{project.description}</p>
                 <p className="mt-3 text-xs text-slate-400">
-                  {project.students.map((s) => s.name).join(', ')}
+                  {project.members.map((m) => m.student?.name ?? m.university_id).join(', ')}
                 </p>
               </Card>
             </Link>

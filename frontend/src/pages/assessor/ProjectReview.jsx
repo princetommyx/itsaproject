@@ -54,9 +54,11 @@ export default function ProjectReview() {
         <div className="mt-5">
           <h3 className="mb-2 text-sm font-semibold text-slate-700">Group Members</h3>
           <ul className="text-sm text-slate-600">
-            {project.students.map((s) => (
-              <li key={s.id}>
-                {s.name} {!!s.pivot.is_leader && <span className="text-xs text-upsa-blue">(Leader)</span>}
+            {project.members.map((m) => (
+              <li key={m.id}>
+                {m.student ? m.student.name : m.university_id}
+                {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
+                {!m.student && <span className="ml-1 text-xs text-amber-600">(Not yet registered)</span>}
               </li>
             ))}
           </ul>

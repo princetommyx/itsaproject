@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
-use App\Models\User;
+use App\Models\ProjectMember;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -15,7 +15,7 @@ class StudentController extends Controller
      */
     public function current(Request $request)
     {
-        $project = $request->user()->projects()->with(['students', 'assessor'])->first();
+        $project = $request->user()->projects()->with(['members.student', 'assessor'])->first();
 
         // response()->json(null) serializes to "{}" (Symfony coerces a null
         // top-level payload to an empty object), so wrap it in an envelope
@@ -46,9 +46,13 @@ class StudentController extends Controller
             'status' => 'draft',
         ]);
 
-        $project->students()->attach($user->id, ['is_leader' => true]);
+        $project->members()->create([
+            'university_id' => $user->university_id,
+            'student_id' => $user->id,
+            'is_leader' => true,
+        ]);
 
-        return response()->json($project->load('students'), 201);
+        return response()->json($project->load('members.student'), 201);
     }
 
     public function update(Request $request, Project $project)
@@ -63,12 +67,16 @@ class StudentController extends Controller
 
         $project->update($validated);
 
-        return response()->json($project->fresh('students'));
+        return response()->json($project->fresh()->load('members.student'));
     }
 
     /**
-     * Add a group member by Index Number. Validates in real-time that
-     * the index number exists and isn't already attached to a group.
+     * Add a group member by Index Number. The full student roster isn't
+     * always imported before groups start forming, so this only checks
+     * that the Index Number isn't already claimed by another group — it
+     * does NOT require the student to already have an account. If that
+     * student is later imported via CSV, their entry links up
+     * automatically at that point (see AdminController::importStudents).
      */
     public function addMember(Request $request, Project $project)
     {
@@ -76,44 +84,44 @@ class StudentController extends Controller
         $this->ensureEditable($project);
 
         $validated = $request->validate([
-            'university_id' => ['required', 'string'],
+            'university_id' => ['required', 'string', 'max:255'],
         ]);
 
-        $student = User::where('university_id', $validated['university_id'])
-            ->where('role', 'student')
-            ->first();
+        $universityId = trim($validated['university_id']);
 
-        if (! $student) {
-            throw ValidationException::withMessages([
-                'university_id' => ['No student found with this Index Number.'],
-            ]);
-        }
-
-        if ($student->projects()->exists()) {
+        if (ProjectMember::where('university_id', $universityId)->exists()) {
             throw ValidationException::withMessages([
                 'university_id' => ['This student is already attached to a group.'],
             ]);
         }
 
-        $project->students()->attach($student->id, ['is_leader' => false]);
+        $project->members()->create([
+            'university_id' => $universityId,
+            'student_id' => $this->findLinkedStudentId($universityId),
+            'is_leader' => false,
+        ]);
 
-        return response()->json($project->fresh('students'));
+        return response()->json($project->fresh()->load('members.student'));
     }
 
-    public function removeMember(Request $request, Project $project, User $student)
+    public function removeMember(Request $request, Project $project, ProjectMember $member)
     {
         $this->authorizeLeader($request, $project);
         $this->ensureEditable($project);
 
-        if ($project->leader()?->id === $student->id) {
+        if ($member->project_id !== $project->id) {
+            abort(404);
+        }
+
+        if ($member->is_leader) {
             throw ValidationException::withMessages([
-                'student' => ['The group leader cannot be removed.'],
+                'member' => ['The group leader cannot be removed.'],
             ]);
         }
 
-        $project->students()->detach($student->id);
+        $member->delete();
 
-        return response()->json($project->fresh('students'));
+        return response()->json($project->fresh()->load('members.student'));
     }
 
     /**
@@ -134,14 +142,21 @@ class StudentController extends Controller
             'assessor_id' => null,
         ]);
 
-        return response()->json($project->fresh('students'));
+        return response()->json($project->fresh()->load('members.student'));
+    }
+
+    private function findLinkedStudentId(string $universityId): ?int
+    {
+        return \App\Models\User::where('university_id', $universityId)
+            ->where('role', 'student')
+            ->value('id');
     }
 
     private function authorizeLeader(Request $request, Project $project): void
     {
-        $isLeader = $project->students()
-            ->wherePivot('is_leader', true)
-            ->where('users.id', $request->user()->id)
+        $isLeader = $project->members()
+            ->where('student_id', $request->user()->id)
+            ->where('is_leader', true)
             ->exists();
 
         if (! $isLeader) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { Alert, Badge, Button, Card, Input, Textarea } from '../../components/ui'
@@ -79,7 +79,8 @@ function CreateProjectForm({ onCreated, onError }) {
 }
 
 function ProjectPanel({ project, user, onChange, onError }) {
-  const isLeader = project.students.some((s) => s.id === user.id && s.pivot.is_leader)
+  const members = project.members
+  const isLeader = members.some((m) => m.student_id === user.id && m.is_leader)
   const editable = ['draft', 'refine'].includes(project.status)
 
   return (
@@ -104,17 +105,25 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         <div className="mt-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-700">Group Members</h3>
+          <h3 className="mb-2 text-sm font-semibold text-slate-700">
+            Group Members <span className="font-normal text-slate-400">({members.length})</span>
+          </h3>
           <ul className="divide-y divide-slate-100 rounded-md border border-slate-100">
-            {project.students.map((s) => (
-              <li key={s.id} className="flex items-center justify-between px-3 py-2 text-sm">
+            {members.map((m) => (
+              <li key={m.id} className="flex items-center justify-between px-3 py-2 text-sm">
                 <span>
-                  {s.name} {!!s.pivot.is_leader && <span className="text-xs text-upsa-blue">(Leader)</span>}
+                  {m.student ? m.student.name : m.university_id}
+                  {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
+                  {!m.student && (
+                    <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
+                      (Not yet registered)
+                    </span>
+                  )}
                 </span>
-                {isLeader && editable && !s.pivot.is_leader && (
+                {isLeader && editable && !m.is_leader && (
                   <button
-                    className="text-xs text-red-600 hover:underline"
-                    onClick={() => removeMember(project.id, s.id, onChange, onError)}
+                    className="shrink-0 text-xs text-red-600 hover:underline"
+                    onClick={() => removeMember(project.id, m.id, onChange, onError)}
                   >
                     Remove
                   </button>
@@ -134,10 +143,10 @@ function ProjectPanel({ project, user, onChange, onError }) {
   )
 }
 
-async function removeMember(projectId, studentId, onChange, onError) {
+async function removeMember(projectId, memberId, onChange, onError) {
   onError('')
   try {
-    await client.delete(`/student/projects/${projectId}/members/${studentId}`)
+    await client.delete(`/student/projects/${projectId}/members/${memberId}`)
     onChange()
   } catch (err) {
     onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not remove member.')
@@ -147,6 +156,7 @@ async function removeMember(projectId, studentId, onChange, onError) {
 function AddMemberForm({ projectId, onChange, onError }) {
   const [universityId, setUniversityId] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const inputRef = useRef(null)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -156,6 +166,7 @@ function AddMemberForm({ projectId, onChange, onError }) {
       await client.post(`/student/projects/${projectId}/members`, { university_id: universityId })
       setUniversityId('')
       onChange()
+      inputRef.current?.focus()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not add member.')
     } finally {
@@ -164,18 +175,27 @@ function AddMemberForm({ projectId, onChange, onError }) {
   }
 
   return (
-    <form className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={handleSubmit}>
-      <Input
-        label="Add Member by Index Number"
-        value={universityId}
-        onChange={(e) => setUniversityId(e.target.value)}
-        className="flex-1"
-        required
-      />
-      <Button type="submit" variant="secondary" className="sm:shrink-0" disabled={submitting}>
-        {submitting ? 'Adding...' : 'Add'}
-      </Button>
-    </form>
+    <div className="mt-4 border-t border-slate-100 pt-4">
+      <p className="mb-2 text-xs text-slate-500">
+        Add as many group members as your project needs — groups are usually 2 to 4 people. If a
+        partner hasn't been added to the system yet, that's fine: add their Index Number now and
+        it'll link to their account automatically once they are.
+      </p>
+      <form className="flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={handleSubmit}>
+        <Input
+          ref={inputRef}
+          label="Add Member by Index Number"
+          value={universityId}
+          onChange={(e) => setUniversityId(e.target.value)}
+          className="flex-1"
+          required
+          autoFocus
+        />
+        <Button type="submit" variant="secondary" className="sm:shrink-0" disabled={submitting}>
+          {submitting ? 'Adding...' : '+ Add Member'}
+        </Button>
+      </form>
+    </div>
   )
 }
 

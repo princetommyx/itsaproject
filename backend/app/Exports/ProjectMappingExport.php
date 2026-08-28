@@ -15,11 +15,13 @@ class ProjectMappingExport implements FromCollection, WithHeadings
 
     public function collection()
     {
-        return Project::with(['students', 'assessor'])->get()->map(function (Project $project) {
+        return Project::with(['members.student', 'assessor'])->get()->map(function (Project $project) {
             return [
                 $project->title,
                 $project->status,
-                $project->students->pluck('name')->implode(', '),
+                $project->members->map(
+                    fn ($member) => $member->student?->name ?? "{$member->university_id} (unregistered)"
+                )->implode(', '),
                 $project->assessor?->name ?? 'Unassigned',
                 $project->feedback,
             ];

@@ -16,7 +16,7 @@ it('lets an assessor approve a pending project', function () {
         'status' => 'pending',
         'assessor_id' => $assessor->id,
     ]);
-    $project->students()->attach($student->id, ['is_leader' => true]);
+    $project->members()->create(['university_id' => $student->university_id, 'student_id' => $student->id, 'is_leader' => true]);
 
     $response = $this->actingAs($assessor, 'sanctum')
         ->postJson("/api/assessor/projects/{$project->id}/decide", ['decision' => 'approved']);
@@ -36,7 +36,7 @@ it('requires feedback text when sending a project back for refinement', function
         'status' => 'pending',
         'assessor_id' => $assessor->id,
     ]);
-    $project->students()->attach($student->id, ['is_leader' => true]);
+    $project->members()->create(['university_id' => $student->university_id, 'student_id' => $student->id, 'is_leader' => true]);
 
     $this->actingAs($assessor, 'sanctum')
         ->postJson("/api/assessor/projects/{$project->id}/decide", ['decision' => 'refine'])

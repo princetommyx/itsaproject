@@ -88,6 +88,12 @@ class AdminController extends Controller
                 'is_first_login' => true,
             ]);
 
+            // Link up any group they were already added to by Index Number
+            // before their account existed.
+            \App\Models\ProjectMember::where('university_id', $universityId)
+                ->whereNull('student_id')
+                ->update(['student_id' => $user->id]);
+
             $created[] = $user->university_id;
         }
 
@@ -102,7 +108,7 @@ class AdminController extends Controller
      */
     public function unassignedProjects()
     {
-        return Project::with('students')
+        return Project::with('members.student')
             ->where('status', 'submitted_unassigned')
             ->get();
     }

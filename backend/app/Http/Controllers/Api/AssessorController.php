@@ -11,7 +11,7 @@ class AssessorController extends Controller
 {
     public function assigned(Request $request)
     {
-        return Project::with('students')
+        return Project::with('members.student')
             ->where('assessor_id', $request->user()->id)
             ->orderByDesc('updated_at')
             ->get();
@@ -21,7 +21,7 @@ class AssessorController extends Controller
     {
         $this->authorizeAssessor($request, $project);
 
-        return $project->load('students');
+        return $project->load('members.student');
     }
 
     public function decide(Request $request, Project $project)
@@ -46,7 +46,7 @@ class AssessorController extends Controller
             $student->notify(new ProjectDecisionNotification($project));
         }
 
-        return response()->json($project->fresh('students'));
+        return response()->json($project->fresh()->load('members.student'));
     }
 
     private function authorizeAssessor(Request $request, Project $project): void

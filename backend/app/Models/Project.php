@@ -7,12 +7,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['title', 'description', 'status', 'assessor_id', 'feedback'])]
 class Project extends Model
 {
     use HasFactory;
 
+    /**
+     * The full group roster, including members added by Index Number who
+     * don't have an account yet (ProjectMember::student is null for them).
+     */
+    public function members(): HasMany
+    {
+        return $this->hasMany(ProjectMember::class);
+    }
+
+    /**
+     * Only members with a real, linked account — e.g. for notifications,
+     * where there's no account to notify otherwise.
+     */
     public function students(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'project_student', 'project_id', 'student_id')
@@ -21,9 +35,9 @@ class Project extends Model
             ->withTimestamps();
     }
 
-    public function leader(): ?User
+    public function leader(): ?ProjectMember
     {
-        return $this->students->firstWhere('pivot.is_leader', true);
+        return $this->members->firstWhere('is_leader', true);
     }
 
     public function assessor(): BelongsTo

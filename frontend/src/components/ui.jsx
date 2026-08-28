@@ -1,3 +1,5 @@
+import { forwardRef } from 'react'
+
 export function Card({ children, className = '' }) {
   return (
     <div className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
@@ -24,11 +26,12 @@ export function Button({ children, variant = 'primary', className = '', ...props
   )
 }
 
-export function Input({ label, error, className = '', ...props }) {
+export const Input = forwardRef(function Input({ label, error, className = '', ...props }, ref) {
   return (
     <label className="block text-sm">
       {label && <span className="mb-1 block font-medium text-slate-700">{label}</span>}
       <input
+        ref={ref}
         className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-upsa-blue ${
           error ? 'border-red-400' : 'border-slate-300'
         } ${className}`}
@@ -37,7 +40,7 @@ export function Input({ label, error, className = '', ...props }) {
       {error && <span className="mt-1 block text-xs text-red-600">{error}</span>}
     </label>
   )
-}
+})
 
 export function Textarea({ label, error, className = '', ...props }) {
   return (

@@ -48,7 +48,7 @@ export default function Assignments() {
               <div className="min-w-0">
                 <h3 className="font-semibold text-slate-800">{project.title}</h3>
                 <p className="text-sm text-slate-500 break-words">
-                  {project.students.map((s) => s.name).join(', ')}
+                  {project.members.map((m) => m.student?.name ?? m.university_id).join(', ')}
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
