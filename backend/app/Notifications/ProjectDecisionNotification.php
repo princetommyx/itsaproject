@@ -25,12 +25,12 @@ class ProjectDecisionNotification extends Notification
             ->greeting('Hello '.$notifiable->name.',');
 
         if ($this->project->status === 'approved') {
-            return $mail->line('Congratulations! Your project has been approved by your assessor.');
+            return $mail->line('Congratulations! Your project has been approved by your supervisor.');
         }
 
         return $mail
             ->line('Your project requires refinement before it can be approved.')
-            ->line('Assessor feedback: '.$this->project->feedback)
+            ->line('Supervisor feedback: '.$this->project->feedback)
             ->line('Please edit and resubmit your project.');
     }
 

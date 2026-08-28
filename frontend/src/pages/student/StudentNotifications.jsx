@@ -72,7 +72,7 @@ export default function StudentNotifications() {
 
                     {status === 'approved' ? (
                       <p className="mt-2 text-sm text-slate-600">
-                        Congratulations! Your assessor has approved your project.
+                        Congratulations! Your supervisor has approved your project.
                       </p>
                     ) : (
                       <>

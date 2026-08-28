@@ -116,13 +116,13 @@ function ProjectPanel({ project, user, onChange, onError }) {
             variant={STATUS_VARIANTS[project.status] || 'slate'}
           />
           <StatCard label="Group Members" value={members.length} variant="blue" />
-          {project.assessor && <StatCard label="Assessor" value={project.assessor.name} variant="violet" />}
+          {project.assessor && <StatCard label="Supervisor" value={project.assessor.name} variant="violet" />}
         </div>
 
         {project.status === 'refine' && project.feedback && (
           <div className="mt-4">
             <Alert variant="info">
-              <strong>Assessor feedback:</strong> {project.feedback}
+              <strong>Supervisor feedback:</strong> {project.feedback}
             </Alert>
           </div>
         )}
