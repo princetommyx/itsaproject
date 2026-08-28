@@ -48,13 +48,14 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    try {
-      await client.post('/logout')
-    } catch {
-      // ignore network errors on logout
-    }
+    const token = localStorage.getItem('token')
     localStorage.removeItem('token')
     setUser(null)
+    try {
+      await client.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } })
+    } catch {
+      // ignore network errors — the token simply expires unused
+    }
   }
 
   function updateUser(patch) {
