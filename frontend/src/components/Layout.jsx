@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
-import { useToast } from '../context/ToastContext'
+import { useToast, useHasVisibleToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
 import upsaLogo from '../assets/upsa-logo.png'
 import upsaShield from '../assets/upsa-shield.png'
@@ -148,6 +148,7 @@ function CloseIcon() {
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const toast = useToast()
+  const hasVisibleToast = useHasVisibleToast()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(0)
@@ -265,7 +266,11 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 pt-28 pb-6 sm:py-8">
+        <main
+          className={`flex-1 px-4 pb-6 transition-[padding-top] duration-300 sm:py-8 ${
+            hasVisibleToast ? 'pt-28' : 'pt-6'
+          }`}
+        >
           <div key={location.pathname} className="animate-page-enter mx-auto max-w-5xl">
             {children ?? <Outlet />}
           </div>
