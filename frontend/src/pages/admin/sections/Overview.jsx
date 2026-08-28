@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
-import { Button, Card } from '../../../components/ui'
+import { Button, Card, StatCard } from '../../../components/ui'
 
 const METRICS = [
-  { key: 'total_submitted', label: 'Total Submitted' },
-  { key: 'unassigned', label: 'Awaiting Assignment' },
-  { key: 'pending', label: 'Under Review' },
-  { key: 'approved', label: 'Approved' },
-  { key: 'refine', label: 'Needs Refinement' },
-  { key: 'total_students', label: 'Total Students' },
-  { key: 'total_assessors', label: 'Total Assessors' },
+  { key: 'total_submitted', label: 'Total Submitted', variant: 'pink' },
+  { key: 'unassigned', label: 'Awaiting Assignment', variant: 'gold' },
+  { key: 'pending', label: 'Under Review', variant: 'blue' },
+  { key: 'approved', label: 'Approved', variant: 'violet' },
+  { key: 'refine', label: 'Needs Refinement', variant: 'pink' },
+  { key: 'total_students', label: 'Total Students', variant: 'gold' },
+  { key: 'total_assessors', label: 'Total Assessors', variant: 'blue' },
 ]
 
 export default function Overview() {
@@ -42,10 +42,7 @@ export default function Overview() {
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {METRICS.map((m) => (
-          <Card key={m.key}>
-            <p className="text-xs uppercase tracking-wide text-slate-500">{m.label}</p>
-            <p className="mt-2 text-3xl font-semibold text-upsa-blue">{stats[m.key]}</p>
-          </Card>
+          <StatCard key={m.key} label={m.label} value={stats[m.key]} variant={m.variant} />
         ))}
       </div>
 

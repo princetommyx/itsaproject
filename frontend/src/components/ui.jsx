@@ -57,33 +57,62 @@ export function Textarea({ label, error, className = '', ...props }) {
   )
 }
 
-export function Badge({ status }) {
-  const styles = {
-    draft: 'bg-slate-100 text-slate-700',
-    submitted_unassigned: 'bg-amber-100 text-amber-800',
-    pending: 'bg-blue-100 text-blue-800',
-    approved: 'bg-emerald-100 text-emerald-800',
-    refine: 'bg-red-100 text-red-800',
-    open: 'bg-amber-100 text-amber-800',
-    in_progress: 'bg-blue-100 text-blue-800',
-    resolved: 'bg-emerald-100 text-emerald-800',
-  }
+// Shared status metadata so the compact Badge and the colorful StatCard
+// stay in sync — same status, same color family, everywhere in the app.
+export const STATUS_LABELS = {
+  draft: 'Draft',
+  submitted_unassigned: 'Awaiting Assignment',
+  pending: 'Under Review',
+  approved: 'Approved',
+  refine: 'Needs Refinement',
+  open: 'Open',
+  in_progress: 'In Progress',
+  resolved: 'Resolved',
+}
 
-  const labels = {
-    draft: 'Draft',
-    submitted_unassigned: 'Awaiting Assignment',
-    pending: 'Under Review',
-    approved: 'Approved',
-    refine: 'Needs Refinement',
-    open: 'Open',
-    in_progress: 'In Progress',
-    resolved: 'Resolved',
-  }
+export const STATUS_VARIANTS = {
+  draft: 'slate',
+  submitted_unassigned: 'gold',
+  pending: 'blue',
+  approved: 'violet',
+  refine: 'pink',
+  open: 'gold',
+  in_progress: 'blue',
+  resolved: 'violet',
+}
+
+const BADGE_STYLES = {
+  slate: 'bg-slate-100 text-slate-700',
+  gold: 'bg-amber-100 text-amber-800',
+  blue: 'bg-blue-100 text-blue-800',
+  violet: 'bg-violet-100 text-violet-800',
+  pink: 'bg-pink-100 text-pink-800',
+}
+
+export function Badge({ status }) {
+  const variant = STATUS_VARIANTS[status] || 'slate'
 
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${styles[status] || 'bg-slate-100 text-slate-700'}`}>
-      {labels[status] || status}
+    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${BADGE_STYLES[variant]}`}>
+      {STATUS_LABELS[status] || status}
     </span>
+  )
+}
+
+const STAT_CARD_STYLES = {
+  pink: 'bg-pink-50 text-pink-800',
+  gold: 'bg-amber-50 text-amber-800',
+  blue: 'bg-blue-50 text-blue-800',
+  violet: 'bg-violet-50 text-violet-800',
+  slate: 'bg-slate-100 text-slate-700',
+}
+
+export function StatCard({ label, value, variant = 'blue' }) {
+  return (
+    <div className={`rounded-2xl p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}>
+      <p className="text-xs font-medium tracking-wide uppercase opacity-70">{label}</p>
+      <p className="mt-3 text-2xl font-bold break-words">{value}</p>
+    </div>
   )
 }
 

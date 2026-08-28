@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
-import { Alert, Badge, Button, Card, Input, Textarea } from '../../components/ui'
+import { Alert, Button, Card, Input, StatCard, Textarea, STATUS_LABELS, STATUS_VARIANTS } from '../../components/ui'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -84,22 +84,27 @@ function ProjectPanel({ project, user, onChange, onError }) {
   return (
     <div className="space-y-6">
       <Card>
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-lg font-semibold break-words text-slate-800">{project.title}</h2>
-            <p className="mt-1 text-sm text-slate-500">{project.description}</p>
-          </div>
-          <Badge status={project.status} />
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold break-words text-slate-800">{project.title}</h2>
+          <p className="mt-1 text-sm text-slate-500">{project.description}</p>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <StatCard
+            label="Status"
+            value={STATUS_LABELS[project.status] || project.status}
+            variant={STATUS_VARIANTS[project.status] || 'slate'}
+          />
+          <StatCard label="Group Members" value={members.length} variant="blue" />
+          {project.assessor && <StatCard label="Assessor" value={project.assessor.name} variant="violet" />}
         </div>
 
         {project.status === 'refine' && project.feedback && (
-          <Alert variant="info">
-            <strong>Assessor feedback:</strong> {project.feedback}
-          </Alert>
-        )}
-
-        {project.assessor && (
-          <p className="mt-3 text-sm text-slate-500">Assigned assessor: {project.assessor.name}</p>
+          <div className="mt-4">
+            <Alert variant="info">
+              <strong>Assessor feedback:</strong> {project.feedback}
+            </Alert>
+          </div>
         )}
 
         <div className="mt-5">
