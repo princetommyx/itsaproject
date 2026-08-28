@@ -54,5 +54,16 @@ services:
         value: database
       - key: QUEUE_CONNECTION
         value: sync
+      # REQUIRED to actually deliver emails (password resets, project
+      # decision notifications). Sign up free at https://resend.com,
+      # create an API key at https://resend.com/api-keys, and paste it
+      # below (or set it directly in the Render dashboard). Without a
+      # verified domain, Resend only lets you send FROM
+      # onboarding@resend.dev — that's fine to start with.
       - key: MAIL_MAILER
-        value: log # switch to smtp + real credentials to actually deliver password-reset emails
+        value: resend
+      - key: MAIL_FROM_ADDRESS
+        value: "onboarding@resend.dev" # switch to an address on your own verified domain once you add one in Resend
+      - key: RESEND_API_KEY
+        value: REPLACE_ME
+        sync: false # marks it sensitive so Render doesn't echo it back in the dashboard

@@ -24,14 +24,19 @@ class ProjectDecisionNotification extends Notification
             ->subject('Project Review Update: '.$this->project->title)
             ->greeting('Hello '.$notifiable->name.',');
 
+        $portalUrl = config('app.frontend_url', config('app.url')).'/student';
+
         if ($this->project->status === 'approved') {
-            return $mail->line('Congratulations! Your project has been approved by your supervisor.');
+            return $mail
+                ->line('Congratulations! Your project has been approved by your supervisor.')
+                ->action('View Project', $portalUrl);
         }
 
         return $mail
             ->line('Your project requires refinement before it can be approved.')
             ->line('Supervisor feedback: '.$this->project->feedback)
-            ->line('Please edit and resubmit your project.');
+            ->line('Please log in to the portal to make the requested changes and resubmit your project.')
+            ->action('Go to Portal', $portalUrl);
     }
 
     public function toArray(object $notifiable): array
