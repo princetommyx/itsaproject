@@ -10,6 +10,12 @@ export function Field({ label, value }) {
   )
 }
 
+// Caps the stagger at `maxSteps` items so a long grid still finishes
+// animating in quickly instead of trailing off for a huge list.
+export function stagger(i, stepMs = 40, maxSteps = 8) {
+  return { animationDelay: `${Math.min(i, maxSteps) * stepMs}ms` }
+}
+
 export function PageHeading({ children, description, actions, className = '' }) {
   return (
     <div className={`flex flex-wrap items-start justify-between gap-4 ${className}`}>
@@ -184,10 +190,11 @@ const STAT_CARD_STYLES = {
   slate: 'bg-slate-100 text-slate-700',
 }
 
-export function StatCard({ label, value, variant = 'blue' }) {
+export function StatCard({ label, value, variant = 'blue', className = '', style }) {
   return (
     <div
-      className={`rounded-2xl p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03),0_6px_16px_-8px_rgba(15,23,42,0.12)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_10px_-2px_rgba(15,23,42,0.14)] sm:p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}
+      style={style}
+      className={`rounded-2xl p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03),0_6px_16px_-8px_rgba(15,23,42,0.12)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_10px_-2px_rgba(15,23,42,0.14)] sm:p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue} ${className}`}
     >
       <p className="text-xs font-semibold tracking-wide uppercase opacity-70">{label}</p>
       <p className="mt-3 text-xl font-bold break-words sm:text-2xl">{value}</p>

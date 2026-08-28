@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import client from '../api/client'
-import { Button, Card, EmptyState, PageHeading } from './ui'
+import { Button, Card, EmptyState, PageHeading, stagger } from './ui'
 import { SkeletonList } from './Skeleton'
 import { InboxIcon } from './icons'
 import { describeNotification } from '../constants/notifications'
@@ -98,6 +98,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
 
   const unreadCount = notifications?.filter((n) => !n.read_at).length ?? 0
   const groups = groupByDate(visible)
+  let cardIndex = 0
 
   return (
     <div className="space-y-6">
@@ -165,8 +166,10 @@ export default function NotificationsPage({ apiPrefix, role }) {
                     if (!info) return null
                     const Icon = info.icon
 
+                    const delay = stagger(cardIndex++)
+
                     return (
-                      <li key={n.id}>
+                      <li key={n.id} className="animate-fade-up" style={delay}>
                         <button
                           onClick={() => openNotification(n)}
                           className={`flex w-full items-start gap-3 rounded-xl px-2 py-3.5 text-left transition hover:bg-slate-50 ${

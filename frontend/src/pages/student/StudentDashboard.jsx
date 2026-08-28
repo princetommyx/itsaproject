@@ -14,6 +14,7 @@ import {
   Textarea,
   STATUS_LABELS,
   STATUS_VARIANTS,
+  stagger,
 } from '../../components/ui'
 import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skeleton'
 import StatusTimeline from '../../components/StatusTimeline'
@@ -134,9 +135,13 @@ function ProjectPanel({ project, user, onChange, onError }) {
             label="Status"
             value={STATUS_LABELS[project.status] || project.status}
             variant={STATUS_VARIANTS[project.status] || 'slate'}
+            className="animate-fade-up"
+            style={stagger(0)}
           />
-          <StatCard label="Group Members" value={members.length} variant="blue" />
-          {project.assessor && <StatCard label="Supervisor" value={project.assessor.name} variant="violet" />}
+          <StatCard label="Group Members" value={members.length} variant="blue" className="animate-fade-up" style={stagger(1)} />
+          {project.assessor && (
+            <StatCard label="Supervisor" value={project.assessor.name} variant="violet" className="animate-fade-up" style={stagger(2)} />
+          )}
         </div>
 
         {project.status === 'refine' && project.feedback && (

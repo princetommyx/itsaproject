@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Button, Card, HeroStatCard, PageHeading, StatCard } from '../../../components/ui'
+import { Button, Card, HeroStatCard, PageHeading, StatCard, stagger } from '../../../components/ui'
 import { SkeletonCard, SkeletonHero, SkeletonStatCards } from '../../../components/Skeleton'
 import StatusBreakdownChart from '../../../components/StatusBreakdownChart'
 
@@ -71,11 +71,20 @@ export default function Overview() {
         Dashboard
       </PageHeading>
 
-      <HeroStatCard label="Total Projects Submitted" value={stats.total_submitted} caption="All-time" />
+      <div className="animate-fade-up">
+        <HeroStatCard label="Total Projects Submitted" value={stats.total_submitted} caption="All-time" />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {PEOPLE_METRICS.map((m) => (
-          <StatCard key={m.key} label={m.label} value={stats[m.key]} variant={m.variant} />
+        {PEOPLE_METRICS.map((m, i) => (
+          <StatCard
+            key={m.key}
+            label={m.label}
+            value={stats[m.key]}
+            variant={m.variant}
+            className="animate-fade-up"
+            style={stagger(i)}
+          />
         ))}
       </div>
 

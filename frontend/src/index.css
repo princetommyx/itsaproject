@@ -58,3 +58,64 @@ body {
 .animate-dot-pulse {
   animation: dot-pulse 1.2s ease-in-out infinite;
 }
+
+/* Whole-page transition on route change, and a staggered entrance for
+   card grids/lists — both GPU-cheap (opacity + transform only) so they
+   stay smooth on the lower-end phones a lot of students will be on. */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-enter {
+  animation: page-enter 0.25s ease-out both;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.3s ease-out both;
+}
+
+@keyframes tab-underline-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.animate-tab-underline {
+  animation: tab-underline-in 0.18s ease-out both;
+}
+
+/* Respect the OS-level "reduce motion" setting — common on older/low-power
+   phones, and the right default for anyone who's opted out of motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

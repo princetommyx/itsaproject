@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import client from '../../api/client'
-import { Badge, Card, EmptyState, PageHeading, StatCard } from '../../components/ui'
+import { Badge, Card, EmptyState, PageHeading, StatCard, stagger } from '../../components/ui'
 import { SkeletonCardGrid, SkeletonStatCards } from '../../components/Skeleton'
 import { ClipboardIcon } from '../../components/icons'
 
@@ -30,10 +30,10 @@ export default function AssessorDashboard() {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <StatCard label="Total Assigned" value={projects.length} variant="blue" />
-            <StatCard label="Pending Review" value={counts.pending} variant="gold" />
-            <StatCard label="Approved" value={counts.approved} variant="violet" />
-            <StatCard label="Needs Refinement" value={counts.refine} variant="pink" />
+            <StatCard label="Total Assigned" value={projects.length} variant="blue" className="animate-fade-up" style={stagger(0)} />
+            <StatCard label="Pending Review" value={counts.pending} variant="gold" className="animate-fade-up" style={stagger(1)} />
+            <StatCard label="Approved" value={counts.approved} variant="violet" className="animate-fade-up" style={stagger(2)} />
+            <StatCard label="Needs Refinement" value={counts.refine} variant="pink" className="animate-fade-up" style={stagger(3)} />
           </div>
 
           {projects.length === 0 ? (
@@ -42,8 +42,13 @@ export default function AssessorDashboard() {
             </Card>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
-              {projects.map((project) => (
-                <Link key={project.id} to={`/assessor/projects/${project.id}`}>
+              {projects.map((project, i) => (
+                <Link
+                  key={project.id}
+                  to={`/assessor/projects/${project.id}`}
+                  className="animate-fade-up"
+                  style={stagger(i)}
+                >
                   <Card interactive className="h-full">
                     <div className="mb-2 flex items-start justify-between gap-3">
                       <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>

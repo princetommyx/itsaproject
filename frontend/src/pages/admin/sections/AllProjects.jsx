@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import client from '../../../api/client'
-import { Avatar, Badge, Card, EmptyState, PageHeading } from '../../../components/ui'
+import { Avatar, Badge, Card, EmptyState, PageHeading, stagger } from '../../../components/ui'
 import { SkeletonCardGrid } from '../../../components/Skeleton'
 import { FolderIcon } from '../../../components/icons'
 
@@ -59,12 +59,17 @@ export default function AllProjects() {
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {visible.map((project) => {
+          {visible.map((project, i) => {
             const leader = project.members.find((m) => m.is_leader) ?? project.members[0]
             const leaderName = leader?.student?.name ?? leader?.university_id ?? 'Unassigned'
 
             return (
-              <Link key={project.id} to={`/admin/projects/${project.id}`}>
+              <Link
+                key={project.id}
+                to={`/admin/projects/${project.id}`}
+                className="animate-fade-up"
+                style={stagger(i)}
+              >
                 <Card interactive className="h-full">
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>

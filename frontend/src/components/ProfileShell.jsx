@@ -39,7 +39,7 @@ export default function ProfileShell({ homePath, homeLabel, children }) {
         </div>
       </div>
 
-      {tab === 'personal' ? children : <PasswordTab />}
+      <div key={tab} className="animate-fade-up">{tab === 'personal' ? children : <PasswordTab />}</div>
     </div>
   )
 }

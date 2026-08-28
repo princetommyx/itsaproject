@@ -266,7 +266,9 @@ export default function Layout({ children }) {
         </header>
 
         <main className="flex-1 px-4 pt-28 pb-6 sm:py-8">
-          <div className="mx-auto max-w-5xl">{children ?? <Outlet />}</div>
+          <div key={location.pathname} className="animate-page-enter mx-auto max-w-5xl">
+            {children ?? <Outlet />}
+          </div>
         </main>
       </div>
     </div>
