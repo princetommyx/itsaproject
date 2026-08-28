@@ -34,6 +34,8 @@ export default function Overview() {
       link.click()
       link.remove()
       toast.success('Project mapping exported.')
+    } catch (err) {
+      toast.error('Could not export project mapping. Please try again.')
     } finally {
       setExporting(false)
     }

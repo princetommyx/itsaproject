@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Project;
+use Illuminate\Support\Enumerable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
@@ -13,7 +14,7 @@ class ProjectMappingExport implements FromCollection, WithHeadings
         return ['Project Title', 'Status', 'Group Members', 'Assessor', 'Feedback'];
     }
 
-    public function collection()
+    public function collection(): Enumerable
     {
         return Project::with(['members.student', 'assessor'])->get()->map(function (Project $project) {
             return [
