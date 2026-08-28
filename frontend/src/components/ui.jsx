@@ -84,7 +84,7 @@ export function Button({ children, variant = 'primary', loading = false, classNa
 }
 
 const FIELD_CLASSES =
-  'w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-800 transition duration-150 placeholder:text-slate-400 focus:outline-none focus:ring-4'
+  'w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-800 transition duration-150 placeholder:text-slate-400 focus:outline-none focus:ring-4 disabled:cursor-not-allowed disabled:border-slate-100 disabled:bg-slate-50 disabled:text-slate-500'
 
 export const Input = forwardRef(function Input({ label, error, className = '', ...props }, ref) {
   return (
