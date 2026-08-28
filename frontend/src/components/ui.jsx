@@ -54,8 +54,10 @@ export function Avatar({ name, className = '' }) {
 export function Card({ children, className = '', interactive = false }) {
   return (
     <div
-      className={`rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-200/60 ${
-        interactive ? 'transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200' : ''
+      className={`rounded-2xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_10px_24px_-8px_rgba(15,23,42,0.14)] ${
+        interactive
+          ? 'transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_8px_rgba(15,23,42,0.06),0_20px_36px_-10px_rgba(15,23,42,0.2)]'
+          : ''
       } ${className}`}
     >
       {children}
@@ -185,7 +187,7 @@ const STAT_CARD_STYLES = {
 export function StatCard({ label, value, variant = 'blue' }) {
   return (
     <div
-      className={`rounded-2xl p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-200/70 sm:p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}
+      className={`rounded-2xl p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03),0_6px_16px_-8px_rgba(15,23,42,0.12)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_10px_-2px_rgba(15,23,42,0.14)] sm:p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}
     >
       <p className="text-xs font-semibold tracking-wide uppercase opacity-70">{label}</p>
       <p className="mt-3 text-xl font-bold break-words sm:text-2xl">{value}</p>
