@@ -265,7 +265,7 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 sm:py-8">
+        <main className="flex-1 px-4 pt-28 pb-6 sm:py-8">
           <div className="mx-auto max-w-5xl">{children ?? <Outlet />}</div>
         </main>
       </div>
