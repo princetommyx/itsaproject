@@ -12,16 +12,43 @@ export default function AdminProjectReview() {
   const navigate = useNavigate()
   const toast = useToast()
   const [project, setProject] = useState(null)
+  const [assessors, setAssessors] = useState([])
+  const [selectedAssessor, setSelectedAssessor] = useState('')
+  const [assigning, setAssigning] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
     load()
+    client.get('/admin/assessors').then((res) => setAssessors(res.data))
   }, [id])
 
   function load() {
     client.get(`/admin/projects/${id}`).then((res) => setProject(res.data))
+  }
+
+  async function assign() {
+    setError('')
+    if (!selectedAssessor) {
+      setError('Select an assessor first.')
+      return
+    }
+    setAssigning(true)
+    try {
+      await client.post(`/admin/projects/${id}/assign`, { assessor_id: selectedAssessor })
+      const assessorName = assessors.find((a) => String(a.id) === String(selectedAssessor))?.name
+      toast.success('Project assigned successfully', {
+        description: assessorName ? `${assessorName} has been assigned to review this project.` : undefined,
+      })
+      load()
+    } catch (err) {
+      const message = err.response?.data?.message
+      setError(message || 'Could not assign assessor.')
+      toast.error('Unable to assign assessor', { description: message || 'Something went wrong. Please try again.' })
+    } finally {
+      setAssigning(false)
+    }
   }
 
   async function decide(decision) {
@@ -57,6 +84,8 @@ export default function AdminProjectReview() {
       </div>
     )
   }
+
+  const awaitingDecision = ['pending', 'submitted_unassigned'].includes(project.status)
 
   return (
     <div className="space-y-6">
@@ -111,12 +140,39 @@ export default function AdminProjectReview() {
           <ProjectDocumentList documents={project.documents} />
         </div>
 
-        {project.status === 'pending' ? (
+        {awaitingDecision ? (
           <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
-            <p className="text-xs text-slate-400">
-              This project is assigned to {project.assessor?.name ?? 'an assessor'}. As an admin you can
-              also decide on it directly — for example if the assessor is unavailable.
-            </p>
+            {project.status === 'submitted_unassigned' ? (
+              <>
+                <p className="text-xs text-slate-400">
+                  This project hasn't been assigned an assessor yet. You can assign one to review it, or decide on
+                  it yourself right now.
+                </p>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <select
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-auto"
+                    value={selectedAssessor}
+                    onChange={(e) => setSelectedAssessor(e.target.value)}
+                  >
+                    <option value="">Select assessor...</option>
+                    {assessors.map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                  </select>
+                  <Button variant="secondary" onClick={assign} disabled={assigning} loading={assigning} className="sm:shrink-0">
+                    Assign Assessor
+                  </Button>
+                </div>
+                <p className="text-xs text-slate-400">— or —</p>
+              </>
+            ) : (
+              <p className="text-xs text-slate-400">
+                This project is assigned to {project.assessor?.name ?? 'an assessor'}. As an admin you can
+                also decide on it directly — for example if the assessor is unavailable.
+              </p>
+            )}
             {error && <Alert>{error}</Alert>}
             <Textarea
               label="Feedback (required if sending back for refinement)"
@@ -135,10 +191,7 @@ export default function AdminProjectReview() {
           </div>
         ) : (
           <p className="mt-6 border-t border-slate-100 pt-4 text-sm text-slate-500">
-            {project.status === 'submitted_unassigned'
-              ? 'This project has not been assigned an assessor yet.'
-              : 'This project has already been reviewed. Decision:'}{' '}
-            {project.status !== 'submitted_unassigned' && <Badge status={project.status} />}
+            This project has already been reviewed. Decision: <Badge status={project.status} />
           </p>
         )}
       </Card>

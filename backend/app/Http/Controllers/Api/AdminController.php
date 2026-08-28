@@ -130,8 +130,10 @@ class AdminController extends Controller
     }
 
     /**
-     * Admins can approve/refine any pending project, as a backup to the
-     * assigned assessor (e.g. if the assessor is unavailable).
+     * Admins can approve/refine any project awaiting a decision — whether
+     * it's already assigned to an assessor (as a backup, e.g. if the
+     * assessor is unavailable) or still unassigned, so an admin doesn't
+     * have to assign someone else just to review it themselves.
      */
     public function decideProject(Request $request, Project $project)
     {
@@ -140,7 +142,7 @@ class AdminController extends Controller
             'feedback' => ['required_if:decision,refine', 'nullable', 'string'],
         ]);
 
-        if ($project->status !== 'pending') {
+        if (! in_array($project->status, ['pending', 'submitted_unassigned'], true)) {
             abort(422, 'This project is not awaiting a decision.');
         }
 

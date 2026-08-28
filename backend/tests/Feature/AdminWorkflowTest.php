@@ -141,10 +141,24 @@ it('lets an admin approve a pending project as a backup to the assessor', functi
     Notification::assertSentTo($student, \App\Notifications\ProjectDecisionNotification::class);
 });
 
-it('prevents an admin from deciding on a project that is not pending', function () {
+it('lets an admin decide directly on a project that has not been assigned an assessor yet', function () {
     $admin = User::factory()->admin()->create();
+    $student = User::factory()->student()->create(['is_first_login' => false]);
 
     $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'submitted_unassigned']);
+    $project->members()->create(['university_id' => $student->university_id, 'student_id' => $student->id, 'is_leader' => true]);
+
+    $response = $this->actingAs($admin, 'sanctum')
+        ->postJson("/api/admin/projects/{$project->id}/decide", ['decision' => 'approved']);
+
+    $response->assertOk();
+    expect($project->fresh()->status)->toBe('approved');
+});
+
+it('prevents an admin from deciding on a project that is not awaiting review', function () {
+    $admin = User::factory()->admin()->create();
+
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'draft']);
 
     $this->actingAs($admin, 'sanctum')
         ->postJson("/api/admin/projects/{$project->id}/decide", ['decision' => 'approved'])

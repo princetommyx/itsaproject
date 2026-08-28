@@ -114,9 +114,11 @@ function CreateProjectForm({ onCreated, onError }) {
 
 function ProjectPanel({ project, user, onChange, onError }) {
   const toast = useToast()
+  const [submitting, setSubmitting] = useState(false)
   const members = project.members
   const isLeader = members.some((m) => m.student_id === user.id && m.is_leader)
   const editable = ['draft', 'refine'].includes(project.status)
+  const isResubmission = project.status === 'refine'
 
   return (
     <div className="space-y-6">
@@ -149,6 +151,28 @@ function ProjectPanel({ project, user, onChange, onError }) {
             <Alert variant="info">
               <strong>Supervisor feedback:</strong> {project.feedback}
             </Alert>
+          </div>
+        )}
+
+        {isLeader && editable && (
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-upsa-blue/15 bg-blue-50/60 p-4">
+            <div>
+              <p className="text-sm font-semibold text-slate-800">
+                {isResubmission ? 'Ready to resubmit?' : 'Ready to submit?'}
+              </p>
+              <p className="text-xs text-slate-500">
+                {isResubmission
+                  ? 'Once you’ve made the requested changes, resubmit for another review.'
+                  : 'You can submit as soon as your group and documents are set — or keep editing below first.'}
+              </p>
+            </div>
+            <Button
+              onClick={() => submitProject(project, onChange, onError, toast, setSubmitting)}
+              disabled={submitting}
+              loading={submitting}
+            >
+              {isResubmission ? 'Resubmit Project' : 'Submit Project'}
+            </Button>
           </div>
         )}
 
@@ -223,6 +247,29 @@ function ProjectPanel({ project, user, onChange, onError }) {
       </Card>
     </div>
   )
+}
+
+async function submitProject(project, onChange, onError, toast, setSubmitting) {
+  const isResubmission = project.status === 'refine'
+  onError('')
+  setSubmitting(true)
+  try {
+    await client.post(`/student/projects/${project.id}/submit`)
+    toast.success(isResubmission ? 'Submission resubmitted successfully' : 'Project submitted successfully', {
+      description: isResubmission
+        ? 'Your revised project has been sent back to your supervisor for review.'
+        : 'Your final-year project has been submitted for review.',
+    })
+    onChange()
+  } catch (err) {
+    const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
+    onError(message || 'Could not submit project.')
+    toast.error('Project submission failed', {
+      description: message || 'We couldn’t submit your project. Please check your connection and try again.',
+    })
+  } finally {
+    setSubmitting(false)
+  }
 }
 
 async function removeMember(projectId, memberId, onChange, onError, toast) {
@@ -305,32 +352,6 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
     }
   }
 
-  async function submitProject() {
-    const isResubmission = project.status === 'refine'
-    onError('')
-    setSubmitting(true)
-    try {
-      await client.post(`/student/projects/${project.id}/submit`)
-      toast.success(
-        isResubmission ? 'Submission resubmitted successfully' : 'Project submitted successfully',
-        {
-          description: isResubmission
-            ? 'Your revised project has been sent back to your supervisor for review.'
-            : 'Your final-year project has been submitted for review.',
-        }
-      )
-      onChange()
-    } catch (err) {
-      const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
-      onError(message || 'Could not submit project.')
-      toast.error('Project submission failed', {
-        description: message || 'We couldn’t submit your project. Please check your connection and try again.',
-      })
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
   return (
     <form className="mt-6 space-y-4 border-t border-slate-100 pt-6" onSubmit={saveEdits}>
       <h3 className="text-sm font-semibold text-slate-700">Edit Project</h3>
@@ -340,8 +361,13 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
         <Button type="submit" variant="secondary" disabled={submitting} loading={submitting}>
           Save Changes
         </Button>
-        <Button type="button" onClick={submitProject} disabled={submitting} loading={submitting}>
-          Submit Project
+        <Button
+          type="button"
+          onClick={() => submitProject(project, onChange, onError, toast, setSubmitting)}
+          disabled={submitting}
+          loading={submitting}
+        >
+          {project.status === 'refine' ? 'Resubmit Project' : 'Submit Project'}
         </Button>
       </div>
     </form>
