@@ -20,7 +20,7 @@ export function PageHeading({ children, description, actions, className = '' }) 
   return (
     <div className={`flex flex-wrap items-start justify-between gap-4 ${className}`}>
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{children}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{children}</h1>
         {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
@@ -197,7 +197,7 @@ export function StatCard({ label, value, variant = 'blue', className = '', style
       className={`rounded-2xl p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03),0_6px_16px_-8px_rgba(15,23,42,0.12)] transition duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_10px_-2px_rgba(15,23,42,0.14)] sm:p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue} ${className}`}
     >
       <p className="text-xs font-semibold tracking-wide uppercase opacity-70">{label}</p>
-      <p className="mt-3 text-xl font-bold break-words sm:text-2xl">{value}</p>
+      <p className="mt-3 text-xl font-extrabold break-words sm:text-2xl">{value}</p>
     </div>
   )
 }
@@ -212,7 +212,7 @@ export function HeroStatCard({ label, value, caption }) {
       <div className="relative flex items-end justify-between gap-4">
         <p className="text-lg font-semibold">{label}</p>
         <div className="text-right">
-          <p className="text-4xl font-bold">{value}</p>
+          <p className="text-4xl font-extrabold tracking-tight">{value}</p>
           {caption && <p className="mt-1 text-sm text-white/70">{caption}</p>}
         </div>
       </div>

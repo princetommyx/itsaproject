@@ -58,7 +58,7 @@ export default function LoginForm({
 
   return (
     <AuthShell>
-      <h1 className="mb-6 text-2xl leading-snug font-bold text-slate-800">{heading}</h1>
+      <h1 className="mb-6 text-2xl leading-snug font-extrabold tracking-tight text-slate-800">{heading}</h1>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
