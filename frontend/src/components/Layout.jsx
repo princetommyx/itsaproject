@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import client from '../api/client'
+import useSWR from 'swr'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
@@ -150,15 +150,14 @@ export default function Layout({ children }) {
   const toast = useToast()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
   const links = NAV_LINKS[user?.role] || []
 
-  useEffect(() => {
-    if (!user?.role || !API_PREFIX[user.role]) return
-    client.get(`${API_PREFIX[user.role]}/notifications`).then((res) => {
-      setUnreadCount(res.data.filter((n) => !n.read_at && describeNotification(n) !== null).length)
-    })
-  }, [user?.role, location.pathname])
+  // Shares its SWR cache key with NotificationsPage, so the list is fetched
+  // once and reused between the sidebar badge and the notifications page —
+  // not re-fetched in full on every route change.
+  const apiPrefix = user?.role ? API_PREFIX[user.role] : null
+  const { data: notifications } = useSWR(apiPrefix ? `${apiPrefix}/notifications` : null)
+  const unreadCount = notifications?.filter((n) => !n.read_at && describeNotification(n) !== null).length ?? 0
 
   function handleLogout() {
     logout()

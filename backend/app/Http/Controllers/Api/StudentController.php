@@ -167,7 +167,7 @@ class StudentController extends Controller
      */
     public function notifications(Request $request)
     {
-        return $request->user()->notifications()->latest()->get();
+        return $request->user()->notifications()->latest()->limit(100)->get();
     }
 
     public function markNotificationRead(Request $request, string $notificationId)
