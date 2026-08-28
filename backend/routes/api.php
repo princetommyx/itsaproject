@@ -24,6 +24,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/projects/{project}/members', [StudentController::class, 'addMember']);
             Route::delete('/projects/{project}/members/{member}', [StudentController::class, 'removeMember']);
             Route::post('/projects/{project}/submit', [StudentController::class, 'submit']);
+            Route::get('/notifications', [StudentController::class, 'notifications']);
+            Route::post('/notifications/{notificationId}/read', [StudentController::class, 'markNotificationRead']);
             Route::get('/complaints', [ComplaintController::class, 'index']);
             Route::post('/complaints', [ComplaintController::class, 'store']);
         });

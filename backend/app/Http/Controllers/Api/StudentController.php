@@ -145,6 +145,25 @@ class StudentController extends Controller
         return response()->json($project->fresh()->load('members.student'));
     }
 
+    /**
+     * The student's notifications (newest first), e.g. assessor decisions
+     * on their project — including the feedback when sent back for
+     * refinement, so they can see it without leaving the notifications
+     * page.
+     */
+    public function notifications(Request $request)
+    {
+        return $request->user()->notifications()->latest()->get();
+    }
+
+    public function markNotificationRead(Request $request, string $notificationId)
+    {
+        $notification = $request->user()->notifications()->where('id', $notificationId)->firstOrFail();
+        $notification->markAsRead();
+
+        return response()->json($notification->fresh());
+    }
+
     private function findLinkedStudentId(string $universityId): ?int
     {
         return \App\Models\User::where('university_id', $universityId)

@@ -176,3 +176,58 @@ it('lets the leader remove a pending (unregistered) member', function () {
 
     $this->assertDatabaseMissing('project_student', ['id' => $pending->id]);
 });
+
+it('notifies the student in-app when their project is sent back for refinement', function () {
+    $assessor = User::factory()->assessor()->create();
+    $student = studentUser();
+
+    $project = Project::create([
+        'title' => 'Smart Irrigation System',
+        'description' => 'D',
+        'status' => 'pending',
+        'assessor_id' => $assessor->id,
+    ]);
+    $project->members()->create(['university_id' => $student->university_id, 'student_id' => $student->id, 'is_leader' => true]);
+
+    $this->actingAs($assessor, 'sanctum')
+        ->postJson("/api/assessor/projects/{$project->id}/decide", [
+            'decision' => 'refine',
+            'feedback' => 'Please expand your methodology section.',
+        ])->assertOk();
+
+    $response = $this->actingAs($student, 'sanctum')->getJson('/api/student/notifications');
+
+    $response->assertOk();
+    expect($response->json())->toHaveCount(1);
+    expect($response->json()[0]['data'])->toMatchArray([
+        'project_id' => $project->id,
+        'project_title' => 'Smart Irrigation System',
+        'status' => 'refine',
+        'feedback' => 'Please expand your methodology section.',
+    ]);
+    expect($response->json()[0]['read_at'])->toBeNull();
+});
+
+it('lets a student mark a notification as read', function () {
+    $assessor = User::factory()->assessor()->create();
+    $student = studentUser();
+
+    $project = Project::create([
+        'title' => 'T',
+        'description' => 'D',
+        'status' => 'pending',
+        'assessor_id' => $assessor->id,
+    ]);
+    $project->members()->create(['university_id' => $student->university_id, 'student_id' => $student->id, 'is_leader' => true]);
+
+    $this->actingAs($assessor, 'sanctum')
+        ->postJson("/api/assessor/projects/{$project->id}/decide", ['decision' => 'approved']);
+
+    $notificationId = $student->notifications()->first()->id;
+
+    $this->actingAs($student, 'sanctum')
+        ->postJson("/api/student/notifications/{$notificationId}/read")
+        ->assertOk();
+
+    expect($student->notifications()->first()->read_at)->not->toBeNull();
+});

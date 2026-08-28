@@ -15,7 +15,7 @@ class ProjectDecisionNotification extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
@@ -32,5 +32,16 @@ class ProjectDecisionNotification extends Notification
             ->line('Your project requires refinement before it can be approved.')
             ->line('Assessor feedback: '.$this->project->feedback)
             ->line('Please edit and resubmit your project.');
+    }
+
+    public function toArray(object $notifiable): array
+    {
+        return [
+            'type' => 'project_decision',
+            'project_id' => $this->project->id,
+            'project_title' => $this->project->title,
+            'status' => $this->project->status,
+            'feedback' => $this->project->feedback,
+        ];
     }
 }

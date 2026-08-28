@@ -10,6 +10,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import StudentDashboard from './pages/student/StudentDashboard'
 import StudentSupport from './pages/student/StudentSupport'
+import StudentNotifications from './pages/student/StudentNotifications'
 import AssessorDashboard from './pages/assessor/AssessorDashboard'
 import ProjectReview from './pages/assessor/ProjectReview'
 import Overview from './pages/admin/sections/Overview'
@@ -44,6 +45,7 @@ export default function App() {
             <Route element={<ProtectedRoute allowedRoles={['student']} />}>
               <Route element={<Layout />}>
                 <Route path="/student" element={<StudentDashboard />} />
+                <Route path="/student/notifications" element={<StudentNotifications />} />
                 <Route path="/student/support" element={<StudentSupport />} />
               </Route>
             </Route>

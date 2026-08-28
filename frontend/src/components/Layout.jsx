@@ -1,9 +1,11 @@
-import { useState } from 'react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import upsaLogo from '../assets/upsa-logo.png'
 import {
+  BellIcon,
   BuildingIcon,
   ClipboardIcon,
   DashboardIcon,
@@ -16,6 +18,7 @@ import {
 const NAV_LINKS = {
   student: [
     { to: '/student', label: 'My Project', icon: FolderIcon },
+    { to: '/student/notifications', label: 'Notifications', icon: BellIcon },
     { to: '/student/support', label: 'Support Tickets', icon: MessageIcon },
   ],
   assessor: [{ to: '/assessor', label: 'Assigned Projects', icon: ClipboardIcon }],
@@ -52,8 +55,17 @@ function CloseIcon() {
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
   const toast = useToast()
+  const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
   const links = NAV_LINKS[user?.role] || []
+
+  useEffect(() => {
+    if (user?.role !== 'student') return
+    client.get('/student/notifications').then((res) => {
+      setUnreadCount(res.data.filter((n) => !n.read_at).length)
+    })
+  }, [user?.role, location.pathname])
 
   function handleLogout() {
     logout()
@@ -109,7 +121,12 @@ export default function Layout({ children }) {
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white/10">
                   <link.icon />
                 </span>
-                {link.label}
+                <span className="flex-1">{link.label}</span>
+                {link.to === '/student/notifications' && unreadCount > 0 && (
+                  <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-upsa-gold px-1 text-xs font-semibold text-upsa-blue-dark">
+                    {unreadCount}
+                  </span>
+                )}
               </NavLink>
             )
           )}
