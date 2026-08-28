@@ -68,7 +68,7 @@ export default function StaffManagement() {
             minLength={8}
             required
           />
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} loading={submitting}>
             {submitting ? 'Creating...' : 'Create Account'}
           </Button>
         </form>

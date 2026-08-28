@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
+import Spinner from '../components/Spinner'
 
 function Field({ label, ...props }) {
   return (
@@ -86,8 +87,9 @@ export default function ChangePassword() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
+          {submitting && <Spinner className="h-4 w-4" light />}
           {submitting ? 'Saving...' : 'Save Password'}
         </button>
         <button

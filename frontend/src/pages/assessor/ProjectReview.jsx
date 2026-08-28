@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { Alert, Badge, Button, Card, Textarea } from '../../components/ui'
+import { Skeleton, SkeletonCard } from '../../components/Skeleton'
 
 export default function ProjectReview() {
   const { id } = useParams()
@@ -39,7 +40,14 @@ export default function ProjectReview() {
     }
   }
 
-  if (!project) return <p className="text-slate-500">Loading...</p>
+  if (!project) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-4 w-40" />
+        <SkeletonCard lines={4} />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -77,10 +85,10 @@ export default function ProjectReview() {
               onChange={(e) => setFeedback(e.target.value)}
             />
             <div className="flex flex-wrap gap-2">
-              <Button variant="success" onClick={() => decide('approved')} disabled={submitting}>
+              <Button variant="success" onClick={() => decide('approved')} disabled={submitting} loading={submitting}>
                 Approve
               </Button>
-              <Button variant="danger" onClick={() => decide('refine')} disabled={submitting}>
+              <Button variant="danger" onClick={() => decide('refine')} disabled={submitting} loading={submitting}>
                 Send Back for Refinement
               </Button>
             </div>

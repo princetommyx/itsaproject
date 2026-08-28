@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import AuthShell from './AuthShell'
 import { Alert } from './ui'
+import Spinner from './Spinner'
 
 function UnderlineInput({ label, ...props }) {
   return (
@@ -92,8 +93,9 @@ export default function LoginForm({
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
         >
+          {submitting && <Spinner className="h-4 w-4" light />}
           {submitting ? 'Signing in...' : 'Login'}
         </button>
       </form>

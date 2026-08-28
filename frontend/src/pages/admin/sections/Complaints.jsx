@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Badge, Card, STATUS_LABELS } from '../../../components/ui'
+import { SkeletonList } from '../../../components/Skeleton'
 
 const STATUSES = ['open', 'in_progress', 'resolved']
 
@@ -23,14 +24,14 @@ export default function Complaints() {
     load()
   }
 
-  if (complaints === null) return <p className="text-slate-500">Loading...</p>
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold text-slate-800">Complaints</h1>
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Student Complaints</h2>
-        {complaints.length === 0 ? (
+        {complaints === null ? (
+          <SkeletonList rows={4} />
+        ) : complaints.length === 0 ? (
           <p className="text-sm text-slate-500">No complaints have been filed.</p>
         ) : (
           <ul className="divide-y divide-slate-100">

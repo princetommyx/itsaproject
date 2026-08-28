@@ -3,6 +3,7 @@ import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
 import { Alert, Button, Card, Input, StatCard, Textarea, STATUS_LABELS, STATUS_VARIANTS } from '../../components/ui'
+import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skeleton'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -18,7 +19,22 @@ export default function StudentDashboard() {
   }
 
   if (project === undefined) {
-    return <p className="text-slate-500">Loading...</p>
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-semibold text-slate-800">My Project</h1>
+        <Card>
+          <Skeleton className="h-5 w-2/5" />
+          <Skeleton className="mt-2 h-3 w-4/5" />
+          <div className="mt-4">
+            <SkeletonStatCards />
+          </div>
+          <div className="mt-5">
+            <Skeleton className="mb-2 h-3 w-32" />
+            <SkeletonList rows={3} />
+          </div>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -71,7 +87,7 @@ function CreateProjectForm({ onCreated, onError }) {
           onChange={(e) => setDescription(e.target.value)}
           required
         />
-        <Button type="submit" disabled={submitting}>
+        <Button type="submit" disabled={submitting} loading={submitting}>
           {submitting ? 'Creating...' : 'Create Draft'}
         </Button>
       </form>
@@ -202,7 +218,7 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
           required
           autoFocus
         />
-        <Button type="submit" variant="secondary" className="sm:shrink-0" disabled={submitting}>
+        <Button type="submit" variant="secondary" className="sm:shrink-0" disabled={submitting} loading={submitting}>
           {submitting ? 'Adding...' : '+ Add Member'}
         </Button>
       </form>
@@ -250,10 +266,10 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
       <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
       <Textarea label="Description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" variant="secondary" disabled={submitting}>
+        <Button type="submit" variant="secondary" disabled={submitting} loading={submitting}>
           Save Changes
         </Button>
-        <Button type="button" onClick={submitProject} disabled={submitting}>
+        <Button type="button" onClick={submitProject} disabled={submitting} loading={submitting}>
           Submit Project
         </Button>
       </div>

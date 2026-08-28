@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import client from '../../api/client'
 import { Badge, Card } from '../../components/ui'
+import { SkeletonCardGrid } from '../../components/Skeleton'
 
 export default function AssessorDashboard() {
   const [projects, setProjects] = useState(null)
@@ -15,7 +16,7 @@ export default function AssessorDashboard() {
       <h1 className="text-2xl font-semibold text-slate-800">Assigned Projects</h1>
 
       {projects === null ? (
-        <p className="text-slate-500">Loading...</p>
+        <SkeletonCardGrid />
       ) : projects.length === 0 ? (
         <Card>
           <p className="text-sm text-slate-500">No projects have been assigned to you yet.</p>

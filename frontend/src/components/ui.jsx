@@ -1,4 +1,5 @@
 import { forwardRef } from 'react'
+import Spinner from './Spinner'
 
 export function Card({ children, className = '' }) {
   return (
@@ -8,19 +9,21 @@ export function Card({ children, className = '' }) {
   )
 }
 
-export function Button({ children, variant = 'primary', className = '', ...props }) {
+export function Button({ children, variant = 'primary', loading = false, className = '', ...props }) {
   const variants = {
     primary: 'bg-upsa-blue text-white hover:bg-upsa-blue-dark',
     secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
     danger: 'bg-red-600 text-white hover:bg-red-700',
     success: 'bg-emerald-600 text-white hover:bg-emerald-700',
   }
+  const light = variant !== 'secondary'
 
   return (
     <button
-      className={`rounded-md px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${className}`}
       {...props}
     >
+      {loading && <Spinner className="h-3.5 w-3.5" light={light} />}
       {children}
     </button>
   )

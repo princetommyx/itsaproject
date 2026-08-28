@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Button, Card, HeroStatCard, StatCard } from '../../../components/ui'
+import { SkeletonCard, SkeletonHero, SkeletonStatCards } from '../../../components/Skeleton'
 
 const METRICS = [
   { key: 'unassigned', label: 'Awaiting Assignment', variant: 'gold' },
@@ -38,7 +39,16 @@ export default function Overview() {
     }
   }
 
-  if (!stats) return <p className="text-slate-500">Loading...</p>
+  if (!stats) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-2xl font-semibold text-slate-800">Dashboard</h1>
+        <SkeletonHero />
+        <SkeletonStatCards count={6} />
+        <SkeletonCard lines={2} />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-6">
@@ -57,7 +67,7 @@ export default function Overview() {
         <p className="mb-4 text-sm text-slate-500">
           Export the full Project → Members → Assessor mapping as an Excel file.
         </p>
-        <Button onClick={handleExport} disabled={exporting}>
+        <Button onClick={handleExport} disabled={exporting} loading={exporting}>
           {exporting ? 'Preparing...' : 'Export to Excel'}
         </Button>
       </Card>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import client from '../api/client'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
+import Spinner from '../components/Spinner'
 
 export default function ForgotPassword() {
   const [universityId, setUniversityId] = useState('')
@@ -43,8 +44,9 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
           >
+            {submitting && <Spinner className="h-4 w-4" light />}
             {submitting ? 'Sending...' : 'Reset Password'}
           </button>
         </form>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { Badge, Button, Card, Input, Textarea } from '../../components/ui'
+import { SkeletonList } from '../../components/Skeleton'
 
 export default function StudentSupport() {
   const toast = useToast()
@@ -41,7 +42,7 @@ export default function StudentSupport() {
         <form className="space-y-3" onSubmit={handleSubmit}>
           <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
           <Textarea label="Message" rows={4} value={message} onChange={(e) => setMessage(e.target.value)} required />
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} loading={submitting}>
             {submitting ? 'Submitting...' : 'Submit Ticket'}
           </Button>
         </form>
@@ -50,7 +51,7 @@ export default function StudentSupport() {
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Your Tickets</h2>
         {complaints === null ? (
-          <p className="text-sm text-slate-500">Loading...</p>
+          <SkeletonList rows={3} />
         ) : complaints.length === 0 ? (
           <p className="text-sm text-slate-500">No support tickets filed yet.</p>
         ) : (
