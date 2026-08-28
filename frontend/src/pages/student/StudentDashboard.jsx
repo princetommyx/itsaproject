@@ -30,8 +30,6 @@ export default function StudentDashboard() {
       ) : (
         <ProjectPanel project={project} user={user} onChange={load} onError={setError} />
       )}
-
-      <ComplaintsPanel />
     </div>
   )
 }
@@ -245,62 +243,5 @@ function EditAndSubmit({ project, onChange, onError }) {
         </Button>
       </div>
     </form>
-  )
-}
-
-function ComplaintsPanel() {
-  const [complaints, setComplaints] = useState([])
-  const [subject, setSubject] = useState('')
-  const [message, setMessage] = useState('')
-  const [submitting, setSubmitting] = useState(false)
-
-  useEffect(() => {
-    load()
-  }, [])
-
-  function load() {
-    client.get('/student/complaints').then((res) => setComplaints(res.data))
-  }
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setSubmitting(true)
-    try {
-      await client.post('/student/complaints', { subject, message })
-      setSubject('')
-      setMessage('')
-      load()
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
-  return (
-    <Card>
-      <h2 className="mb-4 text-lg font-semibold text-slate-800">Support Tickets</h2>
-      <form className="mb-6 space-y-3" onSubmit={handleSubmit}>
-        <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
-        <Textarea label="Message" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} required />
-        <Button type="submit" variant="secondary" disabled={submitting}>
-          {submitting ? 'Submitting...' : 'Submit Ticket'}
-        </Button>
-      </form>
-
-      {complaints.length === 0 ? (
-        <p className="text-sm text-slate-500">No support tickets filed yet.</p>
-      ) : (
-        <ul className="divide-y divide-slate-100">
-          {complaints.map((c) => (
-            <li key={c.id} className="flex items-center justify-between py-2 text-sm">
-              <div>
-                <p className="font-medium text-slate-700">{c.subject}</p>
-                <p className="text-slate-500">{c.message}</p>
-              </div>
-              <Badge status={c.status} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
   )
 }

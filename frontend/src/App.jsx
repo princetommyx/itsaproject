@@ -8,6 +8,7 @@ import ChangePassword from './pages/ChangePassword'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import StudentDashboard from './pages/student/StudentDashboard'
+import StudentSupport from './pages/student/StudentSupport'
 import AssessorDashboard from './pages/assessor/AssessorDashboard'
 import ProjectReview from './pages/assessor/ProjectReview'
 
@@ -34,6 +35,7 @@ export default function App() {
           <Route element={<ProtectedRoute allowedRoles={['student']} />}>
             <Route element={<Layout />}>
               <Route path="/student" element={<StudentDashboard />} />
+              <Route path="/student/support" element={<StudentSupport />} />
             </Route>
           </Route>
 
