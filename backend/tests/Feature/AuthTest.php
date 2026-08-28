@@ -1,7 +1,10 @@
 <?php
 
 use App\Models\User;
+use App\Notifications\StudentPasswordResetNotification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 
 it('logs a student in with their index number', function () {
     $student = User::factory()->student()->create([
@@ -42,6 +45,74 @@ it('rejects invalid credentials', function () {
     $this->postJson('/api/login', [
         'identifier' => 'UPSA/0000001',
         'password' => 'wrong-password',
+    ])->assertUnprocessable();
+});
+
+it('rejects login for an identifier that does not exist, same as a wrong password', function () {
+    $this->postJson('/api/login', [
+        'identifier' => 'UPSA/9999999',
+        'password' => 'whatever',
+    ])->assertUnprocessable();
+});
+
+it('throttles repeated login attempts from the same client', function () {
+    for ($i = 0; $i < 10; $i++) {
+        $this->postJson('/api/login', ['identifier' => 'nobody', 'password' => 'nope'])
+            ->assertUnprocessable();
+    }
+
+    $this->postJson('/api/login', ['identifier' => 'nobody', 'password' => 'nope'])
+        ->assertStatus(429);
+});
+
+it('resets a password with a valid token', function () {
+    Notification::fake();
+
+    $student = User::factory()->student()->create(['university_id' => 'UPSA/2000001']);
+
+    $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/2000001'])->assertOk();
+
+    $token = null;
+    Notification::assertSentTo($student, StudentPasswordResetNotification::class, function ($notification) use (&$token) {
+        $token = (fn () => $this->token)->call($notification);
+
+        return true;
+    });
+
+    $this->postJson('/api/password/reset', [
+        'university_id' => 'UPSA/2000001',
+        'token' => $token,
+        'password' => 'new-secure-password',
+        'password_confirmation' => 'new-secure-password',
+    ])->assertOk();
+
+    $student->refresh();
+    expect(Hash::check('new-secure-password', $student->password))->toBeTrue();
+});
+
+it('rejects a password reset token once it has expired', function () {
+    Notification::fake();
+
+    $student = User::factory()->student()->create(['university_id' => 'UPSA/2000002']);
+
+    $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/2000002'])->assertOk();
+
+    $token = null;
+    Notification::assertSentTo($student, StudentPasswordResetNotification::class, function ($notification) use (&$token) {
+        $token = (fn () => $this->token)->call($notification);
+
+        return true;
+    });
+
+    DB::table('password_reset_tokens')
+        ->where('email', $student->student_email)
+        ->update(['created_at' => now()->subMinutes(config('auth.passwords.users.expire') + 1)]);
+
+    $this->postJson('/api/password/reset', [
+        'university_id' => 'UPSA/2000002',
+        'token' => $token,
+        'password' => 'new-secure-password',
+        'password_confirmation' => 'new-secure-password',
     ])->assertUnprocessable();
 });
 

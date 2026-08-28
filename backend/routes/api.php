@@ -8,9 +8,14 @@ use App\Http\Controllers\Api\ProjectDocumentController;
 use App\Http\Controllers\Api\StudentController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/password/forgot', [AuthController::class, 'requestPasswordReset']);
-Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+// Tighter than the general API limiter — these are unauthenticated,
+// credential-guessing-shaped endpoints (login, and the two password-reset
+// steps), so they get their own stricter per-IP throttle.
+Route::middleware('throttle:10,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/password/forgot', [AuthController::class, 'requestPasswordReset']);
+    Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+});
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

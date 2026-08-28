@@ -18,14 +18,29 @@ class ProjectMappingExport implements FromCollection, WithHeadings
     {
         return Project::with(['members.student', 'assessor'])->get()->map(function (Project $project) {
             return [
-                $project->title,
+                self::escapeFormula($project->title),
                 $project->status,
-                $project->members->map(
+                self::escapeFormula($project->members->map(
                     fn ($member) => $member->student?->name ?? "{$member->university_id} (unregistered)"
-                )->implode(', '),
-                $project->assessor?->name ?? 'Unassigned',
-                $project->feedback,
+                )->implode(', ')),
+                self::escapeFormula($project->assessor?->name ?? 'Unassigned'),
+                self::escapeFormula($project->feedback),
             ];
         });
+    }
+
+    /**
+     * Project titles, member names, and feedback all come from user input.
+     * A value starting with =, +, -, or @ is a live formula to Excel/Sheets
+     * the moment someone opens the file — prefixing it with a quote forces
+     * text interpretation instead. See CWE-1236 (CSV/Excel injection).
+     */
+    private static function escapeFormula(?string $value): ?string
+    {
+        if ($value !== null && preg_match('/^[=+\-@]/', $value)) {
+            return "'".$value;
+        }
+
+        return $value;
     }
 }

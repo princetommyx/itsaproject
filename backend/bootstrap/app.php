@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'is.student' => \App\Http\Middleware\IsStudent::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
         ]);
+
+        // Baseline throttle for every API route (the auth endpoints layer a
+        // stricter one on top — see routes/api.php).
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

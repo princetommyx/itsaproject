@@ -8,11 +8,20 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
+    /**
+     * A precomputed hash with no matching password, so Hash::check() always
+     * has real work to do below — otherwise an unknown identifier returns
+     * near-instantly while a known one takes a full bcrypt comparison,
+     * letting response time alone reveal which index numbers/emails exist.
+     */
+    private const DUMMY_HASH = '$2y$12$Z6WDYnh7MUzwFDpauk24YOVhMk/ZU8CRBI0GCXIz02YpDhr3hQClC';
+
     /**
      * Dual-authentication gateway: a single login field routes to either
      * the student (index number) or staff (email) verification path.
@@ -30,7 +39,9 @@ class AuthController extends Controller
             ? User::where('email', $identifier)->first()
             : User::where('university_id', $identifier)->first();
 
-        if (! $user || ! Hash::check($validated['password'], $user->password)) {
+        if (! Hash::check($validated['password'], $user->password ?? self::DUMMY_HASH) || ! $user) {
+            Log::warning('Failed login attempt', ['identifier' => $identifier, 'ip' => $request->ip()]);
+
             throw ValidationException::withMessages([
                 'identifier' => ['The provided credentials are incorrect.'],
             ]);
@@ -142,7 +153,9 @@ class AuthController extends Controller
             ->where('email', $user->student_email)
             ->first();
 
-        if (! $record || ! Hash::check($validated['token'], $record->token)) {
+        $expiresAt = $record ? \Illuminate\Support\Carbon::parse($record->created_at)->addMinutes(config('auth.passwords.users.expire')) : null;
+
+        if (! $record || ! Hash::check($validated['token'], $record->token) || now()->greaterThan($expiresAt)) {
             throw ValidationException::withMessages([
                 'token' => ['This password reset token is invalid or has expired.'],
             ]);
