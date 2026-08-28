@@ -11,6 +11,7 @@ export default function LoginForm({
   heading,
   identifierLabel,
   identifierPlaceholder,
+  passwordPlaceholder,
   identifierAutoComplete,
   allowedRoles,
   wrongRoleMessage,
@@ -74,6 +75,7 @@ export default function LoginForm({
         <AuthField
           label="Password"
           type="password"
+          placeholder={passwordPlaceholder}
           autoComplete="current-password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

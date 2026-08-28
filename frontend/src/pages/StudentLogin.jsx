@@ -6,7 +6,8 @@ export default function StudentLogin() {
     <LoginForm
       heading="Welcome to UPSA FYP System"
       identifierLabel="Index Number"
-      identifierPlaceholder=""
+      identifierPlaceholder="Index Number"
+      passwordPlaceholder="Date of Birth eg. 20-07-2004"
       identifierAutoComplete="username"
       allowedRoles={['student']}
       wrongRoleMessage="This looks like a staff account. Please use the Staff / Admin sign-in page instead."

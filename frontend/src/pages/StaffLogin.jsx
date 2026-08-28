@@ -6,7 +6,7 @@ export default function StaffLogin() {
     <LoginForm
       heading="Welcome to UPSA FYP System"
       identifierLabel="Official Email"
-      identifierPlaceholder="e.g. j.ofoeda@upsamail.edu.gh"
+      identifierPlaceholder="upsa@mail.edu.gh"
       identifierAutoComplete="username"
       allowedRoles={['admin', 'assessor']}
       wrongRoleMessage="This looks like a student account. Please use the Student sign-in page instead."
