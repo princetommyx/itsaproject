@@ -1,32 +1,35 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
-import StudentLogin from './pages/StudentLogin'
-import AdminEntry from './pages/AdminEntry'
-import ChangePassword from './pages/ChangePassword'
-import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/ResetPassword'
-import StudentDashboard from './pages/student/StudentDashboard'
-import StudentSupport from './pages/student/StudentSupport'
-import StudentNotifications from './pages/student/StudentNotifications'
-import StudentProfile from './pages/student/StudentProfile'
-import StudentDocuments from './pages/student/StudentDocuments'
-import AssessorDashboard from './pages/assessor/AssessorDashboard'
-import ProjectReview from './pages/assessor/ProjectReview'
-import AssessorProfile from './pages/assessor/AssessorProfile'
-import AssessorNotifications from './pages/assessor/AssessorNotifications'
-import Overview from './pages/admin/sections/Overview'
-import AllProjects from './pages/admin/sections/AllProjects'
-import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
-import Assignments from './pages/admin/sections/Assignments'
-import ImportStudents from './pages/admin/sections/ImportStudents'
-import StaffManagement from './pages/admin/sections/StaffManagement'
-import LoginLogs from './pages/admin/sections/LoginLogs'
-import Complaints from './pages/admin/sections/Complaints'
-import AdminProfile from './pages/admin/sections/AdminProfile'
-import AdminNotifications from './pages/admin/sections/AdminNotifications'
+import PageLoader from './components/PageLoader'
+
+const StudentLogin = lazy(() => import('./pages/StudentLogin'))
+const AdminEntry = lazy(() => import('./pages/AdminEntry'))
+const ChangePassword = lazy(() => import('./pages/ChangePassword'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const StudentDashboard = lazy(() => import('./pages/student/StudentDashboard'))
+const StudentSupport = lazy(() => import('./pages/student/StudentSupport'))
+const StudentNotifications = lazy(() => import('./pages/student/StudentNotifications'))
+const StudentProfile = lazy(() => import('./pages/student/StudentProfile'))
+const StudentDocuments = lazy(() => import('./pages/student/StudentDocuments'))
+const AssessorDashboard = lazy(() => import('./pages/assessor/AssessorDashboard'))
+const ProjectReview = lazy(() => import('./pages/assessor/ProjectReview'))
+const AssessorProfile = lazy(() => import('./pages/assessor/AssessorProfile'))
+const AssessorNotifications = lazy(() => import('./pages/assessor/AssessorNotifications'))
+const Overview = lazy(() => import('./pages/admin/sections/Overview'))
+const AllProjects = lazy(() => import('./pages/admin/sections/AllProjects'))
+const AdminProjectReview = lazy(() => import('./pages/admin/sections/AdminProjectReview'))
+const Assignments = lazy(() => import('./pages/admin/sections/Assignments'))
+const ImportStudents = lazy(() => import('./pages/admin/sections/ImportStudents'))
+const StaffManagement = lazy(() => import('./pages/admin/sections/StaffManagement'))
+const LoginLogs = lazy(() => import('./pages/admin/sections/LoginLogs'))
+const Complaints = lazy(() => import('./pages/admin/sections/Complaints'))
+const AdminProfile = lazy(() => import('./pages/admin/sections/AdminProfile'))
+const AdminNotifications = lazy(() => import('./pages/admin/sections/AdminNotifications'))
 
 function HomeRedirect() {
   const { user, loading } = useAuth()
@@ -41,49 +44,51 @@ export default function App() {
     <BrowserRouter>
       <ToastProvider>
         <AuthProvider>
-          <Routes>
-            <Route path="/" element={<HomeRedirect />} />
-            <Route path="/login" element={<StudentLogin />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/change-password" element={<ChangePassword />} />
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<HomeRedirect />} />
+              <Route path="/login" element={<StudentLogin />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/change-password" element={<ChangePassword />} />
 
-            <Route element={<ProtectedRoute allowedRoles={['student']} />}>
-              <Route element={<Layout />}>
-                <Route path="/student" element={<StudentDashboard />} />
-                <Route path="/student/notifications" element={<StudentNotifications />} />
-                <Route path="/student/documents" element={<StudentDocuments />} />
-                <Route path="/student/support" element={<StudentSupport />} />
-                <Route path="/student/profile" element={<StudentProfile />} />
+              <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+                <Route element={<Layout />}>
+                  <Route path="/student" element={<StudentDashboard />} />
+                  <Route path="/student/notifications" element={<StudentNotifications />} />
+                  <Route path="/student/documents" element={<StudentDocuments />} />
+                  <Route path="/student/support" element={<StudentSupport />} />
+                  <Route path="/student/profile" element={<StudentProfile />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route element={<ProtectedRoute allowedRoles={['assessor']} />}>
-              <Route element={<Layout />}>
-                <Route path="/assessor" element={<AssessorDashboard />} />
-                <Route path="/assessor/projects/:id" element={<ProjectReview />} />
-                <Route path="/assessor/notifications" element={<AssessorNotifications />} />
-                <Route path="/assessor/profile" element={<AssessorProfile />} />
+              <Route element={<ProtectedRoute allowedRoles={['assessor']} />}>
+                <Route element={<Layout />}>
+                  <Route path="/assessor" element={<AssessorDashboard />} />
+                  <Route path="/assessor/projects/:id" element={<ProjectReview />} />
+                  <Route path="/assessor/notifications" element={<AssessorNotifications />} />
+                  <Route path="/assessor/profile" element={<AssessorProfile />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="/admin" element={<AdminEntry />}>
-              <Route element={<Layout />}>
-                <Route index element={<Overview />} />
-                <Route path="projects" element={<AllProjects />} />
-                <Route path="projects/:id" element={<AdminProjectReview />} />
-                <Route path="assignments" element={<Assignments />} />
-                <Route path="import" element={<ImportStudents />} />
-                <Route path="staff" element={<StaffManagement />} />
-                <Route path="logs" element={<LoginLogs />} />
-                <Route path="complaints" element={<Complaints />} />
-                <Route path="notifications" element={<AdminNotifications />} />
-                <Route path="profile" element={<AdminProfile />} />
+              <Route path="/admin" element={<AdminEntry />}>
+                <Route element={<Layout />}>
+                  <Route index element={<Overview />} />
+                  <Route path="projects" element={<AllProjects />} />
+                  <Route path="projects/:id" element={<AdminProjectReview />} />
+                  <Route path="assignments" element={<Assignments />} />
+                  <Route path="import" element={<ImportStudents />} />
+                  <Route path="staff" element={<StaffManagement />} />
+                  <Route path="logs" element={<LoginLogs />} />
+                  <Route path="complaints" element={<Complaints />} />
+                  <Route path="notifications" element={<AdminNotifications />} />
+                  <Route path="profile" element={<AdminProfile />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
         </AuthProvider>
       </ToastProvider>
     </BrowserRouter>
