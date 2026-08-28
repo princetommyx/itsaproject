@@ -28,7 +28,7 @@ export function SkeletonHero() {
 
 export function SkeletonCard({ lines = 3, className = '' }) {
   return (
-    <div className={`animate-pulse rounded-lg border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+    <div className={`animate-pulse rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-200/60 ${className}`}>
       <div className="h-4 w-1/3 rounded bg-slate-200" />
       <div className="mt-4 space-y-2.5">
         {Array.from({ length: lines }).map((_, i) => (
@@ -43,7 +43,7 @@ export function SkeletonCardGrid({ count = 4 }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="animate-pulse rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+        <div key={i} className="animate-pulse rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-200/60">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div className="h-4 w-2/3 rounded bg-slate-200" />
             <div className="h-5 w-16 shrink-0 rounded-full bg-slate-100" />

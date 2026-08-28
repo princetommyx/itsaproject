@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Button, Card, HeroStatCard, StatCard } from '../../../components/ui'
+import { Button, HeroStatCard, PageHeading, StatCard } from '../../../components/ui'
 import { SkeletonCard, SkeletonHero, SkeletonStatCards } from '../../../components/Skeleton'
 
 const METRICS = [
@@ -44,7 +44,9 @@ export default function Overview() {
   if (!stats) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-slate-800">Dashboard</h1>
+        <PageHeading description="Plan, assign, and track every final year project in one place.">
+          Dashboard
+        </PageHeading>
         <SkeletonHero />
         <SkeletonStatCards count={6} />
         <SkeletonCard lines={2} />
@@ -54,7 +56,16 @@ export default function Overview() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">Dashboard</h1>
+      <PageHeading
+        description="Plan, assign, and track every final year project in one place."
+        actions={
+          <Button onClick={handleExport} disabled={exporting} loading={exporting}>
+            {exporting ? 'Preparing...' : 'Export to Excel'}
+          </Button>
+        }
+      >
+        Dashboard
+      </PageHeading>
 
       <HeroStatCard label="Total Projects Submitted" value={stats.total_submitted} caption="All-time" />
 
@@ -63,16 +74,6 @@ export default function Overview() {
           <StatCard key={m.key} label={m.label} value={stats[m.key]} variant={m.variant} />
         ))}
       </div>
-
-      <Card>
-        <h2 className="mb-2 text-lg font-semibold text-slate-800">Data Export</h2>
-        <p className="mb-4 text-sm text-slate-500">
-          Export the full Project → Members → Assessor mapping as an Excel file.
-        </p>
-        <Button onClick={handleExport} disabled={exporting} loading={exporting}>
-          {exporting ? 'Preparing...' : 'Export to Excel'}
-        </Button>
-      </Card>
     </div>
   )
 }

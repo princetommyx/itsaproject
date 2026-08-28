@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import client from '../../../api/client'
-import { Badge, Card } from '../../../components/ui'
+import { Avatar, Badge, Card, EmptyState, PageHeading } from '../../../components/ui'
 import { SkeletonCardGrid } from '../../../components/Skeleton'
+import { FolderIcon } from '../../../components/icons'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -24,7 +25,9 @@ export default function AllProjects() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">All Projects</h1>
+      <PageHeading description="Every submitted project, with its current status, group, and assessor.">
+        All Projects
+      </PageHeading>
 
       <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
         <div className="flex gap-2 whitespace-nowrap">
@@ -48,27 +51,38 @@ export default function AllProjects() {
         <SkeletonCardGrid />
       ) : visible.length === 0 ? (
         <Card>
-          <p className="text-sm text-slate-500">No projects match this filter.</p>
+          <EmptyState icon={FolderIcon} title="No projects match this filter" />
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
-          {visible.map((project) => (
-            <Link key={project.id} to={`/admin/projects/${project.id}`}>
-              <Card className="h-full transition hover:shadow-md">
-                <div className="mb-2 flex items-start justify-between gap-3">
-                  <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>
-                  <Badge status={project.status} />
-                </div>
-                <p className="line-clamp-2 text-sm text-slate-500">{project.description}</p>
-                <p className="mt-3 text-xs text-slate-400">
-                  {project.members.map((m) => m.student?.name ?? m.university_id).join(', ')}
-                </p>
-                <p className="mt-1 text-xs text-slate-400">
-                  Assessor: {project.assessor?.name ?? 'Unassigned'}
-                </p>
-              </Card>
-            </Link>
-          ))}
+          {visible.map((project) => {
+            const leader = project.members.find((m) => m.is_leader) ?? project.members[0]
+            const leaderName = leader?.student?.name ?? leader?.university_id ?? 'Unassigned'
+
+            return (
+              <Link key={project.id} to={`/admin/projects/${project.id}`}>
+                <Card interactive className="h-full">
+                  <div className="mb-2 flex items-start justify-between gap-3">
+                    <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>
+                    <Badge status={project.status} />
+                  </div>
+                  <p className="line-clamp-2 text-sm text-slate-500">{project.description}</p>
+                  <div className="mt-4 flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <Avatar name={leaderName} />
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-medium text-slate-700">{leaderName}</p>
+                        <p className="text-xs text-slate-400">
+                          {project.members.length} member{project.members.length !== 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="shrink-0 text-xs text-slate-400">{project.assessor?.name ?? 'Unassigned'}</p>
+                  </div>
+                </Card>
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>

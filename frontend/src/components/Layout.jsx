@@ -113,19 +113,28 @@ export default function Layout({ children }) {
                 end
                 onClick={() => setDrawerOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium ${
+                  `relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition duration-150 ${
                     isActive ? 'bg-white/15 text-upsa-gold' : 'text-white/80 hover:bg-white/5 hover:text-white'
                   }`
                 }
               >
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-white/10">
-                  <link.icon />
-                </span>
-                <span className="flex-1">{link.label}</span>
-                {link.to === '/student/notifications' && unreadCount > 0 && (
-                  <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-upsa-gold px-1 text-xs font-semibold text-upsa-blue-dark">
-                    {unreadCount}
-                  </span>
+                {({ isActive }) => (
+                  <>
+                    {isActive && (
+                      <span className="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-r-full bg-upsa-gold" />
+                    )}
+                    <span
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition duration-150 ${isActive ? 'bg-upsa-gold/15' : 'bg-white/10'}`}
+                    >
+                      <link.icon />
+                    </span>
+                    <span className="flex-1">{link.label}</span>
+                    {link.to === '/student/notifications' && unreadCount > 0 && (
+                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-upsa-gold px-1 text-xs font-semibold text-upsa-blue-dark">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </>
                 )}
               </NavLink>
             )

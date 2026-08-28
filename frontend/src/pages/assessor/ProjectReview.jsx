@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
-import { Alert, Badge, Button, Card, Textarea } from '../../components/ui'
+import { Alert, Avatar, Badge, Button, Card, Textarea } from '../../components/ui'
 import { Skeleton, SkeletonCard } from '../../components/Skeleton'
 
 export default function ProjectReview() {
@@ -64,14 +64,18 @@ export default function ProjectReview() {
 
         <div className="mt-5">
           <h3 className="mb-2 text-sm font-semibold text-slate-700">Group Members</h3>
-          <ul className="text-sm text-slate-600">
-            {project.members.map((m) => (
-              <li key={m.id}>
-                {m.student ? m.student.name : m.university_id}
-                {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
-                {!m.student && <span className="ml-1 text-xs text-amber-600">(Not yet registered)</span>}
-              </li>
-            ))}
+          <ul className="space-y-2">
+            {project.members.map((m) => {
+              const name = m.student ? m.student.name : m.university_id
+              return (
+                <li key={m.id} className="flex items-center gap-2.5 text-sm text-slate-600">
+                  <Avatar name={name} className="h-7 w-7 text-[10px]" />
+                  {name}
+                  {m.is_leader && <span className="text-xs text-upsa-blue">(Leader)</span>}
+                  {!m.student && <span className="text-xs text-amber-600">(Not yet registered)</span>}
+                </li>
+              )
+            })}
           </ul>
         </div>
 

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
-import { Badge, Button, Card, Input, Textarea } from '../../components/ui'
+import { Badge, Button, Card, EmptyState, Input, PageHeading, Textarea } from '../../components/ui'
 import { SkeletonList } from '../../components/Skeleton'
+import { MessageIcon } from '../../components/icons'
 
 export default function StudentSupport() {
   const toast = useToast()
@@ -35,7 +36,7 @@ export default function StudentSupport() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">Support Tickets</h1>
+      <PageHeading description="File a ticket and track its status here.">Support Tickets</PageHeading>
 
       <Card>
         <h2 className="mb-4 text-lg font-semibold text-slate-800">File a New Ticket</h2>
@@ -53,7 +54,7 @@ export default function StudentSupport() {
         {complaints === null ? (
           <SkeletonList rows={3} />
         ) : complaints.length === 0 ? (
-          <p className="text-sm text-slate-500">No support tickets filed yet.</p>
+          <EmptyState icon={MessageIcon} title="No support tickets filed yet" />
         ) : (
           <ul className="divide-y divide-slate-100">
             {complaints.map((c) => (

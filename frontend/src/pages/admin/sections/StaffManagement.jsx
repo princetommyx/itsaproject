@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Alert, Button, Card, Input } from '../../../components/ui'
+import { Alert, Button, Card, Input, PageHeading } from '../../../components/ui'
 
 export default function StaffManagement() {
   const toast = useToast()
@@ -31,7 +31,9 @@ export default function StaffManagement() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">Staff Accounts</h1>
+      <PageHeading description="Onboard assessors and fellow admins with an official UPSA email.">
+        Staff Accounts
+      </PageHeading>
       <Card className="max-w-lg">
         <h2 className="mb-4 text-lg font-semibold text-slate-800">Onboard a Staff Account</h2>
         <p className="mb-4 text-sm text-slate-500">
@@ -52,7 +54,7 @@ export default function StaffManagement() {
           <label className="block text-sm">
             <span className="mb-1 block font-medium text-slate-700">Role</span>
             <select
-              className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >

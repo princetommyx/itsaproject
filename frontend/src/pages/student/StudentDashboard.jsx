@@ -2,7 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import { Alert, Button, Card, Input, StatCard, Textarea, STATUS_LABELS, STATUS_VARIANTS } from '../../components/ui'
+import {
+  Alert,
+  Avatar,
+  Button,
+  Card,
+  Input,
+  PageHeading,
+  StatCard,
+  Textarea,
+  STATUS_LABELS,
+  STATUS_VARIANTS,
+} from '../../components/ui'
 import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skeleton'
 
 export default function StudentDashboard() {
@@ -21,7 +32,7 @@ export default function StudentDashboard() {
   if (project === undefined) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold text-slate-800">My Project</h1>
+        <PageHeading>My Project</PageHeading>
         <Card>
           <Skeleton className="h-5 w-2/5" />
           <Skeleton className="mt-2 h-3 w-4/5" />
@@ -39,7 +50,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">My Project</h1>
+      <PageHeading>My Project</PageHeading>
       {error && <Alert>{error}</Alert>}
 
       {!project ? (
@@ -131,17 +142,20 @@ function ProjectPanel({ project, user, onChange, onError }) {
           <h3 className="mb-2 text-sm font-semibold text-slate-700">
             Group Members <span className="font-normal text-slate-400">({members.length})</span>
           </h3>
-          <ul className="divide-y divide-slate-100 rounded-md border border-slate-100">
+          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-100">
             {members.map((m) => (
-              <li key={m.id} className="flex items-center justify-between px-3 py-2 text-sm">
-                <span>
-                  {m.student ? m.student.name : m.university_id}
-                  {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
-                  {!m.student && (
-                    <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
-                      (Not yet registered)
-                    </span>
-                  )}
+              <li key={m.id} className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <Avatar name={m.student ? m.student.name : m.university_id} className="h-7 w-7 text-[10px]" />
+                  <span className="min-w-0 truncate">
+                    {m.student ? m.student.name : m.university_id}
+                    {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
+                    {!m.student && (
+                      <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
+                        (Not yet registered)
+                      </span>
+                    )}
+                  </span>
                 </span>
                 {isLeader && editable && !m.is_leader && (
                   <button

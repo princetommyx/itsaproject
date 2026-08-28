@@ -1,9 +1,54 @@
 import { forwardRef } from 'react'
 import Spinner from './Spinner'
 
-export function Card({ children, className = '' }) {
+export function PageHeading({ children, description, actions, className = '' }) {
   return (
-    <div className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm ${className}`}>
+    <div className={`flex flex-wrap items-start justify-between gap-4 ${className}`}>
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{children}</h1>
+        {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
+      </div>
+      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+    </div>
+  )
+}
+
+const AVATAR_PALETTE = [
+  'bg-blue-100 text-blue-700',
+  'bg-violet-100 text-violet-700',
+  'bg-pink-100 text-pink-700',
+  'bg-amber-100 text-amber-700',
+  'bg-emerald-100 text-emerald-700',
+  'bg-cyan-100 text-cyan-700',
+]
+
+export function Avatar({ name, className = '' }) {
+  const initials = (name || '?')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
+
+  const hash = (name || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
+  const palette = AVATAR_PALETTE[hash % AVATAR_PALETTE.length]
+
+  return (
+    <span
+      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${palette} ${className}`}
+    >
+      {initials || '?'}
+    </span>
+  )
+}
+
+export function Card({ children, className = '', interactive = false }) {
+  return (
+    <div
+      className={`rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-200/60 ${
+        interactive ? 'transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200' : ''
+      } ${className}`}
+    >
       {children}
     </div>
   )
@@ -11,16 +56,16 @@ export function Card({ children, className = '' }) {
 
 export function Button({ children, variant = 'primary', loading = false, className = '', ...props }) {
   const variants = {
-    primary: 'bg-upsa-blue text-white hover:bg-upsa-blue-dark',
+    primary: 'bg-upsa-blue text-white shadow-sm shadow-upsa-blue/20 hover:bg-upsa-blue-dark',
     secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
-    danger: 'bg-red-600 text-white hover:bg-red-700',
-    success: 'bg-emerald-600 text-white hover:bg-emerald-700',
+    danger: 'bg-red-600 text-white shadow-sm shadow-red-600/20 hover:bg-red-700',
+    success: 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20 hover:bg-emerald-700',
   }
   const light = variant !== 'secondary'
 
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${variants[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 ${variants[variant]} ${className}`}
       {...props}
     >
       {loading && <Spinner className="h-3.5 w-3.5" light={light} />}
@@ -29,14 +74,19 @@ export function Button({ children, variant = 'primary', loading = false, classNa
   )
 }
 
+const FIELD_CLASSES =
+  'w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-800 transition duration-150 placeholder:text-slate-400 focus:outline-none focus:ring-4'
+
 export const Input = forwardRef(function Input({ label, error, className = '', ...props }, ref) {
   return (
     <label className="block text-sm">
-      {label && <span className="mb-1 block font-medium text-slate-700">{label}</span>}
+      {label && <span className="mb-1.5 block font-medium text-slate-700">{label}</span>}
       <input
         ref={ref}
-        className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-upsa-blue ${
-          error ? 'border-red-400' : 'border-slate-300'
+        className={`${FIELD_CLASSES} ${
+          error
+            ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
+            : 'border-slate-200 hover:border-slate-300 focus:border-upsa-blue focus:ring-upsa-blue/10'
         } ${className}`}
         {...props}
       />
@@ -48,10 +98,12 @@ export const Input = forwardRef(function Input({ label, error, className = '', .
 export function Textarea({ label, error, className = '', ...props }) {
   return (
     <label className="block text-sm">
-      {label && <span className="mb-1 block font-medium text-slate-700">{label}</span>}
+      {label && <span className="mb-1.5 block font-medium text-slate-700">{label}</span>}
       <textarea
-        className={`w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-upsa-blue ${
-          error ? 'border-red-400' : 'border-slate-300'
+        className={`${FIELD_CLASSES} ${
+          error
+            ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
+            : 'border-slate-200 hover:border-slate-300 focus:border-upsa-blue focus:ring-upsa-blue/10'
         } ${className}`}
         {...props}
       />
@@ -85,18 +137,27 @@ export const STATUS_VARIANTS = {
 }
 
 const BADGE_STYLES = {
-  slate: 'bg-slate-100 text-slate-700',
-  gold: 'bg-amber-100 text-amber-800',
-  blue: 'bg-blue-100 text-blue-800',
-  violet: 'bg-violet-100 text-violet-800',
-  pink: 'bg-pink-100 text-pink-800',
+  slate: 'bg-slate-100 text-slate-600',
+  gold: 'bg-amber-100 text-amber-700',
+  blue: 'bg-blue-100 text-blue-700',
+  violet: 'bg-violet-100 text-violet-700',
+  pink: 'bg-pink-100 text-pink-700',
+}
+
+const DOT_STYLES = {
+  slate: 'bg-slate-500',
+  gold: 'bg-amber-500',
+  blue: 'bg-blue-500',
+  violet: 'bg-violet-500',
+  pink: 'bg-pink-500',
 }
 
 export function Badge({ status }) {
   const variant = STATUS_VARIANTS[status] || 'slate'
 
   return (
-    <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${BADGE_STYLES[variant]}`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${BADGE_STYLES[variant]}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${DOT_STYLES[variant]}`} aria-hidden="true" />
       {STATUS_LABELS[status] || status}
     </span>
   )
@@ -112,8 +173,10 @@ const STAT_CARD_STYLES = {
 
 export function StatCard({ label, value, variant = 'blue' }) {
   return (
-    <div className={`rounded-2xl p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}>
-      <p className="text-xs font-medium tracking-wide uppercase opacity-70">{label}</p>
+    <div
+      className={`rounded-2xl p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-200/70 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}
+    >
+      <p className="text-xs font-semibold tracking-wide uppercase opacity-70">{label}</p>
       <p className="mt-3 text-2xl font-bold break-words">{value}</p>
     </div>
   )
@@ -121,8 +184,12 @@ export function StatCard({ label, value, variant = 'blue' }) {
 
 export function HeroStatCard({ label, value, caption }) {
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-upsa-blue to-upsa-blue-dark p-6 text-white">
-      <div className="flex items-end justify-between gap-4">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-upsa-blue to-upsa-blue-dark p-6 text-white shadow-lg shadow-upsa-blue/20">
+      <div
+        className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-upsa-gold/20 blur-3xl"
+        aria-hidden="true"
+      />
+      <div className="relative flex items-end justify-between gap-4">
         <p className="text-lg font-semibold">{label}</p>
         <div className="text-right">
           <p className="text-4xl font-bold">{value}</p>
@@ -141,6 +208,20 @@ export function Alert({ children, variant = 'error' }) {
   }
 
   return (
-    <div className={`rounded-md border px-3 py-2 text-sm ${variants[variant]}`}>{children}</div>
+    <div className={`rounded-xl border px-3.5 py-2.5 text-sm ${variants[variant]}`}>{children}</div>
+  )
+}
+
+export function EmptyState({ icon: Icon, title, description }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-10 text-center">
+      {Icon && (
+        <span className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+          <Icon />
+        </span>
+      )}
+      <p className="text-sm font-medium text-slate-600">{title}</p>
+      {description && <p className="max-w-xs text-sm text-slate-400">{description}</p>}
+    </div>
   )
 }

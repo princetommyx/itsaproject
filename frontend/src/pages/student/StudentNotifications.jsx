@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import client from '../../api/client'
-import { Badge, Button, Card } from '../../components/ui'
+import { Badge, Button, Card, EmptyState, PageHeading } from '../../components/ui'
 import { SkeletonList } from '../../components/Skeleton'
+import { BellIcon } from '../../components/icons'
 
 function timeAgo(iso) {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -38,13 +39,13 @@ export default function StudentNotifications() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">Notifications</h1>
+      <PageHeading description="Updates on your project from your supervisor.">Notifications</PageHeading>
 
       <Card>
         {notifications === null ? (
           <SkeletonList rows={3} />
         ) : notifications.length === 0 ? (
-          <p className="text-sm text-slate-500">You have no notifications yet.</p>
+          <EmptyState icon={BellIcon} title="You have no notifications yet" />
         ) : (
           <ul className="divide-y divide-slate-100">
             {notifications.map((n) => {

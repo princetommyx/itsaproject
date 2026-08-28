@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Alert, Button, Card } from '../../../components/ui'
+import { Alert, Button, Card, PageHeading } from '../../../components/ui'
 import { FileSpreadsheetIcon, UploadCloudIcon, XIcon } from '../../../components/icons'
 
 function formatSize(bytes) {
@@ -71,10 +71,9 @@ export default function ImportStudents() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-slate-800">Import Students</h1>
+      <PageHeading description="Bulk-create student accounts from a CSV roster.">Import Students</PageHeading>
       <Card className="max-w-xl">
-        <h2 className="text-lg font-semibold text-slate-800">Upload CSV File</h2>
-        <p className="mb-4 text-sm text-slate-500">Bulk-create student accounts from a CSV file.</p>
+        <h2 className="mb-4 text-lg font-semibold text-slate-800">Upload CSV File</h2>
 
         {error && <Alert>{error}</Alert>}
 
