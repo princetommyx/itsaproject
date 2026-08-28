@@ -4,6 +4,7 @@ import client from '../api/client'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
 import Spinner from '../components/Spinner'
+import AuthField from '../components/AuthField'
 
 export default function ForgotPassword() {
   const [universityId, setUniversityId] = useState('')
@@ -31,16 +32,13 @@ export default function ForgotPassword() {
         <Alert variant="info">{message}</Alert>
       ) : (
         <form className="space-y-6" onSubmit={handleSubmit}>
-          <label className="block text-left">
-            <span className="mb-1 block text-sm text-slate-500">Index Number</span>
-            <input
-              className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-2 text-slate-800 focus:border-upsa-blue focus:outline-none"
-              value={universityId}
-              onChange={(e) => setUniversityId(e.target.value)}
-              required
-              autoFocus
-            />
-          </label>
+          <AuthField
+            label="Index Number"
+            value={universityId}
+            onChange={(e) => setUniversityId(e.target.value)}
+            required
+            autoFocus
+          />
           <button
             type="submit"
             disabled={submitting}

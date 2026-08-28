@@ -6,18 +6,7 @@ import { useToast } from '../context/ToastContext'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
 import Spinner from '../components/Spinner'
-
-function Field({ label, ...props }) {
-  return (
-    <label className="block text-left">
-      <span className="mb-1 block text-sm text-slate-500">{label}</span>
-      <input
-        className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-2 text-slate-800 focus:border-upsa-blue focus:outline-none"
-        {...props}
-      />
-    </label>
-  )
-}
+import AuthField from '../components/AuthField'
 
 export default function ChangePassword() {
   const { user, updateUser, logout } = useAuth()
@@ -61,14 +50,14 @@ export default function ChangePassword() {
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
-        <Field
+        <AuthField
           label={user?.role === 'student' ? 'Current Password (Date of Birth, YYYYMMDD)' : 'Current Password'}
           type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
           required
         />
-        <Field
+        <AuthField
           label="New Password"
           type="password"
           value={password}
@@ -76,7 +65,7 @@ export default function ChangePassword() {
           minLength={8}
           required
         />
-        <Field
+        <AuthField
           label="Confirm New Password"
           type="password"
           value={confirmation}

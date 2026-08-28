@@ -5,18 +5,7 @@ import { useToast } from '../context/ToastContext'
 import AuthShell from './AuthShell'
 import { Alert } from './ui'
 import DotSpinner from './DotSpinner'
-
-function UnderlineInput({ label, ...props }) {
-  return (
-    <label className="block text-left">
-      <span className="mb-1 block text-sm text-slate-500">{label}</span>
-      <input
-        className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-2 text-slate-800 placeholder:text-slate-400 focus:border-upsa-blue focus:outline-none"
-        {...props}
-      />
-    </label>
-  )
-}
+import AuthField from './AuthField'
 
 export default function LoginForm({
   heading,
@@ -73,7 +62,7 @@ export default function LoginForm({
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
-        <UnderlineInput
+        <AuthField
           label={identifierLabel}
           placeholder={identifierPlaceholder}
           autoComplete={identifierAutoComplete}
@@ -82,7 +71,7 @@ export default function LoginForm({
           required
           autoFocus
         />
-        <UnderlineInput
+        <AuthField
           label="Password"
           type="password"
           autoComplete="current-password"

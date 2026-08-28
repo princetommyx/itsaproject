@@ -5,18 +5,7 @@ import { useToast } from '../context/ToastContext'
 import AuthShell from '../components/AuthShell'
 import { Alert } from '../components/ui'
 import Spinner from '../components/Spinner'
-
-function Field({ label, ...props }) {
-  return (
-    <label className="block text-left">
-      <span className="mb-1 block text-sm text-slate-500">{label}</span>
-      <input
-        className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-2 text-slate-800 focus:border-upsa-blue focus:outline-none"
-        {...props}
-      />
-    </label>
-  )
-}
+import AuthField from '../components/AuthField'
 
 export default function ResetPassword() {
   const navigate = useNavigate()
@@ -55,9 +44,9 @@ export default function ResetPassword() {
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
-        <Field label="Index Number" value={universityId} onChange={(e) => setUniversityId(e.target.value)} required />
-        <Field label="Reset Token" value={token} onChange={(e) => setToken(e.target.value)} required />
-        <Field
+        <AuthField label="Index Number" value={universityId} onChange={(e) => setUniversityId(e.target.value)} required />
+        <AuthField label="Reset Token" value={token} onChange={(e) => setToken(e.target.value)} required />
+        <AuthField
           label="New Password"
           type="password"
           value={password}
@@ -65,7 +54,7 @@ export default function ResetPassword() {
           minLength={8}
           required
         />
-        <Field
+        <AuthField
           label="Confirm New Password"
           type="password"
           value={confirmation}
