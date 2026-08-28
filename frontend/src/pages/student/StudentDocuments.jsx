@@ -128,7 +128,7 @@ export default function StudentDocuments() {
     )
   }
 
-  const editable = ['draft', 'refine'].includes(project.status)
+  const editable = ['draft', 'refine', 'approved'].includes(project.status)
   const documents = project.documents ?? []
   const byType = Object.fromEntries(DOCUMENT_TYPES.map((t) => [t.key, documents.filter((d) => d.type === t.key)]))
 
@@ -191,8 +191,8 @@ export default function StudentDocuments() {
         </Card>
       ) : (
         <Alert variant="info">
-          Documents can only be uploaded while your project is a draft or needs refinement — it's currently{' '}
-          under review, so it's locked from changes for now.
+          Documents can only be uploaded once your project is a draft, needs refinement, or has been approved —
+          it's currently under review, so it's locked from changes for now.
         </Alert>
       )}
 

@@ -150,6 +150,18 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </div>
         )}
 
+        {project.status === 'approved' && (
+          <div className="mt-4">
+            <Alert variant="success">
+              <strong>Your topic has been approved!</strong> Head to{' '}
+              <Link to="/student/documents" className="underline">
+                My Documents
+              </Link>{' '}
+              to upload your project write-up as you complete it.
+            </Alert>
+          </div>
+        )}
+
         {isLeader && editable && (
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-upsa-blue/15 bg-blue-50/60 p-4">
             <div>

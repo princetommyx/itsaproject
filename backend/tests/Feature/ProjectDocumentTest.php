@@ -49,6 +49,25 @@ it('rejects an upload from a non-leader group member', function () {
         ->assertForbidden();
 });
 
+it('lets the leader upload a document once the project topic is approved', function () {
+    Storage::fake('local');
+
+    $leader = leaderStudent();
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'approved']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $file = UploadedFile::fake()->create('final_report.pdf', 500, 'application/pdf');
+
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/documents", ['type' => 'final_report', 'file' => $file])
+        ->assertCreated();
+
+    $this->assertDatabaseHas('project_documents', [
+        'project_id' => $project->id,
+        'type' => 'final_report',
+    ]);
+});
+
 it('rejects uploads once the project is no longer editable', function () {
     $leader = leaderStudent();
     $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'pending']);

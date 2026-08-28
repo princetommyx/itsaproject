@@ -97,9 +97,15 @@ class ProjectDocumentController extends Controller
         }
     }
 
+    /**
+     * Documents stay uploadable once a project is approved: approval only
+     * signs off the topic, and the group's actual write-up (chapters, final
+     * report, etc.) is produced and submitted afterward. Only a project
+     * still awaiting a decision (submitted_unassigned/pending) is locked.
+     */
     private function ensureEditable(Project $project): void
     {
-        if (! in_array($project->status, ['draft', 'refine'], true)) {
+        if (! in_array($project->status, ['draft', 'refine', 'approved'], true)) {
             throw ValidationException::withMessages([
                 'project' => ['Documents can only be added or removed while the project is editable.'],
             ]);
