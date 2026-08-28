@@ -72,9 +72,8 @@ export default function Layout({ children }) {
       >
         <div className="relative flex items-center gap-3 border-b border-white/10 px-5 py-4">
           <img src={upsaLogo} alt="UPSA" className="h-8 w-auto shrink-0 rounded bg-white p-1" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white leading-tight">UPSA FYP System</p>
-            <p className="text-xs text-blue-100 leading-tight capitalize">{user?.role}</p>
+          <div className="min-w-0 pr-8 md:pr-0">
+            <p className="truncate text-sm font-semibold text-white leading-tight capitalize">{user?.role}</p>
           </div>
           <button
             onClick={() => setDrawerOpen(false)}
