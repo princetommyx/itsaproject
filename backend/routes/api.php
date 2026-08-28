@@ -10,8 +10,11 @@ use Illuminate\Support\Facades\Route;
 
 // Tighter than the general API limiter — these are unauthenticated,
 // credential-guessing-shaped endpoints (login, and the two password-reset
-// steps), so they get their own stricter per-IP throttle.
-Route::middleware('throttle:10,1')->group(function () {
+// steps), so they get their own stricter per-IP throttle. withoutMiddleware
+// drops the general 60/min limiter here: it can never bind tighter than this
+// 10/min one, so running both just doubles the rate-limit cache round trips
+// (each check is a DB read+write with CACHE_STORE=database) for no benefit.
+Route::middleware('throttle:10,1')->withoutMiddleware('throttle:api')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/password/forgot', [AuthController::class, 'requestPasswordReset']);
     Route::post('/password/reset', [AuthController::class, 'resetPassword']);
