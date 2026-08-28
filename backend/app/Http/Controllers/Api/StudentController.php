@@ -15,7 +15,7 @@ class StudentController extends Controller
      */
     public function current(Request $request)
     {
-        $project = $request->user()->projects()->with(['members.student', 'assessor'])->first();
+        $project = $request->user()->projects()->with(['members.student', 'assessor', 'documents.uploader'])->first();
 
         // response()->json(null) serializes to "{}" (Symfony coerces a null
         // top-level payload to an empty object), so wrap it in an envelope

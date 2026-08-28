@@ -67,3 +67,16 @@ services:
       - key: RESEND_API_KEY
         value: REPLACE_ME
         sync: false # marks it sensitive so Render doesn't echo it back in the dashboard
+
+      # Student-uploaded project documents (proposals, chapters, etc.).
+      # FILESYSTEM_DISK defaults to "local", which works but is NOT
+      # persistent on Render — every uploaded file is lost on the next
+      # deploy or restart. Before this feature goes live for real,
+      # switch to a persistent disk: the easiest option is Supabase
+      # Storage (S3-compatible, same project you're already using for
+      # the database) — create a bucket, then set FILESYSTEM_DISK=s3
+      # and fill in AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_BUCKET
+      # / AWS_DEFAULT_REGION / AWS_ENDPOINT (Supabase's S3 endpoint) /
+      # AWS_USE_PATH_STYLE_ENDPOINT=true from Supabase's Storage settings.
+      - key: FILESYSTEM_DISK
+        value: local

@@ -117,7 +117,7 @@ class AdminController extends Controller
 
     public function showProject(Project $project)
     {
-        return $project->load(['members.student', 'assessor']);
+        return $project->load(['members.student', 'assessor', 'documents.uploader']);
     }
 
     /**

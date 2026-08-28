@@ -44,4 +44,13 @@ class Project extends Model
     {
         return $this->belongsTo(User::class, 'assessor_id');
     }
+
+    /**
+     * Every uploaded document, newest first — includes superseded uploads
+     * of the same type, kept for submission history.
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class)->orderByDesc('created_at');
+    }
 }

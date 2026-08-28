@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AssessorController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComplaintController;
+use App\Http\Controllers\Api\ProjectDocumentController;
 use App\Http\Controllers\Api\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/password/change', [AuthController::class, 'changePassword']);
 
     Route::middleware('password.changed')->group(function () {
+        Route::get('/documents/{document}/download', [ProjectDocumentController::class, 'download']);
+
         Route::middleware('is.student')->prefix('student')->group(function () {
             Route::get('/project', [StudentController::class, 'current']);
             Route::post('/projects', [StudentController::class, 'store']);
@@ -24,6 +27,8 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/projects/{project}/members', [StudentController::class, 'addMember']);
             Route::delete('/projects/{project}/members/{member}', [StudentController::class, 'removeMember']);
             Route::post('/projects/{project}/submit', [StudentController::class, 'submit']);
+            Route::post('/projects/{project}/documents', [ProjectDocumentController::class, 'store']);
+            Route::delete('/projects/{project}/documents/{document}', [ProjectDocumentController::class, 'destroy']);
             Route::get('/notifications', [StudentController::class, 'notifications']);
             Route::post('/notifications/{notificationId}/read', [StudentController::class, 'markNotificationRead']);
             Route::get('/complaints', [ComplaintController::class, 'index']);

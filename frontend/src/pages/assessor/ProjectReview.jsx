@@ -5,6 +5,7 @@ import { useToast } from '../../context/ToastContext'
 import { Alert, Avatar, Badge, Button, Card, Textarea } from '../../components/ui'
 import { Skeleton, SkeletonCard } from '../../components/Skeleton'
 import StatusTimeline from '../../components/StatusTimeline'
+import ProjectDocumentList from '../../components/ProjectDocumentList'
 
 export default function ProjectReview() {
   const { id } = useParams()
@@ -82,6 +83,11 @@ export default function ProjectReview() {
               )
             })}
           </ul>
+        </div>
+
+        <div className="mt-5 border-t border-slate-100 pt-5">
+          <h3 className="mb-2 text-sm font-semibold text-slate-700">Submitted Documents</h3>
+          <ProjectDocumentList documents={project.documents} />
         </div>
 
         {project.status === 'pending' ? (

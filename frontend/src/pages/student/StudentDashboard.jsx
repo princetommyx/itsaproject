@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
@@ -16,6 +17,7 @@ import {
 } from '../../components/ui'
 import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skeleton'
 import StatusTimeline from '../../components/StatusTimeline'
+import { CORE_SUBMISSION_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -142,6 +144,35 @@ function ProjectPanel({ project, user, onChange, onError }) {
             </Alert>
           </div>
         )}
+
+        <div className="mt-5 rounded-xl border border-slate-100 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-700">Submission Status</h3>
+            <Link to="/student/documents" className="text-xs text-upsa-blue hover:underline">
+              Manage Documents
+            </Link>
+          </div>
+          <ul className="space-y-2">
+            {CORE_SUBMISSION_TYPES.map((key) => {
+              const uploaded = (project.documents ?? []).some((d) => d.type === key)
+              return (
+                <li key={key} className="flex items-center gap-2 text-sm">
+                  <span
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white ${
+                      uploaded ? 'bg-emerald-500' : 'bg-slate-200 text-slate-400'
+                    }`}
+                  >
+                    {uploaded ? '✓' : ''}
+                  </span>
+                  <span className={uploaded ? 'text-slate-700' : 'text-slate-400'}>
+                    {DOCUMENT_TYPE_LABELS[key]}
+                  </span>
+                  {!uploaded && <span className="text-xs text-slate-400">— Pending</span>}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
 
         <div className="mt-5">
           <h3 className="mb-2 text-sm font-semibold text-slate-700">

@@ -21,7 +21,7 @@ class AssessorController extends Controller
     {
         $this->authorizeAssessor($request, $project);
 
-        return $project->load('members.student');
+        return $project->load('members.student', 'documents.uploader');
     }
 
     public function decide(Request $request, Project $project)

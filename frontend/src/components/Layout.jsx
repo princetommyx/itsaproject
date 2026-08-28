@@ -9,6 +9,7 @@ import {
   BuildingIcon,
   ClipboardIcon,
   DashboardIcon,
+  FileSpreadsheetIcon,
   FolderIcon,
   LogIcon,
   MessageIcon,
@@ -19,6 +20,7 @@ import {
 const NAV_LINKS = {
   student: [
     { to: '/student', label: 'My Project', icon: FolderIcon },
+    { to: '/student/documents', label: 'My Documents', icon: FileSpreadsheetIcon },
     { to: '/student/notifications', label: 'Notifications', icon: BellIcon },
     { to: '/student/support', label: 'Support Tickets', icon: MessageIcon },
     { to: '/student/profile', label: 'My Profile', icon: UserCircleIcon },
