@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-upsa-blue: #0b4f8a;
-  --color-upsa-blue-dark: #073a66;
-  --color-upsa-gold: #f2a900;
+  /* Sampled from the official UPSA crest and student portal. */
+  --color-upsa-blue: #101642;
+  --color-upsa-blue-dark: #0a0d2e;
+  --color-upsa-gold: #c8962f;
 }
 
 body {

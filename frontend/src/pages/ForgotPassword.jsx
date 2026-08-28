@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import client from '../api/client'
-import { Alert, Button, Card, Input } from '../components/ui'
+import AuthShell from '../components/AuthShell'
+import { Alert } from '../components/ui'
 
 export default function ForgotPassword() {
   const [universityId, setUniversityId] = useState('')
@@ -22,41 +23,42 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-      <Card className="w-full max-w-sm">
-        <h1 className="mb-1 text-lg font-semibold text-slate-800">Reset Your Password</h1>
-        <p className="mb-6 text-sm text-slate-500">
-          Enter your Index Number. A reset token will be emailed to your registered address.
-        </p>
+    <AuthShell>
+      <h1 className="mb-6 text-xl font-bold text-slate-800">Reset Student Password</h1>
 
-        {message ? (
-          <Alert variant="info">{message}</Alert>
-        ) : (
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <Input
-              label="Index Number"
+      {message ? (
+        <Alert variant="info">{message}</Alert>
+      ) : (
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <label className="block text-left">
+            <span className="mb-1 block text-sm text-slate-500">Index Number</span>
+            <input
+              className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-2 text-slate-800 focus:border-upsa-blue focus:outline-none"
               value={universityId}
               onChange={(e) => setUniversityId(e.target.value)}
               required
               autoFocus
             />
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? 'Sending...' : 'Send Reset Token'}
-            </Button>
-          </form>
-        )}
+          </label>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {submitting ? 'Sending...' : 'Reset Password'}
+          </button>
+        </form>
+      )}
 
-        <p className="mt-4 text-center text-sm text-slate-500">
-          <Link to="/reset-password" className="text-upsa-blue hover:underline">
-            Already have a token?
-          </Link>
-        </p>
-        <p className="mt-2 text-center text-sm text-slate-500">
-          <Link to="/login/student" className="text-upsa-blue hover:underline">
-            Back to login
-          </Link>
-        </p>
-      </Card>
-    </div>
+      <p className="mt-6 text-xs text-slate-400">
+        <Link to="/reset-password" className="text-upsa-blue hover:underline">
+          Already have a token?
+        </Link>
+        <span className="mx-2">·</span>
+        <Link to="/login" className="text-upsa-blue hover:underline">
+          Back to login
+        </Link>
+      </p>
+    </AuthShell>
   )
 }

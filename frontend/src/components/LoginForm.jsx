@@ -1,10 +1,23 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { Alert, Button, Card, Input } from './ui'
+import AuthShell from './AuthShell'
+import { Alert } from './ui'
+
+function UnderlineInput({ label, ...props }) {
+  return (
+    <label className="block text-left">
+      <span className="mb-1 block text-sm text-slate-500">{label}</span>
+      <input
+        className="w-full border-0 border-b border-slate-300 bg-transparent px-0 py-2 text-slate-800 placeholder:text-slate-400 focus:border-upsa-blue focus:outline-none"
+        {...props}
+      />
+    </label>
+  )
+}
 
 export default function LoginForm({
-  subtitle,
+  heading,
   identifierLabel,
   identifierPlaceholder,
   identifierAutoComplete,
@@ -12,7 +25,7 @@ export default function LoginForm({
   wrongRoleMessage,
   children,
 }) {
-  const { login, logout } = useAuth()
+  const { login, commitSession, discardSession } = useAuth()
   const navigate = useNavigate()
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
@@ -24,13 +37,15 @@ export default function LoginForm({
     setError('')
     setSubmitting(true)
     try {
-      const user = await login(identifier, password)
+      const { token, user } = await login(identifier, password)
 
       if (allowedRoles && !allowedRoles.includes(user.role)) {
-        await logout()
+        await discardSession(token)
         setError(wrongRoleMessage)
         return
       }
+
+      commitSession(token, user)
 
       if (user.is_first_login) {
         navigate('/change-password')
@@ -49,42 +64,38 @@ export default function LoginForm({
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-      <Card className="w-full max-w-sm">
-        <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-upsa-blue text-lg font-bold text-white">
-            U
-          </div>
-          <h1 className="text-lg font-semibold text-slate-800">UPSA Final Year Project Portal</h1>
-          <p className="text-sm text-slate-500">{subtitle}</p>
-        </div>
+    <AuthShell>
+      <h1 className="mb-6 text-2xl leading-snug font-bold text-slate-800">{heading}</h1>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          {error && <Alert>{error}</Alert>}
-          <Input
-            label={identifierLabel}
-            placeholder={identifierPlaceholder}
-            autoComplete={identifierAutoComplete}
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            required
-            autoFocus
-          />
-          <Input
-            label="Password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" className="w-full" disabled={submitting}>
-            {submitting ? 'Signing in...' : 'Sign in'}
-          </Button>
-        </form>
+      <form className="space-y-6" onSubmit={handleSubmit}>
+        {error && <Alert>{error}</Alert>}
+        <UnderlineInput
+          label={identifierLabel}
+          placeholder={identifierPlaceholder}
+          autoComplete={identifierAutoComplete}
+          value={identifier}
+          onChange={(e) => setIdentifier(e.target.value)}
+          required
+          autoFocus
+        />
+        <UnderlineInput
+          label="Password"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {submitting ? 'Signing in...' : 'Login'}
+        </button>
+      </form>
 
-        {children}
-      </Card>
-    </div>
+      {children}
+    </AuthShell>
   )
 }

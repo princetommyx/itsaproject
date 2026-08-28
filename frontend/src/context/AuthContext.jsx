@@ -23,11 +23,28 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false))
   }, [])
 
+  // Authenticates but does NOT commit the session to app state — callers
+  // that need to validate the response (e.g. reject a wrong-role login)
+  // must call commitSession() themselves once they're satisfied. This
+  // matters because setting `user` here would make every component
+  // watching auth state (like a role-gated route) react and redirect
+  // immediately, racing ahead of the caller's own validation.
   async function login(identifier, password) {
     const res = await client.post('/login', { identifier, password })
-    localStorage.setItem('token', res.data.token)
-    setUser(res.data.user)
-    return res.data.user
+    return res.data
+  }
+
+  function commitSession(token, sessionUser) {
+    localStorage.setItem('token', token)
+    setUser(sessionUser)
+  }
+
+  async function discardSession(token) {
+    try {
+      await client.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } })
+    } catch {
+      // ignore network errors — the token simply expires unused
+    }
   }
 
   async function logout() {
@@ -45,7 +62,9 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, updateUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, commitSession, discardSession, logout, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
   )

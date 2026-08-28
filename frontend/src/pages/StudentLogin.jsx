@@ -4,21 +4,21 @@ import LoginForm from '../components/LoginForm'
 export default function StudentLogin() {
   return (
     <LoginForm
-      subtitle="Student sign in"
+      heading="Welcome to UPSA Student Portal"
       identifierLabel="Index Number"
-      identifierPlaceholder="e.g. UPSA/1234567"
+      identifierPlaceholder=""
       identifierAutoComplete="username"
       allowedRoles={['student']}
       wrongRoleMessage="This looks like a staff account. Please use the Staff / Admin sign-in page instead."
     >
-      <p className="mt-4 text-center text-sm text-slate-500">
+      <p className="mt-6 text-sm">
         <Link to="/forgot-password" className="text-upsa-blue hover:underline">
-          Forgot your password?
+          Forgot Password?
         </Link>
       </p>
-      <p className="mt-2 text-center text-sm text-slate-500">
+      <p className="mt-3 text-xs text-slate-400">
         Staff or admin?{' '}
-        <Link to="/login/staff" className="text-upsa-blue hover:underline">
+        <Link to="/admin" className="text-upsa-blue hover:underline">
           Sign in here
         </Link>
       </p>

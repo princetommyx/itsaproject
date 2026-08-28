@@ -7,7 +7,7 @@ const NAV_LINKS = {
   admin: [{ to: '/admin', label: 'Dashboard' }],
 }
 
-export default function Layout() {
+export default function Layout({ children }) {
   const { user, logout } = useAuth()
 
   return (
@@ -52,7 +52,7 @@ export default function Layout() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6 sm:py-8">
-        <Outlet />
+        {children ?? <Outlet />}
       </main>
     </div>
   )
