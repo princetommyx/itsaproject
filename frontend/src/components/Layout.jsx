@@ -250,7 +250,7 @@ export default function Layout({ children }) {
           className="sticky top-0 z-20 bg-slate-100 px-4 pb-3 md:hidden"
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
         >
-          <div className="flex items-center justify-between rounded-full bg-white px-4 py-2.5 shadow-md shadow-slate-200/70">
+          <div className="flex items-center justify-between rounded-full bg-white py-2.5 pr-4 pl-5 shadow-md shadow-slate-200/70">
             <img src={upsaShield} alt="UPSA" className="h-8 w-auto" />
             <div className="flex items-center gap-1">
               <UserMenu user={user} onLogout={handleLogout} />
