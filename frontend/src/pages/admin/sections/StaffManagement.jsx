@@ -18,7 +18,9 @@ export default function StaffManagement() {
     setSubmitting(true)
     try {
       await client.post('/admin/staff', { name, email, role, password })
-      toast.success(`${role === 'admin' ? 'Administrator' : 'Assessor'} account created for ${email}.`)
+      toast.success(role === 'admin' ? 'Administrator added successfully' : 'Assessor added successfully', {
+        description: `${email} can now sign in with their new account.`,
+      })
       setName('')
       setEmail('')
       setPassword('')

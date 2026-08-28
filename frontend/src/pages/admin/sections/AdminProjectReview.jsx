@@ -33,10 +33,17 @@ export default function AdminProjectReview() {
     setSubmitting(true)
     try {
       await client.post(`/admin/projects/${id}/decide`, { decision, feedback })
-      toast.success(decision === 'approved' ? 'Project approved.' : 'Project sent back for refinement.')
+      toast.success('Project status updated successfully', {
+        description:
+          decision === 'approved'
+            ? 'The project has been approved and the student has been notified.'
+            : 'The project has been sent back for refinement and the student has been notified.',
+      })
       navigate('/admin/projects')
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not submit decision.')
+      const message = err.response?.data?.message
+      setError(message || 'Could not submit decision.')
+      toast.error('Unable to update project', { description: message || 'Something went wrong. Please try again.' })
     } finally {
       setSubmitting(false)
     }

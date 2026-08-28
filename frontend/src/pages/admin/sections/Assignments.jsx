@@ -54,10 +54,14 @@ export default function Assignments() {
     try {
       await client.post(`/admin/projects/${projectId}/assign`, { assessor_id: assessorId })
       const assessorName = assessors.find((a) => String(a.id) === String(assessorId))?.name
-      toast.success(assessorName ? `Assessor ${assessorName} assigned.` : 'Assessor assigned.')
+      toast.success('Project assigned successfully', {
+        description: assessorName ? `${assessorName} has been assigned to review this project.` : undefined,
+      })
       load()
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not assign assessor.')
+      const message = err.response?.data?.message
+      setError(message || 'Could not assign assessor.')
+      toast.error('Unable to assign assessor', { description: message || 'Something went wrong. Please try again.' })
     } finally {
       setAssigningId(null)
     }

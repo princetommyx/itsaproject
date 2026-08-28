@@ -77,7 +77,9 @@ function CreateProjectForm({ onCreated, onError }) {
     setSubmitting(true)
     try {
       await client.post('/student/projects', { title, description })
-      toast.success('Project draft created.')
+      toast.success('Project draft created successfully', {
+        description: 'Add your group members and documents, then submit it when you’re ready for review.',
+      })
       onCreated()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not create project.')
@@ -222,7 +224,7 @@ async function removeMember(projectId, memberId, onChange, onError, toast) {
   onError('')
   try {
     await client.delete(`/student/projects/${projectId}/members/${memberId}`)
-    toast.success('Group member removed.')
+    toast.success('Group member removed successfully')
     onChange()
   } catch (err) {
     onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not remove member.')
@@ -240,7 +242,9 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
     setSubmitting(true)
     try {
       await client.post(`/student/projects/${projectId}/members`, { university_id: universityId })
-      toast.success(`Added ${universityId} to the group.`)
+      toast.success('Group member added successfully', {
+        description: `${universityId} has been added to your project group.`,
+      })
       setUniversityId('')
       onChange()
       inputRef.current?.focus()
@@ -287,7 +291,7 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
     setSubmitting(true)
     try {
       await client.put(`/student/projects/${project.id}`, { title, description })
-      toast.success('Changes saved.')
+      toast.success('Project details saved successfully')
       onChange()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not save changes.')
@@ -297,14 +301,26 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
   }
 
   async function submitProject() {
+    const isResubmission = project.status === 'refine'
     onError('')
     setSubmitting(true)
     try {
       await client.post(`/student/projects/${project.id}/submit`)
-      toast.success('Project submitted for review.')
+      toast.success(
+        isResubmission ? 'Submission resubmitted successfully' : 'Project submitted successfully',
+        {
+          description: isResubmission
+            ? 'Your revised project has been sent back to your supervisor for review.'
+            : 'Your final-year project has been submitted for review.',
+        }
+      )
       onChange()
     } catch (err) {
-      onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not submit project.')
+      const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
+      onError(message || 'Could not submit project.')
+      toast.error('Project submission failed', {
+        description: message || 'We couldn’t submit your project. Please check your connection and try again.',
+      })
     } finally {
       setSubmitting(false)
     }

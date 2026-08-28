@@ -24,6 +24,21 @@ body {
   }
 }
 
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(0.75rem) scale(0.97);
+  }
+}
+
 .animate-toast-in {
   animation: toast-in 0.2s ease-out;
+}
+
+.animate-toast-out {
+  animation: toast-out 0.18s ease-in forwards;
 }

@@ -33,10 +33,22 @@ export default function ProjectReview() {
     setSubmitting(true)
     try {
       await client.post(`/assessor/projects/${id}/decide`, { decision, feedback })
-      toast.success(decision === 'approved' ? 'Project approved.' : 'Project sent back for refinement.')
+      toast.success(
+        decision === 'approved' ? 'Project approved successfully' : 'Revision request sent successfully',
+        {
+          description:
+            decision === 'approved'
+              ? 'The student has been notified of your decision.'
+              : 'The student has been notified and can now resubmit their project.',
+        }
+      )
       navigate('/assessor')
     } catch (err) {
-      setError(err.response?.data?.message || 'Could not submit decision.')
+      const message = err.response?.data?.message
+      setError(message || 'Could not submit decision.')
+      toast.error(decision === 'approved' ? 'Project approval failed' : 'Unable to submit feedback', {
+        description: message || 'Something went wrong. Please try again.',
+      })
     } finally {
       setSubmitting(false)
     }

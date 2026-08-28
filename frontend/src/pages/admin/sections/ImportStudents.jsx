@@ -59,7 +59,10 @@ export default function ImportStudents() {
         onUploadProgress: (e) => setProgress(Math.round((e.loaded / e.total) * 100)),
       })
       setResult(res.data)
-      toast.success(`${res.data.created.length} student(s) imported.`)
+      const count = res.data.created.length
+      toast.success(count === 1 ? 'Student added successfully' : 'Students added successfully', {
+        description: `${count} student account${count === 1 ? '' : 's'} ${count === 1 ? 'was' : 'were'} created from the CSV file.`,
+      })
       setFile(null)
       if (inputRef.current) inputRef.current.value = ''
     } catch (err) {

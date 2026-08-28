@@ -4,6 +4,9 @@ import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { downloadDocument, formatFileSize } from '../../lib/downloadDocument'
 import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
+
+const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'zip']
+const MAX_FILE_BYTES = 20 * 1024 * 1024
 import { Alert, Button, Card, EmptyState, PageHeading } from '../../components/ui'
 import { SkeletonCard } from '../../components/Skeleton'
 import { FileSpreadsheetIcon, UploadCloudIcon } from '../../components/icons'
@@ -29,6 +32,21 @@ export default function StudentDocuments() {
 
   function pickFile(file) {
     if (!file) return
+
+    const extension = file.name.split('.').pop()?.toLowerCase()
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+      toast.error('This file type is not supported.', {
+        description: 'Upload a PDF, Word, PowerPoint, or ZIP file.',
+      })
+      return
+    }
+    if (file.size > MAX_FILE_BYTES) {
+      toast.error('This file exceeds the maximum allowed size.', {
+        description: 'Documents must be 20MB or smaller.',
+      })
+      return
+    }
+
     upload(file)
   }
 
@@ -50,10 +68,17 @@ export default function StudentDocuments() {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => setProgress(Math.round((e.loaded / e.total) * 100)),
       })
-      toast.success(`${DOCUMENT_TYPE_LABELS[type]} uploaded.`)
+      toast.success('Document uploaded successfully', {
+        description: `${DOCUMENT_TYPE_LABELS[type]} has been added to your project.`,
+      })
       load()
     } catch (err) {
-      setError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not upload document.')
+      const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
+      setError(message || 'Could not upload document.')
+      toast.error('Document upload failed', {
+        description: message || 'We couldn’t upload your file. Please try again.',
+        actions: [{ label: 'Retry', onClick: () => upload(file) }, { label: 'Dismiss', variant: 'muted' }],
+      })
     } finally {
       setSubmitting(false)
       if (inputRef.current) inputRef.current.value = ''
@@ -71,10 +96,10 @@ export default function StudentDocuments() {
   async function handleDelete(document) {
     try {
       await client.delete(`/student/projects/${project.id}/documents/${document.id}`)
-      toast.success('Document removed.')
+      toast.success('Document removed successfully')
       load()
     } catch {
-      toast.error('Could not remove this document.')
+      toast.error('Unable to remove this document', { description: 'Please try again.' })
     }
   }
 
