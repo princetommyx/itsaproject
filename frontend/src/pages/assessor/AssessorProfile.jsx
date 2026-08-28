@@ -1,14 +1,5 @@
 import { useAuth } from '../../context/AuthContext'
-import { Avatar, Card, PageHeading } from '../../components/ui'
-
-function Field({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">{label}</p>
-      <p className="mt-1 text-sm text-slate-800">{value || '—'}</p>
-    </div>
-  )
-}
+import { Avatar, Card, Field, PageHeading } from '../../components/ui'
 
 export default function AssessorProfile() {
   const { user } = useAuth()

@@ -29,22 +29,26 @@ export default function AllProjects() {
         All Projects
       </PageHeading>
 
-      <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <div className="flex gap-2 whitespace-nowrap">
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                filter === f.key
-                  ? 'bg-upsa-blue text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+      <div className="relative -mx-4 sm:mx-0">
+        <div className="overflow-x-auto px-4 sm:px-0">
+          <div className="flex gap-2 whitespace-nowrap">
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                  filter === f.key
+                    ? 'bg-upsa-blue text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
+        {/* Hints that the tab row scrolls — otherwise the last tab or two is just cut off on mobile with no clue more exist. */}
+        <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-slate-100 to-transparent sm:hidden" />
       </div>
 
       {projects === null ? (

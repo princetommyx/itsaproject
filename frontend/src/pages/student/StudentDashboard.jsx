@@ -129,7 +129,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
           <StatusTimeline status={project.status} />
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <StatCard
             label="Status"
             value={STATUS_LABELS[project.status] || project.status}

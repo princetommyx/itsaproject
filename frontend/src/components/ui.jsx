@@ -1,6 +1,15 @@
 import { forwardRef } from 'react'
 import Spinner from './Spinner'
 
+export function Field({ label, value }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">{label}</p>
+      <p className="mt-1 text-sm break-words text-slate-800">{value || '—'}</p>
+    </div>
+  )
+}
+
 export function PageHeading({ children, description, actions, className = '' }) {
   return (
     <div className={`flex flex-wrap items-start justify-between gap-4 ${className}`}>
@@ -152,11 +161,13 @@ const DOT_STYLES = {
   pink: 'bg-pink-500',
 }
 
-export function Badge({ status }) {
+export function Badge({ status, className = '' }) {
   const variant = STATUS_VARIANTS[status] || 'slate'
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${BADGE_STYLES[variant]}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 self-start rounded-full px-2.5 py-1 text-xs font-semibold ${BADGE_STYLES[variant]} ${className}`}
+    >
       <span className={`h-1.5 w-1.5 rounded-full ${DOT_STYLES[variant]}`} aria-hidden="true" />
       {STATUS_LABELS[status] || status}
     </span>
@@ -174,10 +185,10 @@ const STAT_CARD_STYLES = {
 export function StatCard({ label, value, variant = 'blue' }) {
   return (
     <div
-      className={`rounded-2xl p-5 transition duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-200/70 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}
+      className={`rounded-2xl p-4 transition duration-200 hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-200/70 sm:p-5 ${STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue}`}
     >
       <p className="text-xs font-semibold tracking-wide uppercase opacity-70">{label}</p>
-      <p className="mt-3 text-2xl font-bold break-words">{value}</p>
+      <p className="mt-3 text-xl font-bold break-words sm:text-2xl">{value}</p>
     </div>
   )
 }

@@ -56,7 +56,7 @@ export default function StudentNotifications() {
                 <li
                   key={n.id}
                   onClick={() => isUnread && markRead(n.id)}
-                  className={`flex gap-3 py-4 first:pt-0 last:pb-0 ${isUnread ? 'cursor-pointer' : ''}`}
+                  className={`flex items-start gap-3 py-4 first:pt-0 last:pb-0 ${isUnread ? 'cursor-pointer' : ''}`}
                 >
                   <span
                     className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${isUnread ? 'bg-upsa-gold' : 'bg-transparent'}`}
@@ -90,7 +90,7 @@ export default function StudentNotifications() {
                       </>
                     )}
                   </div>
-                  <Badge status={status} />
+                  <Badge status={status} className="shrink-0" />
                 </li>
               )
             })}

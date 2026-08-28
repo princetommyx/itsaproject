@@ -1,17 +1,8 @@
 import { useEffect, useState } from 'react'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
-import { Avatar, Card, PageHeading } from '../../components/ui'
+import { Avatar, Card, Field, PageHeading } from '../../components/ui'
 import { SkeletonCard } from '../../components/Skeleton'
-
-function Field({ label, value }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">{label}</p>
-      <p className="mt-1 text-sm text-slate-800">{value || '—'}</p>
-    </div>
-  )
-}
 
 export default function StudentProfile() {
   const { user } = useAuth()
