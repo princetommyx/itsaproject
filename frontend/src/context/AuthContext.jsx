@@ -4,8 +4,15 @@ import client from '../api/client'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('user')
+    return saved ? JSON.parse(saved) : null
+  })
+  const [loading, setLoading] = useState(() => {
+    const token = localStorage.getItem('token')
+    const savedUser = localStorage.getItem('user')
+    return Boolean(token && !savedUser)
+  })
 
   useEffect(() => {
     const token = localStorage.getItem('token')
@@ -16,19 +23,18 @@ export function AuthProvider({ children }) {
 
     client
       .get('/me')
-      .then((res) => setUser(res.data))
+      .then((res) => {
+        setUser(res.data)
+        localStorage.setItem('user', JSON.stringify(res.data))
+      })
       .catch(() => {
         localStorage.removeItem('token')
+        localStorage.removeItem('user')
+        setUser(null)
       })
       .finally(() => setLoading(false))
   }, [])
 
-  // Authenticates but does NOT commit the session to app state — callers
-  // that need to validate the response (e.g. reject a wrong-role login)
-  // must call commitSession() themselves once they're satisfied. This
-  // matters because setting `user` here would make every component
-  // watching auth state (like a role-gated route) react and redirect
-  // immediately, racing ahead of the caller's own validation.
   async function login(identifier, password) {
     const res = await client.post('/login', { identifier, password })
     return res.data
@@ -36,6 +42,7 @@ export function AuthProvider({ children }) {
 
   function commitSession(token, sessionUser) {
     localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(sessionUser))
     setUser(sessionUser)
   }
 
@@ -43,23 +50,28 @@ export function AuthProvider({ children }) {
     try {
       await client.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } })
     } catch {
-      // ignore network errors — the token simply expires unused
+      // ignore network errors
     }
   }
 
   async function logout() {
     const token = localStorage.getItem('token')
     localStorage.removeItem('token')
+    localStorage.removeItem('user')
     setUser(null)
     try {
       await client.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } })
     } catch {
-      // ignore network errors — the token simply expires unused
+      // ignore network errors
     }
   }
 
   function updateUser(patch) {
-    setUser((prev) => ({ ...prev, ...patch }))
+    setUser((prev) => {
+      const updated = { ...prev, ...patch }
+      localStorage.setItem('user', JSON.stringify(updated))
+      return updated
+    })
   }
 
   return (
