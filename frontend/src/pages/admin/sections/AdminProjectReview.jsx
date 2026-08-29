@@ -95,7 +95,7 @@ export default function AdminProjectReview() {
           <h1 className="min-w-0 break-words text-xl font-semibold text-slate-800">{project.title}</h1>
           <Badge status={project.status} />
         </div>
-        <p className="whitespace-pre-wrap text-sm text-slate-600">{project.description}</p>
+        <p className="text-[15px] leading-[1.75] whitespace-pre-wrap text-slate-800">{project.description}</p>
 
         <div className="mt-5 border-t border-slate-100 pt-5">
           <StatusTimeline status={project.status} />

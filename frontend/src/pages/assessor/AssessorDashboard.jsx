@@ -52,7 +52,7 @@ export default function AssessorDashboard() {
                       <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>
                       <Badge status={project.status} />
                     </div>
-                    <p className="line-clamp-3 text-sm text-slate-500">{project.description}</p>
+                    <p className="line-clamp-3 text-[15px] leading-[1.7] text-slate-700">{project.description}</p>
                     <p className="mt-3 text-xs text-slate-400">
                       {project.members.map((m) => m.student?.name ?? m.university_id).join(', ')}
                     </p>

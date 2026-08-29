@@ -187,7 +187,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
                               </p>
                               <span className="text-xs whitespace-nowrap text-slate-400">{formatTime(n.created_at)}</span>
                             </div>
-                            <p className="mt-0.5 text-sm break-words text-slate-500">{info.description}</p>
+                            <p className="mt-0.5 text-[15px] leading-[1.7] break-words text-slate-700">{info.description}</p>
                           </div>
                           {isUnread && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-upsa-gold" aria-hidden="true" />}
                         </button>

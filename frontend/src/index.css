@@ -48,6 +48,12 @@ body {
   margin: 0;
   background-color: #f4f6f9;
   color: #0f172a;
+  /* Tailwind's base is 1.5. The reference article runs ~1.83, which is what
+     makes its text feel roomy — the size is actually smaller than ours. 1.6
+     is the compromise: noticeably more air everywhere without inflating the
+     dense parts of a dashboard (table rows, badges, buttons). Genuine prose
+     blocks go further, to leading-[1.75], at their call sites. */
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;

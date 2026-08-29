@@ -72,7 +72,7 @@ export default function AllProjects() {
                     <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>
                     <Badge status={project.status} />
                   </div>
-                  <p className="line-clamp-2 text-sm text-slate-500">{project.description}</p>
+                  <p className="line-clamp-2 text-[15px] leading-[1.7] text-slate-700">{project.description}</p>
                   <div className="mt-4 flex items-center justify-between gap-3">
                     <div className="flex min-w-0 items-center gap-2">
                       <Avatar name={leaderName} />

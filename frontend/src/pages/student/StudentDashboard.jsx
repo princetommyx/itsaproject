@@ -121,7 +121,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
       <Card>
         <div className="min-w-0">
           <h2 className="text-lg font-semibold break-words text-slate-800">{project.title}</h2>
-          <p className="mt-1 text-sm text-slate-500">{project.description}</p>
+          <p className="mt-1.5 text-[15px] leading-[1.75] text-slate-800">{project.description}</p>
         </div>
 
         <div className="mt-5 border-t border-slate-100 pt-5">

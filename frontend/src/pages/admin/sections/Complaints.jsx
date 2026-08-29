@@ -35,7 +35,7 @@ export default function Complaints() {
                   <Avatar name={c.student?.name} className="mt-0.5" />
                   <div className="min-w-0">
                     <p className="font-medium text-slate-800">{c.subject}</p>
-                    <p className="text-sm text-slate-500">{c.message}</p>
+                    <p className="text-[15px] leading-[1.75] text-slate-800">{c.message}</p>
                     <p className="mt-1 text-xs text-slate-400">Filed by {c.student?.name}</p>
                   </div>
                 </div>
