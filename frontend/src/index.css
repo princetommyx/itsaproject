@@ -1,9 +1,12 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Sampled from the official UPSA crest and student portal. */
-  --color-upsa-blue: #101642;
-  --color-upsa-blue-dark: #0a0d2e;
+  /* --color-upsa-blue-dark is sampled directly from a reference navbar the
+     user pointed to as the target shade (a brighter, less indigo navy than
+     our previous #0a0d2e). --color-upsa-blue is a lighter step in the same
+     hue for gradients/lighter surfaces. */
+  --color-upsa-blue: #0f2d5c;
+  --color-upsa-blue-dark: #071e3d;
   --color-upsa-gold: #c8962f;
 
   --font-sans:
