@@ -4,6 +4,7 @@ use App\Models\Project;
 use App\Models\ProjectDocument;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 function leaderStudent(): User
@@ -157,4 +158,90 @@ it('rejects document types that are no longer part of the submission flow', func
     }
 
     expect(array_keys(ProjectDocument::TYPES))->toBe(['proposal', 'final_report']);
+});
+
+it('does not notify admins on upload alone — only on submit', function () {
+    Notification::fake();
+    Storage::fake('local');
+
+    $admin = User::factory()->admin()->create();
+    $leader = leaderStudent();
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'approved']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $file = UploadedFile::fake()->create('work.pdf', 200, 'application/pdf');
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/documents", ['type' => 'final_report', 'file' => $file])
+        ->assertCreated();
+
+    $document = ProjectDocument::first();
+    expect($document->submitted_at)->toBeNull();
+    Notification::assertNothingSentTo($admin);
+
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/documents/{$document->id}/submit")
+        ->assertOk();
+
+    expect($document->fresh()->submitted_at)->not->toBeNull();
+    Notification::assertSentTo($admin, \App\Notifications\DocumentSubmittedNotification::class);
+});
+
+it('lets a wrongly uploaded document be removed before it is submitted, but not after', function () {
+    Storage::fake('local');
+
+    $leader = leaderStudent();
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'approved']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $upload = fn () => $this->actingAs($leader, 'sanctum')->postJson(
+        "/api/student/projects/{$project->id}/documents",
+        ['type' => 'proposal', 'file' => UploadedFile::fake()->create('wrong.pdf', 100, 'application/pdf')]
+    );
+
+    // Wrong file picked — still removable, because it hasn't been submitted.
+    $upload()->assertCreated();
+    $wrong = ProjectDocument::latest('id')->first();
+    $this->actingAs($leader, 'sanctum')
+        ->deleteJson("/api/student/projects/{$project->id}/documents/{$wrong->id}")
+        ->assertOk();
+    $this->assertDatabaseMissing('project_documents', ['id' => $wrong->id]);
+
+    // Once submitted it is with the admins, so it can no longer be pulled back.
+    $upload()->assertCreated();
+    $right = ProjectDocument::latest('id')->first();
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/documents/{$right->id}/submit")
+        ->assertOk();
+
+    $this->actingAs($leader, 'sanctum')
+        ->deleteJson("/api/student/projects/{$project->id}/documents/{$right->id}")
+        ->assertUnprocessable();
+    $this->assertDatabaseHas('project_documents', ['id' => $right->id]);
+
+    // And it cannot be submitted twice.
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/documents/{$right->id}/submit")
+        ->assertUnprocessable();
+});
+
+it('only lets the group leader submit a document', function () {
+    Storage::fake('local');
+
+    $leader = leaderStudent();
+    $member = leaderStudent();
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'approved']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+    $project->members()->create(['university_id' => $member->university_id, 'student_id' => $member->id, 'is_leader' => false]);
+
+    $this->actingAs($leader, 'sanctum')->postJson("/api/student/projects/{$project->id}/documents", [
+        'type' => 'proposal', 'file' => UploadedFile::fake()->create('p.pdf', 100, 'application/pdf'),
+    ])->assertCreated();
+
+    $document = ProjectDocument::first();
+
+    $this->actingAs($member, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/documents/{$document->id}/submit")
+        ->assertForbidden();
+
+    expect($document->fresh()->submitted_at)->toBeNull();
 });

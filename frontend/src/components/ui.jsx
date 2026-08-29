@@ -75,10 +75,13 @@ export function Button({ children, variant = 'primary', loading = false, classNa
   const variants = {
     primary: 'bg-upsa-blue text-white shadow-sm shadow-upsa-blue/20 hover:bg-upsa-blue-dark',
     secondary: 'bg-slate-100 text-slate-700 hover:bg-slate-200',
+    outline: 'border-2 border-upsa-blue bg-transparent text-upsa-blue hover:bg-upsa-blue/5',
     danger: 'bg-red-600 text-white shadow-sm shadow-red-600/20 hover:bg-red-700',
     success: 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20 hover:bg-emerald-700',
   }
-  const light = variant !== 'secondary'
+  // Outline and secondary both draw dark text on a light ground, so their
+  // spinner needs to be dark too.
+  const light = !['secondary', 'outline'].includes(variant)
 
   return (
     <button

@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['project_id', 'type', 'original_filename', 'stored_path', 'mime_type', 'size_bytes', 'uploaded_by'])]
+#[Fillable(['project_id', 'type', 'original_filename', 'stored_path', 'mime_type', 'size_bytes', 'uploaded_by', 'submitted_at'])]
 class ProjectDocument extends Model
 {
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return ['submitted_at' => 'datetime'];
+    }
 
     /**
      * Document types a student can submit, and the label shown for each.

@@ -22,7 +22,10 @@ const INTRO_ITEMS = {
     'Your project is approved',
   ],
   assessor: ['A new project is assigned to you', 'A student resubmits a project you sent back for revision'],
-  admin: ['A student submits a project that needs an assessor assigned'],
+  admin: [
+    'A student submits a project that needs an assessor assigned',
+    'A group submits a project document for review',
+  ],
 }
 
 function groupByDate(notifications) {

@@ -21,6 +21,7 @@ export default function StudentDocuments() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [expandedType, setExpandedType] = useState(null)
+  const [submittingId, setSubmittingId] = useState(null)
   const inputRef = useRef(null)
 
   const project = projectData?.project
@@ -96,6 +97,24 @@ export default function StudentDocuments() {
       mutate()
     } catch {
       toast.error('Unable to remove this document', { description: 'Please try again.' })
+    }
+  }
+
+  async function handleSubmitDocument(document, label) {
+    setSubmittingId(document.id)
+    try {
+      await client.post(`/student/projects/${project.id}/documents/${document.id}/submit`)
+      toast.success(`${label} submitted successfully`, {
+        description: 'Your admins have been notified and can now review it.',
+      })
+      mutate()
+    } catch (err) {
+      const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
+      toast.error('Could not submit this document', {
+        description: message || 'Please try again.',
+      })
+    } finally {
+      setSubmittingId(null)
     }
   }
 
@@ -210,10 +229,21 @@ export default function StudentDocuments() {
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-700">{t.label}</p>
                     {current ? (
-                      <p className="truncate text-xs text-slate-500">
-                        {current.original_filename} · {formatFileSize(current.size_bytes)} ·{' '}
-                        {new Date(current.created_at).toLocaleDateString()}
-                      </p>
+                      <>
+                        <p className="truncate text-xs text-slate-500">
+                          {current.original_filename} · {formatFileSize(current.size_bytes)} ·{' '}
+                          {new Date(current.created_at).toLocaleDateString()}
+                        </p>
+                        {current.submitted_at ? (
+                          <p className="mt-1 text-xs font-semibold text-emerald-700">
+                            ✓ Submitted {new Date(current.submitted_at).toLocaleDateString()}
+                          </p>
+                        ) : (
+                          <p className="mt-1 text-xs font-semibold text-amber-700">
+                            Uploaded — not submitted yet
+                          </p>
+                        )}
+                      </>
                     ) : (
                       <p className="text-xs text-slate-400">Not yet uploaded</p>
                     )}
@@ -224,7 +254,21 @@ export default function StudentDocuments() {
                         Download
                       </Button>
                     )}
-                    {current && editable && (
+                    {/* Submitting is a separate, deliberate step from uploading,
+                        so a wrong file can be swapped out before it ever
+                        reaches the admins. */}
+                    {current && !current.submitted_at && (
+                      <Button
+                        variant="outline"
+                        className="text-xs"
+                        disabled={submittingId === current.id}
+                        loading={submittingId === current.id}
+                        onClick={() => handleSubmitDocument(current, t.label)}
+                      >
+                        {submittingId === current.id ? 'Submitting...' : 'Submit to Admin'}
+                      </Button>
+                    )}
+                    {current && editable && !current.submitted_at && (
                       <button
                         onClick={() => handleDelete(current)}
                         className="text-xs text-red-600 hover:underline"

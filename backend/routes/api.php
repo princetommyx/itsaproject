@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::delete('/projects/{project}/members/{member}', [StudentController::class, 'removeMember']);
             Route::post('/projects/{project}/submit', [StudentController::class, 'submit']);
             Route::post('/projects/{project}/documents', [ProjectDocumentController::class, 'store']);
+            Route::post('/projects/{project}/documents/{document}/submit', [ProjectDocumentController::class, 'submit']);
             Route::delete('/projects/{project}/documents/{document}', [ProjectDocumentController::class, 'destroy']);
             Route::get('/notifications', [StudentController::class, 'notifications']);
             Route::post('/notifications/{notificationId}/read', [StudentController::class, 'markNotificationRead']);

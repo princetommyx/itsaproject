@@ -1,9 +1,10 @@
-import { CheckCircleIcon, ClipboardIcon, FolderIcon, RefreshCwIcon } from '../components/icons'
+import { CheckCircleIcon, ClipboardIcon, FileSpreadsheetIcon, FolderIcon, RefreshCwIcon } from '../components/icons'
 
 // One entry per real notification `kind` the backend actually sends — see
 // ProjectDecisionNotification, ProjectAssignedNotification,
-// ProjectSubmittedNotification, and ProjectResubmittedNotification. Nothing
-// here should exist without a matching backend trigger.
+// ProjectSubmittedNotification, ProjectResubmittedNotification, and
+// DocumentSubmittedNotification. Nothing here should exist without a
+// matching backend trigger.
 export const NOTIFICATION_KIND_META = {
   approved: {
     title: 'Project Approved',
@@ -32,6 +33,13 @@ export const NOTIFICATION_KIND_META = {
     variant: 'gold',
     describe: (data) => `A revised version of "${data.project_title}" is ready for your review.`,
     linkFor: (data) => `/assessor/projects/${data.project_id}`,
+  },
+  document_submitted: {
+    title: 'Document Submitted',
+    icon: FileSpreadsheetIcon,
+    variant: 'blue',
+    describe: (data) => `${data.document_label} for "${data.project_title}" has been submitted for review.`,
+    linkFor: (data) => `/admin/projects/${data.project_id}`,
   },
   submitted: {
     title: 'New Project Submitted',

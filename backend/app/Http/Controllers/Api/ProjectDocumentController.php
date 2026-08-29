@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\ProjectDocument;
+use App\Models\User;
+use App\Notifications\DocumentSubmittedNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -41,6 +43,35 @@ class ProjectDocumentController extends Controller
         return response()->json($document->load('uploader'), 201);
     }
 
+    /**
+     * Hands an uploaded document to the admins. Upload and submit are
+     * deliberately separate: a group can upload, check they picked the right
+     * file, replace it if not, and only then submit. Nothing reaches the
+     * admins until this runs.
+     */
+    public function submit(Request $request, Project $project, ProjectDocument $document)
+    {
+        $this->authorizeLeader($request, $project);
+
+        if ($document->project_id !== $project->id) {
+            abort(404);
+        }
+
+        if ($document->submitted_at) {
+            throw ValidationException::withMessages([
+                'document' => ['This document has already been submitted.'],
+            ]);
+        }
+
+        $document->update(['submitted_at' => now()]);
+
+        foreach (User::where('role', 'admin')->get() as $admin) {
+            $admin->notify(new DocumentSubmittedNotification($document));
+        }
+
+        return response()->json($document->fresh()->load('uploader'));
+    }
+
     public function destroy(Request $request, Project $project, ProjectDocument $document)
     {
         $this->authorizeLeader($request, $project);
@@ -48,6 +79,15 @@ class ProjectDocumentController extends Controller
 
         if ($document->project_id !== $project->id) {
             abort(404);
+        }
+
+        // Removing is the escape hatch for picking the wrong file, so it only
+        // applies before submission — once it's with the admins, pulling it
+        // back out from under them would defeat the point of the two steps.
+        if ($document->submitted_at) {
+            throw ValidationException::withMessages([
+                'document' => ['This document has already been submitted and can no longer be removed.'],
+            ]);
         }
 
         Storage::disk(config('filesystems.default'))->delete($document->stored_path);
