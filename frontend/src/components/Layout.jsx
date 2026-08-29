@@ -1,11 +1,34 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
-import useSWR from 'swr'
+import useSWR, { preload } from 'swr'
+import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
 import upsaLogo from '../assets/upsa-logo.png'
 import upsaShield from '../assets/upsa-shield.png'
+
+const fetcher = (url) => client.get(url).then((res) => res.data)
+
+const PREFETCH_MAP = {
+  '/student': ['/student/project'],
+  '/student/documents': ['/student/documents'],
+  '/student/support': ['/student/complaints'],
+  '/assessor': ['/assessor/projects'],
+  '/admin': ['/admin/dashboard'],
+  '/admin/projects': ['/admin/projects'],
+  '/admin/assignments': ['/admin/projects/unassigned', '/admin/assessors'],
+  '/admin/logs': ['/admin/login-logs'],
+  '/admin/complaints': ['/admin/complaints'],
+}
+
+function handlePrefetch(path) {
+  const endpoints = PREFETCH_MAP[path]
+  if (endpoints) {
+    endpoints.forEach((url) => preload(url, fetcher))
+  }
+}
+
 import { Avatar } from './ui'
 import {
   BellIcon,
@@ -203,6 +226,7 @@ export default function Layout({ children }) {
                 key={link.to}
                 to={link.to}
                 end
+                onMouseEnter={() => handlePrefetch(link.to)}
                 onClick={() => setDrawerOpen(false)}
                 className={({ isActive }) =>
                   `relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition duration-150 ${
