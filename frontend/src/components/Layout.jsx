@@ -5,7 +5,6 @@ import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
-import upsaLogo from '../assets/upsa-logo.png'
 import upsaShield from '../assets/upsa-shield.png'
 
 const fetcher = (url) => client.get(url).then((res) => res.data)
@@ -194,19 +193,26 @@ export default function Layout({ children }) {
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col bg-gradient-to-b from-upsa-blue to-upsa-blue-dark transition-transform duration-200 md:static md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-full shrink-0 flex-col bg-gradient-to-b from-upsa-blue to-upsa-blue-dark transition-transform duration-200 md:static md:w-64 md:translate-x-0 ${
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="relative flex items-center gap-3 border-b border-white/10 px-5 py-4">
-          <img src={upsaLogo} alt="UPSA" className="h-8 w-auto shrink-0 rounded bg-white p-1" />
-          <div className="min-w-0 pr-8 md:pr-0">
-            <p className="truncate text-sm font-semibold text-white leading-tight capitalize">{user?.role}</p>
+        <div
+          className="flex items-center justify-between border-b border-white/10 px-5 py-4"
+          style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
+        >
+          <div className="flex items-center gap-3">
+            <img
+              src={upsaShield}
+              alt="UPSA"
+              className="h-10 w-10 shrink-0 rounded-2xl bg-white object-contain p-1.5"
+            />
+            <span className="text-xl font-extrabold tracking-tight text-upsa-gold">UPSA</span>
           </div>
           <button
             onClick={() => setDrawerOpen(false)}
             aria-label="Close menu"
-            className="absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:hidden"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:hidden"
           >
             <CloseIcon />
           </button>
@@ -257,13 +263,13 @@ export default function Layout({ children }) {
           )}
         </nav>
 
-        <div className="border-t border-white/10 px-3 py-4">
-          <p className="truncate px-3 pb-2 text-sm text-white/80">{user?.name}</p>
+        <div className="border-t border-white/10 px-4 py-4" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+          <p className="truncate px-1 pb-3 text-sm text-white/70">{user?.name}</p>
           <button
             onClick={handleLogout}
-            className="w-full rounded-md bg-white/10 px-3 py-2 text-left text-sm font-medium text-white hover:bg-white/20"
+            className="w-full rounded-xl bg-upsa-gold py-3.5 text-center text-base font-bold text-upsa-blue-dark transition hover:brightness-95"
           >
-            Log out
+            Sign Out
           </button>
         </div>
       </aside>
