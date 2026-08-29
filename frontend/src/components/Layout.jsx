@@ -114,10 +114,10 @@ function UserMenu({ user, onLogout }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-1.5 rounded-full py-0.5 pr-1.5 pl-0.5 hover:bg-slate-100"
+        className="flex items-center gap-1.5 rounded-full py-0.5 pr-1.5 pl-0.5 hover:bg-white/10"
       >
         <Avatar name={user?.name} className="h-8 w-8 text-[11px]" />
-        <span className={`text-slate-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}>
+        <span className={`text-white/60 transition-transform duration-150 ${open ? 'rotate-180' : ''}`}>
           <ChevronDownIcon />
         </span>
       </button>
@@ -270,17 +270,24 @@ export default function Layout({ children }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header
-          className="sticky top-0 z-20 bg-slate-100 px-4 pb-3 md:hidden"
+          className="sticky top-0 z-20 bg-upsa-blue-dark px-4 pb-3 md:hidden"
           style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
         >
-          <div className="flex items-center justify-between rounded-full bg-white py-2.5 pr-4 pl-5 shadow-md shadow-slate-200/70">
-            <img src={upsaShield} alt="UPSA" className="h-8 w-auto" />
+          <div className="flex items-center justify-between py-1.5">
+            <div className="flex items-center gap-3">
+              <img
+                src={upsaShield}
+                alt="UPSA"
+                className="h-10 w-10 shrink-0 rounded-2xl bg-white object-contain p-1.5"
+              />
+              <span className="text-xl font-extrabold tracking-tight text-upsa-gold">UPSA</span>
+            </div>
             <div className="flex items-center gap-1">
               <UserMenu user={user} onLogout={handleLogout} />
               <button
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open menu"
-                className="rounded-full p-2 text-slate-600 hover:bg-slate-100"
+                className="rounded-full p-2 text-white hover:bg-white/10"
               >
                 <MenuIcon />
               </button>
