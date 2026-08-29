@@ -9,8 +9,12 @@
   --color-upsa-blue-dark: #071e3d;
   --color-upsa-gold: #c8962f;
 
+  /* Roboto, identified from the reference screenshot's letterforms
+     (single-storey hooked 'g', angled cut on 't', spurred 'u', pointed 'A').
+     Deliberately a neutral grotesque rather than a geometric sans like
+     Poppins/Outfit — the geometric ones read as template-y. */
   --font-sans:
-    'Poppins', Arial, Helvetica, sans-serif;
+    'Roboto', Arial, Helvetica, sans-serif;
 }
 
 

@@ -221,9 +221,9 @@ export default function Layout({ children }) {
             link.section ? (
               <p
                 key={`section-${i}`}
-                className="mt-4 mb-1 flex items-center gap-1.5 px-3 text-xs font-semibold tracking-wider text-white/40 uppercase first:mt-0"
+                className="mt-6 mb-2 px-3 text-xs font-medium tracking-[0.14em] text-white/45 uppercase first:mt-1"
               >
-                <span className="text-white/25">//</span> {link.section}
+                {link.section}
               </p>
             ) : (
               <NavLink
@@ -233,19 +233,20 @@ export default function Layout({ children }) {
                 onMouseEnter={() => handlePrefetch(link.to)}
                 onClick={() => setDrawerOpen(false)}
                 className={({ isActive }) =>
-                  `relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition duration-150 ${
-                    isActive ? 'bg-white/15 text-upsa-gold' : 'text-white/80 hover:bg-white/5 hover:text-white'
+                  `relative flex items-center gap-4 rounded-xl px-3 py-3 text-base font-medium transition duration-150 ${
+                    isActive ? 'bg-white/10 text-upsa-gold' : 'text-white hover:bg-white/5'
                   }`
                 }
               >
                 {({ isActive }) => (
                   <>
                     {isActive && (
-                      <span className="absolute top-1/2 left-0 h-5 w-1 -translate-y-1/2 rounded-r-full bg-upsa-gold" />
+                      <span className="absolute top-1/2 left-0 h-6 w-1 -translate-y-1/2 rounded-r-full bg-upsa-gold" />
                     )}
-                    <span
-                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg transition duration-150 ${isActive ? 'bg-upsa-gold/15' : 'bg-white/10'}`}
-                    >
+                    {/* Bare icon, no badge — the reference sits its icons
+                        straight on the dark ground, which reads cleaner and
+                        keeps the glyph at full contrast. */}
+                    <span className="flex shrink-0 items-center justify-center">
                       <link.icon />
                     </span>
                     <span className="flex-1">{link.label}</span>
