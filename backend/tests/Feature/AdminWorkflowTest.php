@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\LoginLog;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
@@ -163,4 +164,20 @@ it('prevents an admin from deciding on a project that is not awaiting review', f
     $this->actingAs($admin, 'sanctum')
         ->postJson("/api/admin/projects/{$project->id}/decide", ['decision' => 'approved'])
         ->assertUnprocessable();
+});
+
+it('lists login logs newest first with the acting user eager loaded', function () {
+    $admin = User::factory()->admin()->create();
+    $student = User::factory()->student()->create();
+
+    $older = LoginLog::create(['user_id' => $student->id, 'login_time' => now()->subHour()]);
+    $newer = LoginLog::create(['user_id' => $student->id, 'login_time' => now()]);
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/login-logs');
+
+    $response->assertOk();
+    $ids = collect($response->json('data'))->pluck('id');
+    expect($ids->first())->toBe($newer->id);
+    expect($ids->last())->toBe($older->id);
+    expect($response->json('data.0.user.id'))->toBe($student->id);
 });

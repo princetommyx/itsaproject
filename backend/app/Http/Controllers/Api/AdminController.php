@@ -224,9 +224,13 @@ class AdminController extends Controller
 
     public function loginLogs()
     {
+        // simplePaginate, not paginate: the UI only ever reads the row list
+        // (there's no page-number control), so the extra COUNT(*) query
+        // paginate() runs just to compute a total nobody displays is a pure
+        // round trip to cut — and every round trip counts on this DB link.
         return LoginLog::with('user:id,name,role,university_id,email')
             ->orderByDesc('login_time')
-            ->paginate(50);
+            ->simplePaginate(50);
     }
 
     public function complaints()
