@@ -140,3 +140,21 @@ it('lets the owning student, the assigned assessor, and any admin download a doc
     $this->actingAs($admin, 'sanctum')->get("/api/documents/{$document->id}/download")->assertOk();
     $this->actingAs($otherAssessor, 'sanctum')->get("/api/documents/{$document->id}/download")->assertForbidden();
 });
+
+it('rejects document types that are no longer part of the submission flow', function () {
+    $leader = leaderStudent();
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'draft']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    // Only the proposal and the final project work document are submitted
+    // through the system now; the old per-chapter/slides/zip types are gone.
+    foreach (['chapter_1', 'chapter_5', 'presentation', 'source_code', 'supporting'] as $retired) {
+        $file = UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf');
+
+        $this->actingAs($leader, 'sanctum')
+            ->postJson("/api/student/projects/{$project->id}/documents", ['type' => $retired, 'file' => $file])
+            ->assertUnprocessable();
+    }
+
+    expect(array_keys(ProjectDocument::TYPES))->toBe(['proposal', 'final_report']);
+});

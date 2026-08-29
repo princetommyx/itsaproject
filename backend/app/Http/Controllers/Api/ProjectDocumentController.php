@@ -23,7 +23,7 @@ class ProjectDocumentController extends Controller
 
         $validated = $request->validate([
             'type' => ['required', 'string', 'in:'.implode(',', array_keys(ProjectDocument::TYPES))],
-            'file' => ['required', 'file', 'mimes:pdf,doc,docx,ppt,pptx,zip', 'max:20480'],
+            'file' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:20480'],
         ]);
 
         $file = $request->file('file');
@@ -99,7 +99,7 @@ class ProjectDocumentController extends Controller
 
     /**
      * Documents stay uploadable once a project is approved: approval only
-     * signs off the topic, and the group's actual write-up (chapters, final
+     * signs off the topic, and the group's actual write-up (the final
      * report, etc.) is produced and submitted afterward. Only a project
      * still awaiting a decision (submitted_unassigned/pending) is locked.
      */

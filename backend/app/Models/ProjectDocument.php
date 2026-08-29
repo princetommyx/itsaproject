@@ -19,15 +19,7 @@ class ProjectDocument extends Model
      */
     public const TYPES = [
         'proposal' => 'Project Proposal',
-        'chapter_1' => 'Chapter 1',
-        'chapter_2' => 'Chapter 2',
-        'chapter_3' => 'Chapter 3',
-        'chapter_4' => 'Chapter 4',
-        'chapter_5' => 'Chapter 5',
-        'final_report' => 'Final Report',
-        'presentation' => 'Presentation Slides',
-        'source_code' => 'Source Code / ZIP',
-        'supporting' => 'Supporting Document',
+        'final_report' => 'Final Project Work Document',
     ];
 
     public function project(): BelongsTo

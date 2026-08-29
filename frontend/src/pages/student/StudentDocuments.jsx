@@ -6,7 +6,7 @@ import { useToast } from '../../context/ToastContext'
 import { downloadDocument, formatFileSize } from '../../lib/downloadDocument'
 import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
 
-const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'zip']
+const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx']
 const MAX_FILE_BYTES = 20 * 1024 * 1024
 import { Alert, Button, Card, EmptyState, PageHeading } from '../../components/ui'
 import { SkeletonCard } from '../../components/Skeleton'
@@ -32,7 +32,7 @@ export default function StudentDocuments() {
     const extension = file.name.split('.').pop()?.toLowerCase()
     if (!ALLOWED_EXTENSIONS.includes(extension)) {
       toast.error('This file type is not supported.', {
-        description: 'Upload a PDF, Word, PowerPoint, or ZIP file.',
+        description: 'Upload a PDF or Word document.',
       })
       return
     }
@@ -134,7 +134,7 @@ export default function StudentDocuments() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Upload your proposal, chapters, final report, and other project files.">
+      <PageHeading description="Upload your project proposal, then your final project work document once your topic is approved.">
         My Documents
       </PageHeading>
 
@@ -178,12 +178,12 @@ export default function StudentDocuments() {
               <p className="text-sm font-medium text-slate-700">
                 {submitting ? `Uploading... ${progress}%` : 'Drag your file here'}
               </p>
-              <p className="text-xs text-slate-400">or, click to browse (PDF, Word, PowerPoint, ZIP — 20MB max)</p>
+              <p className="text-xs text-slate-400">or, click to browse (PDF or Word — 20MB max)</p>
             </div>
             <input
               ref={inputRef}
               type="file"
-              accept=".pdf,.doc,.docx,.ppt,.pptx,.zip"
+              accept=".pdf,.doc,.docx"
               className="hidden"
               onChange={(e) => pickFile(e.target.files[0])}
             />
