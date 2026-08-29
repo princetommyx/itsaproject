@@ -140,16 +140,16 @@ export default function StudentDocuments() {
 
       {editable ? (
         <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">Upload a Document</h2>
+          <h2 className="mb-4 text-lg font-bold text-slate-900">Upload a Document</h2>
           {error && <Alert>{error}</Alert>}
 
           <label className="mb-4 block text-sm">
-            <span className="mb-1.5 block font-medium text-slate-700">Document Type</span>
+            <span className="mb-1.5 block text-sm font-semibold text-slate-800">Document Type</span>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
               disabled={submitting}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-72"
+              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-[15px] font-medium text-slate-900 transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-72"
             >
               {DOCUMENT_TYPES.map((t) => (
                 <option key={t.key} value={t.key}>
@@ -197,7 +197,7 @@ export default function StudentDocuments() {
       )}
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Your Documents</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-900">Your Documents</h2>
         <ul className="divide-y divide-slate-100">
           {DOCUMENT_TYPES.map((t) => {
             const versions = byType[t.key]

@@ -87,7 +87,7 @@ function CreateProjectForm({ onCreated, onError }) {
 
   return (
     <Card>
-      <h2 className="mb-4 text-lg font-semibold text-slate-800">Start a Project Draft</h2>
+      <h2 className="mb-4 text-lg font-bold text-slate-900">Start a Project Draft</h2>
       <p className="mb-4 text-sm text-slate-500">
         As the group leader, create your project draft, then add your group members by Index Number.
       </p>

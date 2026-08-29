@@ -76,7 +76,7 @@ export default function ImportStudents() {
     <div className="space-y-6">
       <PageHeading description="Bulk-create student accounts from a CSV roster.">Import Students</PageHeading>
       <Card className="max-w-xl">
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Upload CSV File</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-900">Upload CSV File</h2>
 
         {error && <Alert>{error}</Alert>}
 

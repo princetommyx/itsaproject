@@ -22,7 +22,7 @@ export default function Complaints() {
     <div className="space-y-6">
       <PageHeading description="Messages and complaints filed by students, all in one place.">Complaints</PageHeading>
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Student Complaints</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-900">Student Complaints</h2>
         {isLoading ? (
           <SkeletonList rows={4} />
         ) : complaints.length === 0 ? (

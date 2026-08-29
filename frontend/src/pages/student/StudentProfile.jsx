@@ -21,7 +21,7 @@ export default function StudentProfile() {
           <div className="flex items-center gap-4">
             <Avatar name={user?.name} className="h-16 w-16 text-lg" />
             <div>
-              <h2 className="text-lg font-semibold text-slate-800">{user?.name}</h2>
+              <h2 className="text-lg font-bold text-slate-900">{user?.name}</h2>
               <p className="text-sm text-slate-500">{user?.university_id}</p>
             </div>
           </div>
@@ -46,7 +46,7 @@ export default function StudentProfile() {
         </Card>
 
         <Card>
-          <h2 className="mb-4 text-lg font-semibold text-slate-800">Project Information</h2>
+          <h2 className="mb-4 text-lg font-bold text-slate-900">Project Information</h2>
           {isLoading ? (
             <SkeletonCard lines={2} />
           ) : project ? (

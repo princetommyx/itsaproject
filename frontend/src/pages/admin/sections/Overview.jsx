@@ -87,7 +87,7 @@ export default function Overview() {
       </div>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Projects by Status</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-900">Projects by Status</h2>
         <StatusBreakdownChart rows={STATUS_ROWS.map((r) => ({ ...r, value: stats[r.key] }))} />
       </Card>
     </div>

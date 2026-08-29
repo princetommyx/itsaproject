@@ -15,13 +15,26 @@
      Poppins/Outfit — the geometric ones read as template-y. */
   --font-sans:
     'Roboto', Arial, Helvetica, sans-serif;
+
+  /* Muted text across the app used slate-400/500, which on white sit at
+     roughly 2.6:1 and 4.8:1 contrast — the 400 in particular fails WCAG AA
+     (4.5:1) and is what reads as washed out / "blurry". Each muted step is
+     shifted one notch darker here (400 takes 500's old value, 500 takes
+     600's), which lifts every one of the ~75 muted-text usages at once
+     instead of editing them file by file. Both are used almost exclusively
+     for text, so nothing else shifts meaningfully. */
+  --color-slate-400: #64748b;
+  --color-slate-500: #475569;
 }
 
 
 body {
   margin: 0;
   background-color: #f4f6f9;
-  color: #1f2937;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 @keyframes toast-in {

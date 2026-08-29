@@ -21,7 +21,7 @@ export default function StatusBreakdownChart({ rows }) {
 
         return (
           <div key={row.label} className="flex items-center gap-3">
-            <span className="w-36 shrink-0 truncate text-xs font-medium text-slate-500">{row.label}</span>
+            <span className="w-36 shrink-0 truncate text-[13px] font-semibold text-slate-700">{row.label}</span>
             <div className={`h-2 flex-1 overflow-hidden rounded-full ${style.track}`}>
               <div
                 className={`h-full rounded-full ${style.fill} transition-all duration-500`}

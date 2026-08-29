@@ -13,7 +13,7 @@ export default function LoginLogs() {
     <div className="space-y-6">
       <PageHeading description="A record of every sign-in across the system.">Login Logs</PageHeading>
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Login Audit Trail</h2>
+        <h2 className="mb-4 text-lg font-bold text-slate-900">Login Audit Trail</h2>
         {isLoading ? (
           <SkeletonTable rows={6} cols={5} />
         ) : logs.length === 0 ? (
