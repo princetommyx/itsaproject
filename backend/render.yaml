@@ -76,7 +76,6 @@ services:
       - key: DB_USERNAME
         value: REPLACE_ME # usually "postgres" on Supabase
       - key: DB_PASSWORD
-        value: REPLACE_ME
         sync: false # marks it sensitive so Render doesn't echo it back in the dashboard
       - key: DB_SSLMODE
         value: require # both Supabase and Neon require SSL on external connections
@@ -100,7 +99,6 @@ services:
       - key: MAIL_FROM_ADDRESS
         value: "onboarding@resend.dev" # switch to an address on your own verified domain once you add one in Resend
       - key: RESEND_API_KEY
-        value: REPLACE_ME
         sync: false # marks it sensitive so Render doesn't echo it back in the dashboard
 
       # Student-uploaded project documents (proposals, chapters, etc.).
