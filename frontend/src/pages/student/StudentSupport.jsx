@@ -18,7 +18,7 @@ export default function StudentSupport() {
     setSubmitting(true)
     try {
       await client.post('/student/complaints', { subject, message })
-      toast.success('Support ticket submitted.')
+      toast.success('Message submitted.')
       setSubject('')
       setMessage('')
       mutate()
@@ -29,10 +29,10 @@ export default function StudentSupport() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="File a ticket and track its status here.">Support Tickets</PageHeading>
+      <PageHeading description="Send a message and track its status here.">Messages</PageHeading>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">File a New Ticket</h2>
+        <h2 className="mb-4 text-lg font-semibold text-slate-800">Send a New Message</h2>
         <form className="space-y-3" onSubmit={handleSubmit}>
           <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
           <Textarea label="Message" rows={4} value={message} onChange={(e) => setMessage(e.target.value)} required />
@@ -43,11 +43,11 @@ export default function StudentSupport() {
       </Card>
 
       <Card>
-        <h2 className="mb-4 text-lg font-semibold text-slate-800">Your Tickets</h2>
+        <h2 className="mb-4 text-lg font-semibold text-slate-800">Your Messages</h2>
         {!complaints ? (
           <SkeletonList rows={3} />
         ) : complaints.length === 0 ? (
-          <EmptyState icon={MessageIcon} title="No support tickets filed yet" />
+          <EmptyState icon={MessageIcon} title="No messages sent yet" />
         ) : (
           <ul className="divide-y divide-slate-100">
             {complaints.map((c) => (

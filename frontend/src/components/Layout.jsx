@@ -27,7 +27,7 @@ const NAV_LINKS = {
     { to: '/student', label: 'My Project', icon: FolderIcon },
     { to: '/student/documents', label: 'My Documents', icon: FileSpreadsheetIcon },
     { to: '/student/notifications', label: 'Notifications', icon: BellIcon },
-    { to: '/student/support', label: 'Support Tickets', icon: MessageIcon },
+    { to: '/student/support', label: 'Messages', icon: MessageIcon },
     { to: '/student/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
   assessor: [
