@@ -188,13 +188,11 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-slate-100 md:flex">
-      {drawerOpen && (
-        <div className="fixed inset-0 z-30 bg-black/40 md:hidden" onClick={() => setDrawerOpen(false)} />
-      )}
+      {drawerOpen && <div className="fixed inset-0 z-30 md:hidden" onClick={() => setDrawerOpen(false)} />}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-full shrink-0 flex-col bg-gradient-to-b from-upsa-blue to-upsa-blue-dark transition-transform duration-200 md:static md:w-64 md:translate-x-0 ${
-          drawerOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed inset-x-0 top-0 z-40 flex max-h-[calc(100vh-2rem)] w-full shrink-0 flex-col overflow-y-auto rounded-b-3xl bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/30 transition-transform duration-200 md:static md:inset-auto md:max-h-none md:w-64 md:translate-y-0 md:overflow-visible md:rounded-none md:shadow-none ${
+          drawerOpen ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
         <div
@@ -218,7 +216,7 @@ export default function Layout({ children }) {
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+        <nav className="space-y-1 px-3 py-4 md:flex-1 md:overflow-y-auto">
           {links.map((link, i) =>
             link.section ? (
               <p
