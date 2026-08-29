@@ -62,6 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/projects/{project}', [AdminController::class, 'showProject']);
             Route::post('/projects/{project}/assign', [AdminController::class, 'assignAssessor']);
             Route::post('/projects/{project}/decide', [AdminController::class, 'decideProject']);
+            Route::get('/diagnostics', [AdminController::class, 'diagnostics']);
             Route::get('/login-logs', [AdminController::class, 'loginLogs']);
             Route::get('/complaints', [AdminController::class, 'complaints']);
             Route::put('/complaints/{complaint}', [AdminController::class, 'updateComplaint']);

@@ -251,6 +251,49 @@ class AdminController extends Controller
         return response()->json($complaint);
     }
 
+    /**
+     * Measures the real round-trip time to the database, to settle whether
+     * slowness is network distance (app server and database in different
+     * regions) rather than guesswork. A trivial `SELECT 1` does no work, so
+     * whatever it costs is almost entirely network:
+     *
+     *   under ~10ms  -> same region, look elsewhere for the slowness
+     *   ~50-100ms    -> nearby region, some room to improve
+     *   over ~150ms  -> different continent; every query in every request
+     *                   pays this, which is the thing to fix
+     *
+     * Reports timings only — never host, credentials, or schema.
+     */
+    public function diagnostics()
+    {
+        $samples = [];
+
+        for ($i = 0; $i < 5; $i++) {
+            $start = hrtime(true);
+            DB::select('select 1');
+            $samples[] = (hrtime(true) - $start) / 1_000_000;
+        }
+
+        sort($samples);
+        $median = $samples[intdiv(count($samples), 2)];
+
+        $verdict = match (true) {
+            $median < 10 => 'same_region',
+            $median < 100 => 'nearby_region',
+            default => 'different_region',
+        };
+
+        return response()->json([
+            'db_driver' => config('database.default'),
+            'query_ms' => [
+                'median' => round($median, 1),
+                'min' => round($samples[0], 1),
+                'max' => round($samples[count($samples) - 1], 1),
+            ],
+            'verdict' => $verdict,
+        ]);
+    }
+
     public function notifications(Request $request)
     {
         return $request->user()->notifications()->latest()->limit(100)->get();

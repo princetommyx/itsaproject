@@ -2,7 +2,18 @@ services:
   - type: web
     name: itsaproject-backend
     runtime: docker
-    region: oregon # Update to your preferred region (e.g., frankfurt, ohio, singapore) — pick one close to your database to cut per-query latency; see the DB_HOST note below.
+    # frankfurt, not the oregon default: Render has no African region, and
+    # Frankfurt is the closest one to Accra — Oregon is roughly the furthest
+    # point on earth from Ghana, so it penalises both the round trip from
+    # students' phones AND every query to the database.
+    #
+    # The database must be in the SAME region as this service. That matters
+    # more than which region you pick: a request runs many queries, and each
+    # one pays the app-server-to-database round trip. Cross-continent that is
+    # ~150ms+ per query, which is what turns a fast page into a slow one.
+    # Check the real number with GET /api/admin/diagnostics (admin login
+    # required) — it reports the measured query round-trip and a verdict.
+    region: frankfurt
     # NOTE on the "long time to load dashboard / long time to log in" complaint:
     # the free plan spins the service down after ~15 minutes with no traffic.
     # The next request has to boot the whole container again, which routinely

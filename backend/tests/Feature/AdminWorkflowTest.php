@@ -181,3 +181,23 @@ it('lists login logs newest first with the acting user eager loaded', function (
     expect($ids->last())->toBe($older->id);
     expect($response->json('data.0.user.id'))->toBe($student->id);
 });
+
+it('reports database round-trip timings to admins only', function () {
+    $admin = User::factory()->admin()->create();
+    $assessor = User::factory()->assessor()->create();
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/diagnostics');
+
+    $response->assertOk()->assertJsonStructure([
+        'db_driver',
+        'query_ms' => ['median', 'min', 'max'],
+        'verdict',
+    ]);
+
+    // Timings only — never anything that identifies or reaches the database.
+    $body = $response->json();
+    expect(json_encode($body))->not->toContain('password');
+    expect($body)->not->toHaveKey('host');
+
+    $this->actingAs($assessor, 'sanctum')->getJson('/api/admin/diagnostics')->assertForbidden();
+});
