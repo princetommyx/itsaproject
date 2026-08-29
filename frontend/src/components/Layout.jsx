@@ -191,12 +191,12 @@ export default function Layout({ children }) {
       {drawerOpen && <div className="fixed inset-0 z-30 md:hidden" onClick={() => setDrawerOpen(false)} />}
 
       <aside
-        className={`fixed inset-x-0 top-0 z-40 flex max-h-[calc(100vh-2rem)] w-full shrink-0 flex-col overflow-y-auto rounded-b-3xl bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/30 transition-transform duration-200 md:static md:inset-auto md:max-h-none md:w-64 md:translate-y-0 md:overflow-visible md:rounded-none md:shadow-none ${
+        className={`drawer-height fixed inset-x-0 top-0 z-40 flex w-full shrink-0 flex-col rounded-b-3xl bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/30 transition-transform duration-200 md:static md:inset-auto md:h-auto md:max-h-none md:w-64 md:translate-y-0 md:rounded-none md:shadow-none ${
           drawerOpen ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
         <div
-          className="flex items-center justify-between border-b border-white/10 px-5 py-4"
+          className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4"
           style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
         >
           <div className="flex items-center gap-3">
@@ -216,12 +216,12 @@ export default function Layout({ children }) {
           </button>
         </div>
 
-        <nav className="space-y-1 px-3 py-4 md:flex-1 md:overflow-y-auto">
+        <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3 py-3">
           {links.map((link, i) =>
             link.section ? (
               <p
                 key={`section-${i}`}
-                className="mt-6 mb-2 px-3 text-xs font-medium tracking-[0.14em] text-white/45 uppercase first:mt-1"
+                className="mt-4 mb-1 px-3 text-xs font-medium tracking-[0.14em] text-white/45 uppercase first:mt-0"
               >
                 {link.section}
               </p>
@@ -233,7 +233,7 @@ export default function Layout({ children }) {
                 onMouseEnter={() => handlePrefetch(link.to)}
                 onClick={() => setDrawerOpen(false)}
                 className={({ isActive }) =>
-                  `relative flex items-center gap-4 rounded-xl px-3 py-3 text-base font-medium transition duration-150 ${
+                  `relative flex items-center gap-4 rounded-xl px-3 py-2.5 text-base font-medium transition duration-150 ${
                     isActive ? 'bg-white/10 text-upsa-gold' : 'text-white hover:bg-white/5'
                   }`
                 }
@@ -262,7 +262,7 @@ export default function Layout({ children }) {
           )}
         </nav>
 
-        <div className="border-t border-white/10 px-4 py-4" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div className="shrink-0 border-t border-white/10 px-4 py-3.5" style={{ paddingBottom: 'max(0.875rem, env(safe-area-inset-bottom))' }}>
           <p className="truncate px-1 pb-3 text-sm text-white/70">{user?.name}</p>
           <button
             onClick={handleLogout}

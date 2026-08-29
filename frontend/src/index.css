@@ -28,6 +28,22 @@
 }
 
 
+/* The mobile drawer's height cap. 100vh on iOS Safari measures the viewport
+   *including* the area behind the URL bar, so a vh-based cap renders the
+   drawer's footer underneath the browser chrome where it can't be reached.
+   dvh tracks the actually-visible area and shrinks when the toolbar shows;
+   the vh line stays first as a fallback for browsers without dvh. Capped
+   well under 100 so page content still shows beneath the open drawer.
+   Scoped to below Tailwind's md breakpoint: plain CSS here sits outside
+   Tailwind's cascade layer and so would beat `md:max-h-none`, capping the
+   desktop sidebar too. */
+@media (max-width: 767px) {
+  .drawer-height {
+    max-height: 78vh;
+    max-height: 78dvh;
+  }
+}
+
 body {
   margin: 0;
   background-color: #f4f6f9;
