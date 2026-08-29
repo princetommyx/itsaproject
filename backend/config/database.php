@@ -97,6 +97,12 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Reuse one connection per web worker instead of opening a fresh
+            // TCP+TLS handshake to Postgres on every request. This matters a
+            // lot when the app server and database are in different regions
+            // (see the render.yaml region note) — that handshake alone can
+            // cost seconds, and it was previously paid on every single request.
+            'options' => extension_loaded('pdo_pgsql') ? [PDO::ATTR_PERSISTENT => true] : [],
         ],
 
         'sqlsrv' => [
