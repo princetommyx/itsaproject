@@ -52,12 +52,18 @@ class AssessorController extends Controller
         // The decision belongs to the version it was made on. On a revision
         // request that version is kept untouched and a fresh draft opened
         // beside it — the record the comparison is built from.
-        $this->versioning->recordDecision(
+        $version = $this->versioning->recordDecision(
             $project->fresh(),
             $request->user(),
             $validated['decision'],
             $validated['feedback'] ?? null,
             $validated['required_changes'] ?? [],
+        );
+
+        activity_log(
+            $validated['decision'] === 'approved' ? 'project.approved' : 'project.revision_requested',
+            $project,
+            ['version' => $version?->label, 'title' => $project->title],
         );
 
         if ($validated['decision'] === 'approved') {

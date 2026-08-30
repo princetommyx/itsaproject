@@ -9,12 +9,16 @@ use App\Models\User;
 use App\Notifications\DocumentSubmittedNotification;
 use Illuminate\Http\Request;
 use App\Services\ProjectVersioning;
+use App\Services\Settings;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ProjectDocumentController extends Controller
 {
-    public function __construct(private ProjectVersioning $versioning) {}
+    public function __construct(
+        private ProjectVersioning $versioning,
+        private Settings $settings,
+    ) {}
 
     /**
      * The group leader uploads a document for their project. Each upload
@@ -26,10 +30,18 @@ class ProjectDocumentController extends Controller
         $this->authorizeLeader($request, $project);
         $this->ensureEditable($project);
 
+        // The allowed types, the size cap and the deadlines are all
+        // administrator settings, so they're read here rather than hard-coded
+        // — changing them must not need a deploy.
+        $allowedTypes = $this->settings->get('allowed_file_types') ?: ['pdf', 'doc', 'docx'];
+        $maxKilobytes = ((int) ($this->settings->get('max_file_size_mb') ?: 20)) * 1024;
+
         $validated = $request->validate([
             'type' => ['required', 'string', 'in:'.implode(',', array_keys(ProjectDocument::TYPES))],
-            'file' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:20480'],
+            'file' => ['required', 'file', 'mimes:'.implode(',', $allowedTypes), "max:{$maxKilobytes}"],
         ]);
+
+        $this->ensureDeadlineNotPassed($validated['type']);
 
         $file = $request->file('file');
         $path = $file->store("project-documents/{$project->id}", config('filesystems.default'));
@@ -131,6 +143,31 @@ class ProjectDocumentController extends Controller
         }
 
         return $disk->download($document->stored_path, $document->original_filename);
+    }
+
+    /**
+     * Submissions close when the deadline for that stage passes.
+     *
+     * A deadline that isn't set doesn't close anything — an institution that
+     * hasn't configured one shouldn't find uploads silently blocked.
+     */
+    private function ensureDeadlineNotPassed(string $type): void
+    {
+        $deadline = $type === 'proposal'
+            ? $this->settings->get('proposal_deadline')
+            : $this->settings->get('final_deadline');
+
+        if (! $deadline) {
+            return;
+        }
+
+        $closesAt = \Illuminate\Support\Carbon::parse($deadline);
+
+        if (now()->greaterThan($closesAt)) {
+            throw ValidationException::withMessages([
+                'file' => ['The deadline for this submission passed on '.$closesAt->format('j F Y \a\t g:ia').'.'],
+            ]);
+        }
     }
 
     private function authorizeLeader(Request $request, Project $project): void

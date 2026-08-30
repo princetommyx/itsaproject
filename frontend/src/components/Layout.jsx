@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import useSWR, { preload } from 'swr'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { useSettings } from '../context/SettingsContext'
 import { useToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
 import upsaShield from '../assets/upsa-shield.png'
@@ -42,6 +43,7 @@ import {
   LogIcon,
   LogOutIcon,
   MessageIcon,
+  SettingsIcon,
   UploadCloudIcon,
   UserCircleIcon,
   UsersIcon,
@@ -72,6 +74,7 @@ const NAV_LINKS = {
     { section: 'System' },
     { to: '/admin/logs', label: 'Login Logs', icon: LogIcon },
     { to: '/admin/complaints', label: 'Complaints', icon: MessageIcon },
+    { to: '/admin/settings', label: 'Settings', icon: SettingsIcon, permission: 'settings.manage' },
     { to: '/admin/notifications', label: 'Notifications', icon: BellIcon },
     { to: '/admin/profile', label: 'My Profile', icon: UserCircleIcon },
   ],
@@ -176,7 +179,11 @@ export default function Layout({ children }) {
   const toast = useToast()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const links = NAV_LINKS[user?.role] || []
+  // A nav item can name a permission. Someone whose role lacks it never sees
+  // the link, rather than finding a page that refuses them when they arrive.
+  const links = (NAV_LINKS[user?.role] || []).filter(
+    (link) => !link.permission || (user?.permissions ?? []).includes(link.permission)
+  )
 
   // Shares its SWR cache key with NotificationsPage, so the list is fetched
   // once and reused between the sidebar badge and the notifications page —
@@ -204,12 +211,7 @@ export default function Layout({ children }) {
           style={{ paddingTop: 'max(1rem, env(safe-area-inset-top))' }}
         >
           <div className="flex items-center gap-3">
-            <img
-              src={upsaShield}
-              alt="UPSA"
-              className="h-10 w-10 shrink-0 rounded-2xl bg-white object-contain p-1.5"
-            />
-            <span className="text-xl font-extrabold tracking-tight text-upsa-gold">UPSA</span>
+            <BrandMark />
           </div>
           <button
             onClick={() => setDrawerOpen(false)}
@@ -281,12 +283,7 @@ export default function Layout({ children }) {
         >
           <div className="flex items-center justify-between py-1.5">
             <div className="flex items-center gap-3">
-              <img
-                src={upsaShield}
-                alt="UPSA"
-                className="h-10 w-10 shrink-0 rounded-2xl bg-white object-contain p-1.5"
-              />
-              <span className="text-xl font-extrabold tracking-tight text-upsa-gold">UPSA</span>
+              <BrandMark />
             </div>
             <div className="flex items-center gap-1">
               <UserMenu user={user} onLogout={handleLogout} />
@@ -309,5 +306,27 @@ export default function Layout({ children }) {
         </main>
       </div>
     </div>
+  )
+}
+
+/**
+ * The mark in the navigation. Falls back to the built-in UPSA shield and
+ * wordmark until an administrator uploads their own, so a fresh install still
+ * looks like something rather than an empty box.
+ */
+function BrandMark() {
+  const { settings } = useSettings()
+
+  return (
+    <>
+      <img
+        src={settings.logo_url || upsaShield}
+        alt={settings.school_name || 'UPSA'}
+        className="h-10 w-10 shrink-0 rounded-2xl bg-white object-contain p-1.5"
+      />
+      <span className="text-xl font-extrabold tracking-tight text-upsa-gold">
+        {settings.short_name?.trim() || 'UPSA'}
+      </span>
+    </>
   )
 }

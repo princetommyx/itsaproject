@@ -68,7 +68,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $token,
-            'user' => $user,
+            'user' => $this->userPayload($user),
         ]);
     }
 
@@ -81,7 +81,25 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return response()->json($request->user());
+        return response()->json($this->userPayload($request->user()));
+    }
+
+    /**
+     * The account, plus what it may do.
+     *
+     * Attached here rather than appended to the model: serialising a user
+     * would otherwise resolve their role, and a list of fifty students would
+     * become fifty extra queries for permissions nothing on that page reads.
+     */
+    private function userPayload(User $user): array
+    {
+        $user->loadMissing('assignedRole');
+
+        return [
+            ...$user->toArray(),
+            'role_name' => $user->assignedRole?->name,
+            'permissions' => $user->permissions(),
+        ];
     }
 
     /**

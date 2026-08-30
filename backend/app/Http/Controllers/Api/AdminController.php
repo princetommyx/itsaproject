@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Exports\ProjectDataExport;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Complaint;
 use App\Models\LoginLog;
 use App\Models\Project;
@@ -178,12 +179,18 @@ class AdminController extends Controller
             'feedback' => $validated['decision'] === 'refine' ? $validated['feedback'] : null,
         ]);
 
-        $this->versioning->recordDecision(
+        $version = $this->versioning->recordDecision(
             $project->fresh(),
             $request->user(),
             $validated['decision'],
             $validated['feedback'] ?? null,
             $validated['required_changes'] ?? [],
+        );
+
+        activity_log(
+            $validated['decision'] === 'approved' ? 'project.approved' : 'project.revision_requested',
+            $project,
+            ['version' => $version?->label, 'title' => $project->title],
         );
 
         if ($validated['decision'] === 'approved') {
@@ -225,6 +232,7 @@ class AdminController extends Controller
         // The submitted version is now actually being looked at, which is a
         // different thing from sitting in the queue.
         $this->versioning->markUnderReview($project->fresh());
+        activity_log('project.assessor_assigned', $project, ['assessor' => $assessor->name]);
 
         return response()->json($project->fresh('assessor'));
     }
@@ -322,6 +330,7 @@ class AdminController extends Controller
         ]);
 
         $student->notify(new AddedToGroupNotification($project));
+        activity_log('project.member_added', $project, ['student' => $student->name]);
 
         return response()->json($this->projectPayload($project));
     }
@@ -340,7 +349,9 @@ class AdminController extends Controller
             ]);
         }
 
+        $memberName = $member->student?->name ?? $member->name ?? $member->university_id;
         $member->delete();
+        activity_log('project.member_removed', $project, ['student' => $memberName]);
 
         return response()->json($this->projectPayload($project));
     }
@@ -374,6 +385,11 @@ class AdminController extends Controller
             }
         }
 
+        activity_log('project.defense_scheduled', $project, [
+            'proposal_defense_at' => $project->proposal_defense_at?->toIso8601String(),
+            'final_defense_at' => $project->final_defense_at?->toIso8601String(),
+        ]);
+
         return response()->json($this->projectPayload($project));
     }
 
@@ -396,6 +412,21 @@ class AdminController extends Controller
     ];
 
     /**
+     * Staff accounts, with the role each has been given.
+     *
+     * Only staff: students all do the same thing, and offering a per-student
+     * role would mostly be a way to quietly remove one student's ability to
+     * submit.
+     */
+    public function staff()
+    {
+        return User::whereIn('role', ['admin', 'assessor'])
+            ->with('assignedRole:id,name,base_role')
+            ->orderBy('name')
+            ->get(['id', 'name', 'email', 'role', 'role_id', 'created_at']);
+    }
+
+    /**
      * Onboard a staff account (assessor or admin) via official email.
      */
     public function createStaff(Request $request)
@@ -415,6 +446,8 @@ class AdminController extends Controller
             'is_first_login' => false,
         ]);
 
+        activity_log('staff.created', $user, ['role' => $user->role, 'email' => $user->email]);
+
         return response()->json($user, 201);
     }
 
@@ -425,6 +458,20 @@ class AdminController extends Controller
     public function exportProjects()
     {
         return Excel::download(new ProjectDataExport, 'upsa-project-data.xlsx');
+    }
+
+    /**
+     * The audit trail, newest first. Filterable by action so "who changed the
+     * settings" doesn't mean scrolling past every project decision.
+     */
+    public function auditLogs(Request $request)
+    {
+        $action = trim((string) $request->query('action', ''));
+
+        return AuditLog::with('user:id,name')
+            ->when($action !== '', fn ($query) => $query->where('action', 'like', $action.'%'))
+            ->latest()
+            ->simplePaginate(50);
     }
 
     public function loginLogs()

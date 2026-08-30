@@ -4,6 +4,7 @@ import { SWRConfig } from 'swr'
 import client from './api/client'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
+import { SettingsProvider } from './context/SettingsContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import PageLoader from './components/PageLoader'
@@ -30,6 +31,7 @@ import ImportStudents from './pages/admin/sections/ImportStudents'
 import Students from './pages/admin/sections/Students'
 import AdminStudentDetail from './pages/admin/sections/AdminStudentDetail'
 import CompareVersions from './pages/CompareVersions'
+import AdminSettings from './pages/admin/settings/AdminSettings'
 import StaffManagement from './pages/admin/sections/StaffManagement'
 import LoginLogs from './pages/admin/sections/LoginLogs'
 import Complaints from './pages/admin/sections/Complaints'
@@ -55,6 +57,7 @@ export default function App() {
       >
         <ToastProvider>
           <AuthProvider>
+          <SettingsProvider>
             <Routes>
               <Route path="/" element={<HomeRedirect />} />
               <Route path="/login" element={<StudentLogin />} />
@@ -96,12 +99,14 @@ export default function App() {
                   <Route path="logs" element={<LoginLogs />} />
                   <Route path="complaints" element={<Complaints />} />
                   <Route path="notifications" element={<AdminNotifications />} />
+                  <Route path="settings" element={<AdminSettings />} />
                   <Route path="profile" element={<AdminProfile />} />
                 </Route>
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+          </SettingsProvider>
         </AuthProvider>
       </ToastProvider>
       </SWRConfig>

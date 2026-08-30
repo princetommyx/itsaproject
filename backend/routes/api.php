@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\ProjectDocumentController;
 use App\Http\Controllers\Api\ProjectVersionController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +27,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/password/change', [AuthController::class, 'changePassword']);
+
+    // Branding and the submission limits reach every signed-in user: the app
+    // can't render in the institution's colours without them, and the upload
+    // form should apply the same limits the server will.
+    Route::get('/settings', [SettingsController::class, 'public']);
 
     Route::middleware('password.changed')->group(function () {
         Route::get('/documents/{document}/download', [ProjectDocumentController::class, 'download']);
@@ -62,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::middleware('is.admin')->prefix('admin')->group(function () {
             Route::get('/dashboard', [AdminController::class, 'dashboard']);
             Route::post('/students/import', [AdminController::class, 'importStudents']);
+            Route::get('/staff', [AdminController::class, 'staff']);
             Route::post('/staff', [AdminController::class, 'createStaff']);
             Route::get('/assessors', [AdminController::class, 'assessors']);
             Route::get('/students', [AdminController::class, 'students']);
@@ -80,6 +88,26 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::get('/login-logs', [AdminController::class, 'loginLogs']);
             Route::get('/complaints', [AdminController::class, 'complaints']);
             Route::put('/complaints/{complaint}', [AdminController::class, 'updateComplaint']);
+            // is.admin says which area of the app you reach; can.do says what
+            // you may do inside it — so a Project Coordinator can work in the
+            // admin area without being able to rewrite the system's settings.
+            Route::middleware('can.do:settings.manage')->group(function () {
+                Route::get('/settings', [SettingsController::class, 'index']);
+                Route::put('/settings', [SettingsController::class, 'update']);
+                Route::post('/settings/logo', [SettingsController::class, 'uploadLogo']);
+                Route::delete('/settings/logo', [SettingsController::class, 'removeLogo']);
+            });
+
+            Route::middleware('can.do:roles.manage')->group(function () {
+                Route::get('/roles', [RoleController::class, 'index']);
+                Route::post('/roles', [RoleController::class, 'store']);
+                Route::put('/roles/{role}', [RoleController::class, 'update']);
+                Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
+                Route::put('/users/{user}/role', [RoleController::class, 'assign']);
+            });
+
+            Route::get('/audit-logs', [AdminController::class, 'auditLogs'])
+                ->middleware('can.do:audit.view');
             Route::get('/notifications', [AdminController::class, 'notifications']);
             Route::post('/notifications/{notificationId}/read', [AdminController::class, 'markNotificationRead']);
         });

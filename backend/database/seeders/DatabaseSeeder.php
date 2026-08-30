@@ -21,6 +21,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Roles first: accounts can be assigned one, and start.sh runs this on
+        // every boot, so the starting set has to exist before anything reads
+        // it.
+        $this->call(RoleSeeder::class);
+
         User::updateOrCreate(
             ['email' => 'admin@upsa.edu.gh'],
             [

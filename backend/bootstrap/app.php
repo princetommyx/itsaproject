@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'is.assessor' => \App\Http\Middleware\IsAssessor::class,
             'is.student' => \App\Http\Middleware\IsStudent::class,
             'password.changed' => \App\Http\Middleware\EnsurePasswordChanged::class,
+            'can.do' => \App\Http\Middleware\RequiresPermission::class,
         ]);
 
         // Baseline throttle for every API route (the auth endpoints layer a
