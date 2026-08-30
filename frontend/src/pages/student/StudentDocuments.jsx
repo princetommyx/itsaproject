@@ -65,8 +65,8 @@ export default function StudentDocuments() {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => setProgress(Math.round((e.loaded / e.total) * 100)),
       })
-      toast.success('Document uploaded successfully', {
-        description: `${DOCUMENT_TYPE_LABELS[type]} has been added to your project.`,
+      toast.success('Document uploaded', {
+        description: `Check it's the right file, then tap Submit for Review to send it.`,
       })
       mutate()
     } catch (err) {
@@ -104,8 +104,8 @@ export default function StudentDocuments() {
     setSubmittingId(document.id)
     try {
       await client.post(`/student/projects/${project.id}/documents/${document.id}/submit`)
-      toast.success(`${label} submitted successfully`, {
-        description: 'Your admins have been notified and can now review it.',
+      toast.success(`${label} submitted for review`, {
+        description: 'It has been sent for review and can no longer be removed.',
       })
       mutate()
     } catch (err) {
@@ -236,11 +236,11 @@ export default function StudentDocuments() {
                         </p>
                         {current.submitted_at ? (
                           <p className="mt-1 text-xs font-semibold text-emerald-700">
-                            ✓ Submitted {new Date(current.submitted_at).toLocaleDateString()}
+                            ✓ Submitted for review on {new Date(current.submitted_at).toLocaleDateString()}
                           </p>
                         ) : (
                           <p className="mt-1 text-xs font-semibold text-amber-700">
-                            Uploaded — not submitted yet
+                            Uploaded — not submitted for review yet
                           </p>
                         )}
                       </>
@@ -256,7 +256,7 @@ export default function StudentDocuments() {
                     )}
                     {/* Submitting is a separate, deliberate step from uploading,
                         so a wrong file can be swapped out before it ever
-                        reaches the admins. */}
+                        goes for review. */}
                     {current && !current.submitted_at && (
                       <Button
                         variant="outline"
@@ -265,7 +265,7 @@ export default function StudentDocuments() {
                         loading={submittingId === current.id}
                         onClick={() => handleSubmitDocument(current, t.label)}
                       >
-                        {submittingId === current.id ? 'Submitting...' : 'Submit to Admin'}
+                        {submittingId === current.id ? 'Submitting...' : 'Submit for Review'}
                       </Button>
                     )}
                     {current && editable && !current.submitted_at && (
