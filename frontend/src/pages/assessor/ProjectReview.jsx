@@ -19,7 +19,7 @@ export default function ProjectReview() {
 
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [submitting, setSubmitting] = useState(null)
 
   async function decide(decision) {
     setError('')
@@ -27,7 +27,7 @@ export default function ProjectReview() {
       setError('Feedback is required when sending a project back for refinement.')
       return
     }
-    setSubmitting(true)
+    setSubmitting(decision)
     try {
       await client.post(`/assessor/projects/${id}/decide`, { decision, feedback })
       toast.success(
@@ -47,7 +47,7 @@ export default function ProjectReview() {
         description: message || 'Something went wrong. Please try again.',
       })
     } finally {
-      setSubmitting(false)
+      setSubmitting(null)
     }
   }
 
@@ -145,10 +145,10 @@ export default function ProjectReview() {
               onChange={(e) => setFeedback(e.target.value)}
             />
             <div className="flex flex-wrap gap-2">
-              <Button variant="success" onClick={() => decide('approved')} disabled={submitting} loading={submitting}>
+              <Button variant="success" onClick={() => decide('approved')} disabled={!!submitting} loading={submitting === 'approved'}>
                 Approve
               </Button>
-              <Button variant="danger" onClick={() => decide('refine')} disabled={submitting} loading={submitting}>
+              <Button variant="danger" onClick={() => decide('refine')} disabled={!!submitting} loading={submitting === 'refine'}>
                 Send Back for Refinement
               </Button>
             </div>

@@ -215,25 +215,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         {isLeader && editable && (
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-ink/20 bg-blue-500/10 p-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {isResubmission ? 'Ready to resubmit?' : 'Ready to submit?'}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {isResubmission
-                  ? 'Once you’ve made the requested changes, resubmit for another review.'
-                  : 'You can submit as soon as your group and documents are set — or keep editing below first.'}
-              </p>
-            </div>
-            <Button
-              onClick={() => submitProject(project, onChange, onError, toast, setSubmitting)}
-              disabled={submitting}
-              loading={submitting}
-            >
-              {isResubmission ? 'Resubmit Project' : 'Submit Project'}
-            </Button>
-          </div>
+          <EditProjectForm project={project} onChange={onChange} onError={onError} toast={toast} />
         )}
 
         <div className="mt-5 rounded-xl border border-border p-4">
@@ -307,7 +289,25 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         {isLeader && editable && (
-          <EditAndSubmit project={project} onChange={onChange} onError={onError} toast={toast} />
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-ink/20 bg-blue-500/10 p-4">
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                {isResubmission ? 'Ready to resubmit?' : 'Ready to submit?'}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {isResubmission
+                  ? 'Once you’ve made the requested changes, resubmit for another review.'
+                  : 'You can submit as soon as your group and documents are set.'}
+              </p>
+            </div>
+            <Button
+              onClick={() => submitProject(project, onChange, onError, toast, setSubmitting)}
+              disabled={submitting}
+              loading={submitting}
+            >
+              {isResubmission ? 'Resubmit Project' : 'Submit Project'}
+            </Button>
+          </div>
         )}
       </Card>
     </div>
@@ -409,7 +409,7 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
   )
 }
 
-function EditAndSubmit({ project, onChange, onError, toast }) {
+function EditProjectForm({ project, onChange, onError, toast }) {
   const [title, setTitle] = useState(project.title)
   const [description, setDescription] = useState(project.description)
   const [submitting, setSubmitting] = useState(false)
@@ -430,21 +430,13 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
   }
 
   return (
-    <form className="mt-6 space-y-4 border-t border-border pt-6" onSubmit={saveEdits}>
-      <h3 className="text-sm font-semibold text-foreground">Edit Project</h3>
+    <form className="mt-5 space-y-4 rounded-xl border border-border p-4" onSubmit={saveEdits}>
+      <h3 className="text-sm font-semibold text-foreground">Edit Project Details</h3>
       <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
       <Textarea label="Description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
-      <div className="flex flex-wrap gap-2">
+      <div className="flex justify-end">
         <Button type="submit" variant="secondary" disabled={submitting} loading={submitting}>
           Save Changes
-        </Button>
-        <Button
-          type="button"
-          onClick={() => submitProject(project, onChange, onError, toast, setSubmitting)}
-          disabled={submitting}
-          loading={submitting}
-        >
-          {project.status === 'refine' ? 'Resubmit Project' : 'Submit Project'}
         </Button>
       </div>
     </form>
