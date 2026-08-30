@@ -232,30 +232,27 @@ export default function Layout({ children }) {
                 end
                 onMouseEnter={() => handlePrefetch(link.to)}
                 onClick={() => setDrawerOpen(false)}
+                // Active is just a filled row with the icon and label in gold,
+                // matching the reference. No left accent bar — the fill and
+                // the colour already say which page you're on.
                 className={({ isActive }) =>
-                  `relative flex items-center gap-4 rounded-xl px-3 py-2.5 text-base font-medium transition duration-150 ${
+                  `flex items-center gap-4 rounded-xl px-3 py-2.5 text-base font-medium transition duration-150 ${
                     isActive ? 'bg-white/10 text-upsa-gold' : 'text-white hover:bg-white/5'
                   }`
                 }
               >
-                {({ isActive }) => (
-                  <>
-                    {isActive && (
-                      <span className="absolute top-1/2 left-0 h-6 w-1 -translate-y-1/2 rounded-r-full bg-upsa-gold" />
-                    )}
-                    {/* Bare icon, no badge — the reference sits its icons
-                        straight on the dark ground, which reads cleaner and
-                        keeps the glyph at full contrast. */}
-                    <span className="flex shrink-0 items-center justify-center">
-                      <link.icon />
-                    </span>
-                    <span className="flex-1">{link.label}</span>
-                    {link.to === NOTIFICATIONS_PATH[user?.role] && unreadCount > 0 && (
-                      <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-upsa-gold px-1 text-xs font-semibold text-upsa-blue-dark">
-                        {unreadCount}
-                      </span>
-                    )}
-                  </>
+                {/* Bare icon, no badge — the reference sits its icons straight
+                    on the dark ground, which reads cleaner and keeps the glyph
+                    at full contrast. It inherits the row's colour, so it turns
+                    gold along with the label when active. */}
+                <span className="flex shrink-0 items-center justify-center">
+                  <link.icon />
+                </span>
+                <span className="flex-1">{link.label}</span>
+                {link.to === NOTIFICATIONS_PATH[user?.role] && unreadCount > 0 && (
+                  <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-upsa-gold px-1 text-xs font-semibold text-upsa-blue-dark">
+                    {unreadCount}
+                  </span>
                 )}
               </NavLink>
             )
