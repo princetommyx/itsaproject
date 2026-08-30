@@ -8,6 +8,7 @@ export default function StaffLogin() {
       subtitle="Sign in with your official staff email to continue."
       identifierLabel="Official Email"
       identifierPlaceholder="upsa@mail.edu.gh"
+      passwordPlaceholder="Enter your password"
       identifierAutoComplete="username"
       allowedRoles={['admin', 'assessor']}
       wrongRoleMessage="This looks like a student account. Please use the Student sign-in page instead."
