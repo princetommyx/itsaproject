@@ -8,6 +8,7 @@ import { Skeleton, SkeletonCard } from '../../components/Skeleton'
 import StatusTimeline from '../../components/StatusTimeline'
 import ProjectDocumentList from '../../components/ProjectDocumentList'
 import SubmissionHistory from '../../components/SubmissionHistory'
+import { apiErrorMessage } from '../../lib/apiError'
 
 export default function ProjectReview() {
   const { id } = useParams()
@@ -19,7 +20,10 @@ export default function ProjectReview() {
 
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  // Which decision is in flight, not just whether one is: a single boolean
+  // put the spinner on both buttons, so pressing Approve looked like it had
+  // also sent the project back for refinement.
+  const [deciding, setDeciding] = useState(null)
 
   async function decide(decision) {
     setError('')
@@ -27,7 +31,7 @@ export default function ProjectReview() {
       setError('Feedback is required when sending a project back for refinement.')
       return
     }
-    setSubmitting(true)
+    setDeciding(decision)
     try {
       await client.post(`/assessor/projects/${id}/decide`, { decision, feedback })
       toast.success(
@@ -41,13 +45,13 @@ export default function ProjectReview() {
       )
       navigate('/assessor')
     } catch (err) {
-      const message = err.response?.data?.message
-      setError(message || 'Could not submit decision.')
+      const message = apiErrorMessage(err, 'Could not submit decision.')
+      setError(message)
       toast.error(decision === 'approved' ? 'Project approval failed' : 'Unable to submit feedback', {
-        description: message || 'Something went wrong. Please try again.',
+        description: message,
       })
     } finally {
-      setSubmitting(false)
+      setDeciding(null)
     }
   }
 
@@ -65,7 +69,7 @@ export default function ProjectReview() {
   if (swrError || !project) {
     return (
       <div className="space-y-6">
-        <Link to="/assessor" className="text-sm text-brand-ink hover:underline">
+        <Link to="/assessor" className="inline-block text-sm text-brand-ink hover:underline">
           &larr; Back to assigned projects
         </Link>
         <Card>
@@ -81,7 +85,7 @@ export default function ProjectReview() {
 
   return (
     <div className="space-y-6">
-      <Link to="/assessor" className="text-sm text-brand-ink hover:underline">
+      <Link to="/assessor" className="inline-block text-sm text-brand-ink hover:underline">
         &larr; Back to assigned projects
       </Link>
 
@@ -145,10 +149,10 @@ export default function ProjectReview() {
               onChange={(e) => setFeedback(e.target.value)}
             />
             <div className="flex flex-wrap gap-2">
-              <Button variant="success" onClick={() => decide('approved')} disabled={submitting} loading={submitting}>
+              <Button variant="success" onClick={() => decide('approved')} disabled={Boolean(deciding)} loading={deciding === 'approved'}>
                 Approve
               </Button>
-              <Button variant="danger" onClick={() => decide('refine')} disabled={submitting} loading={submitting}>
+              <Button variant="danger" onClick={() => decide('refine')} disabled={Boolean(deciding)} loading={deciding === 'refine'}>
                 Send Back for Refinement
               </Button>
             </div>

@@ -9,6 +9,7 @@ import StatusTimeline from '../../../components/StatusTimeline'
 import ProjectDocumentList from '../../../components/ProjectDocumentList'
 import SubmissionHistory from '../../../components/SubmissionHistory'
 import DefenseScheduleCard from '../../../components/DefenseScheduleCard'
+import { apiErrorMessage } from '../../../lib/apiError'
 
 export default function AdminProjectReview() {
   const { id } = useParams()
@@ -23,7 +24,10 @@ export default function AdminProjectReview() {
   const [assigning, setAssigning] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  // Which decision is in flight, not just whether one is: a single boolean
+  // put the spinner on both buttons, so pressing Approve looked like it had
+  // also sent the project back for refinement.
+  const [deciding, setDeciding] = useState(null)
 
   async function assign() {
     setError('')
@@ -54,7 +58,7 @@ export default function AdminProjectReview() {
       setError('Feedback is required when sending a project back for refinement.')
       return
     }
-    setSubmitting(true)
+    setDeciding(decision)
     try {
       await client.post(`/admin/projects/${id}/decide`, { decision, feedback })
       toast.success('Project status updated successfully', {
@@ -65,11 +69,11 @@ export default function AdminProjectReview() {
       })
       navigate('/admin/projects')
     } catch (err) {
-      const message = err.response?.data?.message
-      setError(message || 'Could not submit decision.')
-      toast.error('Unable to update project', { description: message || 'Something went wrong. Please try again.' })
+      const message = apiErrorMessage(err, 'Could not submit decision.')
+      setError(message)
+      toast.error('Unable to update project', { description: message })
     } finally {
-      setSubmitting(false)
+      setDeciding(null)
     }
   }
 
@@ -87,7 +91,7 @@ export default function AdminProjectReview() {
   if (projectError || !project) {
     return (
       <div className="space-y-6">
-        <Link to="/admin/projects" className="text-sm text-brand-ink hover:underline">
+        <Link to="/admin/projects" className="inline-block text-sm text-brand-ink hover:underline">
           &larr; Back to all projects
         </Link>
         <Card>
@@ -105,7 +109,7 @@ export default function AdminProjectReview() {
 
   return (
     <div className="space-y-6">
-      <Link to="/admin/projects" className="text-sm text-brand-ink hover:underline">
+      <Link to="/admin/projects" className="inline-block text-sm text-brand-ink hover:underline">
         &larr; Back to all projects
       </Link>
 
@@ -218,10 +222,10 @@ export default function AdminProjectReview() {
               onChange={(e) => setFeedback(e.target.value)}
             />
             <div className="flex flex-wrap gap-2">
-              <Button variant="success" onClick={() => decide('approved')} disabled={submitting} loading={submitting}>
+              <Button variant="success" onClick={() => decide('approved')} disabled={Boolean(deciding)} loading={deciding === 'approved'}>
                 Approve
               </Button>
-              <Button variant="danger" onClick={() => decide('refine')} disabled={submitting} loading={submitting}>
+              <Button variant="danger" onClick={() => decide('refine')} disabled={Boolean(deciding)} loading={deciding === 'refine'}>
                 Send Back for Refinement
               </Button>
             </div>
