@@ -173,7 +173,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         {(project.proposal_defense_at || project.final_defense_at) && (
-          <div className="mt-5 rounded-xl border border-brand/20 bg-blue-50/60 p-4">
+          <div className="mt-5 rounded-xl border border-brand-ink/20 bg-blue-500/10/60 p-4">
             <p className="text-sm font-bold text-foreground">Defense Schedule</p>
             <dl className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {project.proposal_defense_at && (
@@ -215,7 +215,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         {isLeader && editable && (
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand/20 bg-blue-50/60 p-4">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand-ink/20 bg-blue-500/10/60 p-4">
             <div>
               <p className="text-sm font-semibold text-foreground">
                 {isResubmission ? 'Ready to resubmit?' : 'Ready to submit?'}
@@ -239,7 +239,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
         <div className="mt-5 rounded-xl border border-border p-4">
           <div className="mb-3 flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground">Submission Status</h3>
-            <Link to="/student/documents" className="text-xs text-brand hover:underline">
+            <Link to="/student/documents" className="text-xs text-brand-ink hover:underline">
               Manage Documents
             </Link>
           </div>
@@ -281,7 +281,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
                     {!m.student && m.name && (
                       <span className="ml-1 text-xs text-muted-foreground">{m.university_id}</span>
                     )}
-                    {m.is_leader && <span className="ml-1 text-xs text-brand">(Leader)</span>}
+                    {m.is_leader && <span className="ml-1 text-xs text-brand-ink">(Leader)</span>}
                     {!m.student && (
                       <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
                         (Not yet registered)

@@ -111,7 +111,7 @@ export default function Assignments() {
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                 <select
-                  className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-auto"
+                  className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-auto"
                   value={selection[project.id] || ''}
                   onChange={(e) => setSelection({ ...selection, [project.id]: e.target.value })}
                 >

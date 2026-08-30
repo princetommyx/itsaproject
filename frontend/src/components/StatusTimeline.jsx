@@ -52,9 +52,9 @@ export default function StatusTimeline({ status }) {
                   isRefineHere
                     ? 'border-amber-400 bg-amber-400'
                     : isCompleted
-                      ? 'border-brand bg-brand'
+                      ? 'border-brand-ink bg-brand'
                       : isCurrent
-                        ? 'border-brand bg-card text-brand'
+                        ? 'border-brand-ink bg-card text-brand-ink'
                         : 'border-border bg-card text-muted-foreground'
                 }`}
               >

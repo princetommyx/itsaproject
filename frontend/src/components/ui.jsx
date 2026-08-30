@@ -32,12 +32,14 @@ export function PageHeading({ children, description, actions, className = '' }) 
 // Tints rather than flat pastels, so the same palette works on a light or a
 // dark card without a second set of values.
 const AVATAR_PALETTE = [
-  'bg-blue-500/15 text-blue-600 dark:text-blue-300',
-  'bg-violet-500/15 text-violet-600 dark:text-violet-300',
-  'bg-pink-500/15 text-pink-600 dark:text-pink-300',
+  // The 700 step, not 600: initials are small text, and against a 15% tint the
+  // lighter step lands around 3.3:1 — under AA.
+  'bg-blue-500/15 text-blue-700 dark:text-blue-300',
+  'bg-violet-500/15 text-violet-700 dark:text-violet-300',
+  'bg-pink-500/15 text-pink-700 dark:text-pink-300',
   'bg-amber-500/15 text-amber-700 dark:text-amber-300',
-  'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
-  'bg-cyan-500/15 text-cyan-600 dark:text-cyan-300',
+  'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
+  'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300',
 ]
 
 export function Avatar({ name, className = '' }) {
@@ -81,7 +83,7 @@ export function Button({ children, variant = 'primary', loading = false, classNa
   const variants = {
     primary: 'bg-brand text-brand-foreground shadow-sm hover:brightness-110',
     secondary: 'bg-secondary text-secondary-foreground hover:bg-accent',
-    outline: 'border-2 border-brand bg-transparent text-brand hover:bg-brand/5',
+    outline: 'border-2 border-brand-ink bg-transparent text-brand-ink hover:bg-brand/5',
     danger: 'bg-destructive text-destructive-foreground shadow-sm hover:brightness-110',
     success: 'bg-success text-white shadow-sm hover:brightness-110',
   }
@@ -116,7 +118,7 @@ export const Input = forwardRef(function Input({ label, error, className = '', .
         className={`${FIELD_CLASSES} ${
           error
             ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/20'
-            : 'border-input hover:border-ring/60 focus:border-brand focus:ring-ring/25'
+            : 'border-input hover:border-ring/60 focus:border-brand-ink focus:ring-ring/25'
         } ${className}`}
         {...props}
       />
@@ -133,7 +135,7 @@ export function Textarea({ label, error, className = '', ...props }) {
         className={`${FIELD_CLASSES} ${
           error
             ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/20'
-            : 'border-input hover:border-ring/60 focus:border-brand focus:ring-ring/25'
+            : 'border-input hover:border-ring/60 focus:border-brand-ink focus:ring-ring/25'
         } ${className}`}
         {...props}
       />
@@ -249,7 +251,7 @@ export function Alert({ children, variant = 'error' }) {
   const variants = {
     error: 'border-destructive/25 bg-destructive/10 text-destructive',
     success: 'border-success/25 bg-success/10 text-success',
-    info: 'border-brand/25 bg-brand/10 text-brand',
+    info: 'border-brand-ink/25 bg-brand/10 text-brand-ink',
   }
 
   return (

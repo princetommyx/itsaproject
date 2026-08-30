@@ -87,7 +87,7 @@ export default function AdminProjectReview() {
   if (projectError || !project) {
     return (
       <div className="space-y-6">
-        <Link to="/admin/projects" className="text-sm text-brand hover:underline">
+        <Link to="/admin/projects" className="text-sm text-brand-ink hover:underline">
           &larr; Back to all projects
         </Link>
         <Card>
@@ -105,7 +105,7 @@ export default function AdminProjectReview() {
 
   return (
     <div className="space-y-6">
-      <Link to="/admin/projects" className="text-sm text-brand hover:underline">
+      <Link to="/admin/projects" className="text-sm text-brand-ink hover:underline">
         &larr; Back to all projects
       </Link>
 
@@ -130,7 +130,7 @@ export default function AdminProjectReview() {
                   <li key={m.id} className="flex items-center gap-2.5 text-sm text-muted-foreground">
                     <Avatar name={name} className="h-7 w-7 text-[10px]" />
                     {name}
-                    {m.is_leader && <span className="text-xs text-brand">(Leader)</span>}
+                    {m.is_leader && <span className="text-xs text-brand-ink">(Leader)</span>}
                     {!m.student && <span className="text-xs text-amber-600">(Not yet registered)</span>}
                   </li>
                 )
@@ -164,7 +164,7 @@ export default function AdminProjectReview() {
             {(project.versions?.length ?? 0) > 1 && (
               <Link
                 to={`/admin/projects/${project.id}/compare`}
-                className="text-sm font-semibold text-brand hover:underline"
+                className="text-sm font-semibold text-brand-ink hover:underline"
               >
                 Compare versions
               </Link>
@@ -187,7 +187,7 @@ export default function AdminProjectReview() {
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <select
-                    className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-auto"
+                    className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-auto"
                     value={selectedAssessor}
                     onChange={(e) => setSelectedAssessor(e.target.value)}
                   >

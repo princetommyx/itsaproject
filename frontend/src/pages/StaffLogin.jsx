@@ -13,7 +13,7 @@ export default function StaffLogin() {
     >
       <p className="mt-6 text-xs text-muted-foreground">
         Student?{' '}
-        <Link to="/login" className="text-brand hover:underline">
+        <Link to="/login" className="text-brand-ink hover:underline">
           Sign in here
         </Link>
       </p>

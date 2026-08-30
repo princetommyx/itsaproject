@@ -89,10 +89,10 @@ export default function ImportStudents() {
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
           className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
-            dragging ? 'border-brand bg-blue-50' : 'border-border hover:border-ring/60'
+            dragging ? 'border-brand-ink bg-blue-500/10' : 'border-border hover:border-ring/60'
           }`}
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-brand">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10 text-brand-ink">
             <UploadCloudIcon />
           </span>
           <div>
@@ -118,7 +118,7 @@ export default function ImportStudents() {
 
         {file && (
           <div className="mt-4 flex items-center gap-3 rounded-lg border border-border p-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600">
               <FileSpreadsheetIcon />
             </span>
             <div className="min-w-0 flex-1">
@@ -158,7 +158,7 @@ export default function ImportStudents() {
           <div className="mt-6 space-y-3">
             <Alert variant="success">{result.created.length} student(s) imported successfully.</Alert>
             {result.errors.length > 0 && (
-              <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <div className="rounded-md border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">
                 <p className="mb-1 font-semibold">Rows with errors:</p>
                 <ul className="list-inside list-disc">
                   {result.errors.map((e, i) => (

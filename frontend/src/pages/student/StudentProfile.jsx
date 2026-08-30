@@ -72,7 +72,7 @@ export default function StudentProfile() {
           ) : (
             <p className="text-sm text-muted-foreground">
               You haven't started a project yet.{' '}
-              <Link to="/student" className="font-medium text-brand hover:underline">
+              <Link to="/student" className="font-medium text-brand-ink hover:underline">
                 Get started
               </Link>
               .

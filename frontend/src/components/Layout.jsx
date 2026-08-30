@@ -270,8 +270,10 @@ export default function Layout({ children }) {
   return (
     // The template's shell: the whole application sits inside one rounded card
     // floating on the page background, rather than running edge to edge.
-    <div className="min-h-screen bg-background px-0 py-0 sm:px-4 sm:py-5">
-      <div className="mx-auto flex min-h-screen overflow-hidden bg-card ring-border sm:min-h-[calc(100vh-2.5rem)] sm:rounded-3xl sm:shadow-sm sm:ring-1">
+    // Fixed to the viewport, not min-height: the content column is the only
+    // thing that scrolls, so the sidebar and topbar stay where they are.
+    <div className="app-shell overflow-hidden bg-background px-0 py-0 sm:px-4 sm:py-5">
+      <div className="mx-auto flex h-full overflow-hidden bg-card ring-border sm:rounded-3xl sm:shadow-sm sm:ring-1">
       {/* Kept mounted rather than conditionally rendered, so it can fade out
           with the drawer instead of vanishing the instant it closes. */}
       <div
@@ -297,7 +299,7 @@ export default function Layout({ children }) {
         inert={!isDesktop && !drawerOpen ? true : undefined}
         className={cn(
           'bg-sidebar-gradient fixed inset-y-0 left-0 z-40 flex w-[17.5rem] max-w-[85vw] shrink-0 flex-col text-white shadow-2xl shadow-black/40 transition-[transform,width] duration-300 ease-out will-change-transform motion-reduce:transition-none',
-          'md:static md:inset-auto md:max-w-none md:translate-x-0 md:shadow-none',
+          'md:static md:inset-auto md:h-full md:max-w-none md:translate-x-0 md:shadow-none',
           collapsed ? 'md:w-[4.75rem]' : 'md:w-60',
           drawerOpen ? 'translate-x-0' : '-translate-x-full'
         )}
@@ -367,6 +369,10 @@ export default function Layout({ children }) {
                       // tab cut out of the brand gradient, so it stays white
                       // in dark mode too — a themed surface here would make
                       // the active row vanish into the sidebar.
+                      // text-brand, not text-brand-ink: the pill is white in
+                      // both themes, so its label needs the dark brand — the
+                      // ink variant lightens for dark backgrounds and would
+                      // wash out here.
                       ? 'bg-white text-brand shadow-sm'
                       : 'text-white/90 hover:bg-white/10 hover:text-white'
                   )
@@ -419,7 +425,14 @@ export default function Layout({ children }) {
 
       {/* The content column: a muted panel inside the shell, so the white
           cards on it read as raised rather than flush. */}
-      <div className="flex min-w-0 flex-1 flex-col overflow-auto bg-muted">
+      <div
+        className={cn(
+          'flex min-w-0 flex-1 flex-col overflow-y-auto bg-muted',
+          // Locking document.body no longer holds the page still, because the
+          // scroller is this element rather than the document.
+          drawerOpen && !isDesktop && 'overflow-hidden'
+        )}
+      >
         <header
           className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
@@ -501,7 +514,10 @@ function NotificationsButton({ to, count }) {
     >
       <BellIcon />
       {count > 0 && (
-        <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+        // A fixed red rather than the destructive token: that token lightens
+        // in dark mode for use as text, which drops white-on-red below AA at
+        // this size. red-600 clears 4.5:1 against white in both themes.
+        <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
           {count > 9 ? '9+' : count}
         </span>
       )}

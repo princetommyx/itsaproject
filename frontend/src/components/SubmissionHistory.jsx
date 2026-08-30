@@ -41,7 +41,7 @@ export default function SubmissionHistory({ versions = [], compareBase = null })
             <span className="text-sm font-bold text-foreground">{version.label}</span>
             <Badge status={version.status} />
             {i === 0 && (
-              <span className="text-xs font-semibold text-brand">Current</span>
+              <span className="text-xs font-semibold text-brand-ink">Current</span>
             )}
           </div>
 
@@ -62,7 +62,7 @@ export default function SubmissionHistory({ versions = [], compareBase = null })
           {compareBase && version.sequence > 1 && (
             <Link
               to={`${compareBase}?current=${version.id}`}
-              className="mt-2 inline-block text-xs font-semibold text-brand hover:underline"
+              className="mt-2 inline-block text-xs font-semibold text-brand-ink hover:underline"
             >
               Compare with previous version
             </Link>

@@ -122,11 +122,11 @@ export default function Students() {
                             date-of-birth password the import generated, so
                             flagging that is the useful status here. */}
                           {student.is_first_login ? (
-                            <span className="text-xs font-semibold text-amber-700">
+                            <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">
                               Not signed in yet
                             </span>
                           ) : (
-                            <span className="text-xs font-semibold text-emerald-700">
+                            <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                               Active
                             </span>
                           )}

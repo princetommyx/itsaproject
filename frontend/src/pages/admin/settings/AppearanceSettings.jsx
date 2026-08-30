@@ -13,7 +13,7 @@ const COLORS = [
 
 export default function AppearanceSettings({ settings, onSaved }) {
   const toast = useToast()
-  const { applyTheme, refresh } = useSettings()
+  const { applyTheme, applySaved } = useSettings()
   const [form, setForm] = useState({
     primary_color: settings.primary_color ?? '#0f2d5c',
     secondary_color: settings.secondary_color ?? '#071e3d',
@@ -39,10 +39,12 @@ export default function AppearanceSettings({ settings, onSaved }) {
     try {
       const body = new FormData()
       body.append('logo', file)
-      await client.post('/admin/settings/logo', body, {
+      const { data } = await client.post('/admin/settings/logo', body, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-      await refresh()
+      // The upload response carries the new URL, so there is nothing to go
+      // back and ask for.
+      applySaved({ ...settings, logo_url: data.logo_url })
       toast.success('Logo updated')
     } catch (err) {
       const message = err.response?.data?.errors
@@ -57,7 +59,7 @@ export default function AppearanceSettings({ settings, onSaved }) {
   async function removeLogo() {
     try {
       await client.delete('/admin/settings/logo')
-      await refresh()
+      applySaved({ ...settings, logo_url: null })
       toast.success('Logo removed', { description: 'The built-in mark is back in use.' })
     } catch {
       toast.error('Could not remove the logo')
@@ -90,7 +92,7 @@ export default function AppearanceSettings({ settings, onSaved }) {
                 aria-label={`${color.label} hex value`}
                 value={form[color.key]}
                 onChange={(e) => preview({ ...form, [color.key]: e.target.value })}
-                className="w-28 shrink-0 rounded-lg border border-border px-3 py-2 font-mono text-sm text-foreground uppercase focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
+                className="w-28 shrink-0 rounded-lg border border-border px-3 py-2 font-mono text-sm text-foreground uppercase focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none"
               />
             </div>
           ))}
@@ -111,7 +113,7 @@ export default function AppearanceSettings({ settings, onSaved }) {
               onClick={() => preview({ ...form, font_family: font.name })}
               className={`rounded-xl border-2 px-4 py-3 text-left transition ${
                 form.font_family === font.name
-                  ? 'border-brand bg-brand/5'
+                  ? 'border-brand-ink bg-brand/5'
                   : 'border-border hover:border-ring/60'
               }`}
             >
@@ -141,7 +143,7 @@ export default function AppearanceSettings({ settings, onSaved }) {
               className="h-14 w-14 rounded-xl border border-border bg-card object-contain p-1"
             />
           )}
-          <label className="cursor-pointer rounded-lg border-2 border-brand px-4 py-2.5 text-sm font-semibold text-brand transition hover:bg-brand/5">
+          <label className="cursor-pointer rounded-lg border-2 border-brand-ink px-4 py-2.5 text-sm font-semibold text-brand-ink transition hover:bg-brand/5">
             {uploading ? 'Uploading…' : settings.logo_url ? 'Replace Logo' : 'Upload Logo'}
             <input
               type="file"

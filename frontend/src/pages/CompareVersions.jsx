@@ -30,7 +30,7 @@ export default function CompareVersions({ apiPrefix, backTo }) {
   const isLoading = !data && !swrError
 
   const back = (
-    <Link to={`${backTo}/${id}`} className="text-sm text-brand hover:underline">
+    <Link to={`${backTo}/${id}`} className="text-sm text-brand-ink hover:underline">
       &larr; Back to project
     </Link>
   )
@@ -137,7 +137,7 @@ function VersionPanel({ version, tone }) {
   const isCurrent = tone === 'current'
 
   return (
-    <Card className={isCurrent ? 'border-brand/30' : ''}>
+    <Card className={isCurrent ? 'border-brand-ink/30' : ''}>
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5">
           <span className="text-base font-extrabold text-foreground">{version.label}</span>
@@ -175,7 +175,7 @@ function VersionPanel({ version, tone }) {
 
         {version.feedback && (
           <div className="rounded-xl bg-pink-50 px-3.5 py-3">
-            <p className="text-xs font-bold tracking-wide text-pink-700 uppercase">Reviewer Note</p>
+            <p className="text-xs font-bold tracking-wide text-pink-700 dark:text-pink-300 uppercase">Reviewer Note</p>
             <p className="mt-1 text-sm font-medium text-pink-900">{version.feedback}</p>
           </div>
         )}
@@ -272,14 +272,14 @@ function DecisionCard({ projectId, apiPrefix, onDecided, toast }) {
                 value={change}
                 onChange={(e) => setChangeAt(i, e.target.value)}
                 placeholder={i === 0 ? 'e.g. Narrow project scope' : 'Add another change'}
-                className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 placeholder:font-normal placeholder:text-muted-foreground hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 placeholder:font-normal placeholder:text-muted-foreground hover:border-ring/60 focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none"
               />
             ))}
           </div>
           <button
             type="button"
             onClick={() => setChanges((prev) => [...prev, ''])}
-            className="mt-2 text-xs font-semibold text-brand hover:underline"
+            className="mt-2 text-xs font-semibold text-brand-ink hover:underline"
           >
             + Add another
           </button>

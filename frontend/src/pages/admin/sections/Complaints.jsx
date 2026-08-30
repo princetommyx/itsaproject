@@ -44,7 +44,7 @@ export default function Complaints() {
                 <div className="flex items-center gap-2">
                   <Badge status={c.status} />
                   <select
-                    className="rounded-lg border border-border px-2 py-1 text-xs transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
+                    className="rounded-lg border border-border px-2 py-1 text-xs transition duration-150 hover:border-ring/60 focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none"
                     value={c.status}
                     onChange={(e) => updateStatus(c.id, e.target.value)}
                   >

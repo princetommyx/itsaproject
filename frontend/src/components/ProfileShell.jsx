@@ -14,7 +14,7 @@ export default function ProfileShell({ homePath, homeLabel, children }) {
   return (
     <div className="space-y-6">
       <nav className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-label="Breadcrumb">
-        <Link to={homePath} className="hover:text-brand hover:underline">
+        <Link to={homePath} className="hover:text-brand-ink hover:underline">
           {homeLabel}
         </Link>
         <span>/</span>
@@ -30,7 +30,7 @@ export default function ProfileShell({ homePath, homeLabel, children }) {
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`relative -mb-px border-b-2 px-1 pb-3 text-sm font-medium transition duration-150 ${
-                tab === t.key ? 'border-brand text-brand' : 'border-transparent text-muted-foreground hover:text-foreground'
+                tab === t.key ? 'border-brand-ink text-brand-ink' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {t.label}

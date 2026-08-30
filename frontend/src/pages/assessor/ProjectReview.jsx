@@ -65,7 +65,7 @@ export default function ProjectReview() {
   if (swrError || !project) {
     return (
       <div className="space-y-6">
-        <Link to="/assessor" className="text-sm text-brand hover:underline">
+        <Link to="/assessor" className="text-sm text-brand-ink hover:underline">
           &larr; Back to assigned projects
         </Link>
         <Card>
@@ -81,7 +81,7 @@ export default function ProjectReview() {
 
   return (
     <div className="space-y-6">
-      <Link to="/assessor" className="text-sm text-brand hover:underline">
+      <Link to="/assessor" className="text-sm text-brand-ink hover:underline">
         &larr; Back to assigned projects
       </Link>
 
@@ -105,7 +105,7 @@ export default function ProjectReview() {
                 <li key={m.id} className="flex items-center gap-2.5 text-sm text-muted-foreground">
                   <Avatar name={name} className="h-7 w-7 text-[10px]" />
                   {name}
-                  {m.is_leader && <span className="text-xs text-brand">(Leader)</span>}
+                  {m.is_leader && <span className="text-xs text-brand-ink">(Leader)</span>}
                   {!m.student && <span className="text-xs text-amber-600">(Not yet registered)</span>}
                 </li>
               )
@@ -126,7 +126,7 @@ export default function ProjectReview() {
             {(project.versions?.length ?? 0) > 1 && (
               <Link
                 to={`/assessor/projects/${project.id}/compare`}
-                className="text-sm font-semibold text-brand hover:underline"
+                className="text-sm font-semibold text-brand-ink hover:underline"
               >
                 Compare versions
               </Link>

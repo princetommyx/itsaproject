@@ -49,6 +49,12 @@
   --brand: oklch(0.32 0.083 262);
   --brand-2: oklch(0.24 0.072 264);
   --brand-foreground: oklch(0.99 0 0);
+  /* The brand as *ink* rather than as a surface. The brand is a dark navy: it
+     carries white text well as a background, but as text on a dark card it is
+     nearly invisible. On light surfaces ink is the brand itself; in dark mode
+     it is a lightened mix, computed from whatever the admin has chosen so a
+     custom brand colour stays legible too. */
+  --brand-ink: var(--brand);
   /* UPSA gold (#c8962f). */
   --accent-gold: oklch(0.71 0.13 78);
 }
@@ -85,6 +91,7 @@
   /* On a dark ground the navy sidebar would disappear into the page, so the
      gradient lightens rather than darkens. */
   --brand-2: oklch(0.4 0.09 262);
+  --brand-ink: color-mix(in oklab, var(--brand) 40%, white 60%);
 }
 
 @theme inline {
@@ -113,6 +120,7 @@
   --color-ring: var(--ring);
 
   --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
   --color-brand-2: var(--brand-2);
   --color-brand-foreground: var(--brand-foreground);
   --color-gold: var(--accent-gold);
@@ -155,6 +163,19 @@
      brand steps, so the panel reads as one surface rather than a flat block. */
   .bg-sidebar-gradient {
     background: linear-gradient(to bottom, var(--brand), var(--brand-2));
+  }
+
+  /* Pins the shell to the viewport so the content column scrolls on its own
+     and the sidebar stays put. A min-height would let the shell grow with the
+     page, which puts the scrollbar on the document and drags the sidebar up
+     with the content.
+
+     dvh, with vh first as a fallback: on mobile Safari 100vh measures the
+     viewport including the area behind the browser chrome, which would push
+     the bottom of the shell out of reach. */
+  .app-shell {
+    height: 100vh;
+    height: 100dvh;
   }
 }
 

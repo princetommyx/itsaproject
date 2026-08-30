@@ -4,13 +4,16 @@ import { useToast } from '../../../context/ToastContext'
 import { useSettings } from '../../../context/SettingsContext'
 
 /**
- * Saving is the same everywhere on this page: PUT the changed keys, write the
- * response back into the cache, and re-read the branding so a colour or font
- * change is visible immediately rather than after a reload.
+ * Saving is the same everywhere on this page: PUT the changed keys, then write
+ * what came back into both caches.
+ *
+ * No re-read afterwards. The response already carries every setting, and
+ * fetching them again made the save button sit in its loading state across two
+ * round trips instead of one — which is what made saving appearance feel slow.
  */
 export function useSaveSettings(onSaved) {
   const toast = useToast()
-  const { refresh } = useSettings()
+  const { applySaved } = useSettings()
   const [saving, setSaving] = useState(false)
 
   async function save(values, successMessage = 'Settings saved') {
@@ -18,7 +21,7 @@ export function useSaveSettings(onSaved) {
     try {
       const { data } = await client.put('/admin/settings', values)
       onSaved?.(data)
-      await refresh()
+      applySaved(data.settings)
       toast.success(successMessage)
       return true
     } catch (err) {

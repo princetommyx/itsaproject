@@ -195,7 +195,7 @@ export default function StudentDocuments() {
               value={type}
               onChange={(e) => setType(e.target.value)}
               disabled={submitting}
-              className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-72"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-72"
             >
               {DOCUMENT_TYPES.map((t) => (
                 <option key={t.key} value={t.key}>
@@ -214,10 +214,10 @@ export default function StudentDocuments() {
             onDrop={handleDrop}
             onClick={() => !submitting && inputRef.current?.click()}
             className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
-              dragging ? 'border-brand bg-blue-50' : 'border-border hover:border-ring/60'
+              dragging ? 'border-brand-ink bg-blue-500/10' : 'border-border hover:border-ring/60'
             } ${submitting ? 'pointer-events-none opacity-60' : ''}`}
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-brand">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10 text-brand-ink">
               <UploadCloudIcon />
             </span>
             <div>
@@ -262,11 +262,11 @@ export default function StudentDocuments() {
                           {new Date(current.created_at).toLocaleDateString()}
                         </p>
                         {current.submitted_at ? (
-                          <p className="mt-1 text-xs font-semibold text-emerald-700">
+                          <p className="mt-1 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                             ✓ Submitted for review on {new Date(current.submitted_at).toLocaleDateString()}
                           </p>
                         ) : (
-                          <p className="mt-1 text-xs font-semibold text-amber-700">
+                          <p className="mt-1 text-xs font-semibold text-amber-700 dark:text-amber-300">
                             Uploaded — not submitted for review yet
                           </p>
                         )}
@@ -306,7 +306,7 @@ export default function StudentDocuments() {
                     {history.length > 0 && (
                       <button
                         onClick={() => setExpandedType(expandedType === t.key ? null : t.key)}
-                        className="text-xs text-brand hover:underline"
+                        className="text-xs text-brand-ink hover:underline"
                       >
                         {expandedType === t.key ? 'Hide' : `History (${history.length})`}
                       </button>
@@ -321,7 +321,7 @@ export default function StudentDocuments() {
                         <span className="truncate">
                           {doc.original_filename} · {new Date(doc.created_at).toLocaleDateString()}
                         </span>
-                        <button onClick={() => handleDownload(doc)} className="shrink-0 text-brand hover:underline">
+                        <button onClick={() => handleDownload(doc)} className="shrink-0 text-brand-ink hover:underline">
                           Download
                         </button>
                       </li>

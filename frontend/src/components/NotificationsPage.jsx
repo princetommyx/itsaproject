@@ -8,10 +8,10 @@ import { InboxIcon } from './icons'
 import { describeNotification } from '../constants/notifications'
 
 const ICON_VARIANT_STYLES = {
-  blue: 'bg-blue-50 text-blue-600',
+  blue: 'bg-blue-500/10 text-blue-600',
   violet: 'bg-violet-50 text-violet-600',
   pink: 'bg-pink-50 text-pink-600',
-  gold: 'bg-amber-50 text-amber-600',
+  gold: 'bg-amber-500/10 text-amber-600',
 }
 
 const INTRO_ITEMS = {
@@ -177,7 +177,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
                         <button
                           onClick={() => openNotification(n)}
                           className={`flex w-full items-start gap-3 rounded-xl px-2 py-3.5 text-left transition hover:bg-muted ${
-                            isUnread ? 'bg-blue-50/40' : ''
+                            isUnread ? 'bg-blue-500/10/40' : ''
                           }`}
                         >
                           <span

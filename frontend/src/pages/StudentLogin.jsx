@@ -13,13 +13,13 @@ export default function StudentLogin() {
       wrongRoleMessage="This looks like a staff account. Please use the Staff / Admin sign-in page instead."
     >
       <p className="mt-6 text-sm">
-        <Link to="/forgot-password" className="text-brand hover:underline">
+        <Link to="/forgot-password" className="text-brand-ink hover:underline">
           Forgot Password?
         </Link>
       </p>
       <p className="mt-3 text-xs text-muted-foreground">
         Staff or admin?{' '}
-        <Link to="/admin" className="text-brand hover:underline">
+        <Link to="/admin" className="text-brand-ink hover:underline">
           Sign in here
         </Link>
       </p>

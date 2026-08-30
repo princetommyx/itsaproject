@@ -51,11 +51,11 @@ export default function ForgotPassword() {
       )}
 
       <p className="mt-6 text-xs text-muted-foreground">
-        <Link to="/reset-password" className="text-brand hover:underline">
+        <Link to="/reset-password" className="text-brand-ink hover:underline">
           Already have a token?
         </Link>
         <span className="mx-2">·</span>
-        <Link to="/login" className="text-brand hover:underline">
+        <Link to="/login" className="text-brand-ink hover:underline">
           Back to login
         </Link>
       </p>

@@ -41,7 +41,9 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     // The token sets are keyed on a `dark` class, matching the template's
-    // custom variant, so the whole palette swaps from this one line.
+    // custom variant, so the whole palette swaps from this one line. main.jsx
+    // has already applied the stored choice before the first paint; this keeps
+    // it in step with every change after that.
     document.documentElement.classList.toggle('dark', resolved === 'dark')
     document.documentElement.style.colorScheme = resolved
   }, [resolved])

@@ -238,7 +238,7 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
                   <button
                     type="button"
                     onClick={() => toggleGroup(keys, allOn)}
-                    className="text-xs font-semibold text-brand hover:underline"
+                    className="text-xs font-semibold text-brand-ink hover:underline"
                   >
                     {allOn ? 'Clear all' : 'Select all'}
                   </button>
@@ -325,7 +325,7 @@ function AssignRoles({ roles, toast }) {
               disabled={saving === user.id}
               value={user.role_id ?? ''}
               onChange={(e) => assign(user, e.target.value ? Number(e.target.value) : null)}
-              className="w-full shrink-0 rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-56"
+              className="w-full shrink-0 rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-ring/60 focus:border-brand-ink focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-56"
             >
               <option value="">Default permissions</option>
               {roles

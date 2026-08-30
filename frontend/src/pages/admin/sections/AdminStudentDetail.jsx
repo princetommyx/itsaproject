@@ -23,7 +23,7 @@ export default function AdminStudentDetail() {
   const isLoading = !student && !swrError
 
   const back = (
-    <Link to="/admin/students" className="text-sm text-brand hover:underline">
+    <Link to="/admin/students" className="text-sm text-brand-ink hover:underline">
       &larr; Back to students
     </Link>
   )
@@ -116,7 +116,7 @@ function GroupCard({ project }) {
                 <p className="text-xs text-muted-foreground">{m.university_id}</p>
               </div>
               {m.is_leader && (
-                <span className="ml-auto shrink-0 text-xs font-semibold text-brand">Leader</span>
+                <span className="ml-auto shrink-0 text-xs font-semibold text-brand-ink">Leader</span>
               )}
             </li>
           ))}
