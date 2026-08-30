@@ -393,7 +393,6 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
           onChange={(e) => setUniversityId(e.target.value)}
           className="flex-1"
           required
-          autoFocus
         />
         <Input
           label="Full Name (optional)"
