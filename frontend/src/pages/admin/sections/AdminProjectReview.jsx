@@ -7,6 +7,7 @@ import { Alert, Avatar, Badge, Button, Card, ErrorState, Textarea } from '../../
 import { Skeleton, SkeletonCard } from '../../../components/Skeleton'
 import StatusTimeline from '../../../components/StatusTimeline'
 import ProjectDocumentList from '../../../components/ProjectDocumentList'
+import SubmissionHistory from '../../../components/SubmissionHistory'
 import DefenseScheduleCard from '../../../components/DefenseScheduleCard'
 
 export default function AdminProjectReview() {
@@ -153,6 +154,23 @@ export default function AdminProjectReview() {
         <div className="mt-5 border-t border-slate-100 pt-5">
           <h3 className="mb-2 text-sm font-semibold text-slate-700">Submitted Documents</h3>
           <ProjectDocumentList documents={project.documents} />
+        </div>
+
+        {/* Nothing here is ever removed — the version an earlier review sent
+            back stays put, which is what makes a comparison possible. */}
+        <div className="mt-5 border-t border-slate-100 pt-5">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-slate-700">Submission History</h3>
+            {(project.versions?.length ?? 0) > 1 && (
+              <Link
+                to={`/admin/projects/${project.id}/compare`}
+                className="text-sm font-semibold text-upsa-blue hover:underline"
+              >
+                Compare versions
+              </Link>
+            )}
+          </div>
+          <SubmissionHistory versions={project.versions} compareBase={`/admin/projects/${project.id}/compare`} />
         </div>
 
         <div className="mt-5 border-t border-slate-100 pt-5">

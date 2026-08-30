@@ -23,6 +23,8 @@ import StatusTimeline from '../../components/StatusTimeline'
 import { CORE_SUBMISSION_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
 import { memberName } from '../../lib/memberName'
 import { formatDateTime } from '../../lib/formatDate'
+import SubmissionHistory from '../../components/SubmissionHistory'
+import RequiredChangesList from '../../components/RequiredChangesList'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -160,6 +162,16 @@ function ProjectPanel({ project, user, onChange, onError }) {
           )}
         </div>
 
+        {(project.versions?.length ?? 0) > 0 && (
+          <div className="mt-5 border-t border-slate-100 pt-5">
+            <h3 className="mb-3 text-sm font-semibold text-slate-700">Submission History</h3>
+            {/* Every version stays here. A submission that was sent back is
+                not replaced by the one that answers it — both are part of the
+                academic record. */}
+            <SubmissionHistory versions={project.versions} />
+          </div>
+        )}
+
         {(project.proposal_defense_at || project.final_defense_at) && (
           <div className="mt-5 rounded-xl border border-upsa-blue/15 bg-blue-50/60 p-4">
             <p className="text-sm font-bold text-slate-800">Defense Schedule</p>
@@ -188,13 +200,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </div>
         )}
 
-        {project.status === 'refine' && project.feedback && (
-          <div className="mt-4">
-            <Alert variant="info">
-              <strong>Supervisor feedback:</strong> {project.feedback}
-            </Alert>
-          </div>
-        )}
+        {project.status === 'refine' && <RevisionPanel project={project} />}
 
         {project.status === 'approved' && (
           <div className="mt-4">
@@ -443,5 +449,39 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
         </Button>
       </div>
     </form>
+  )
+}
+
+/**
+ * What the student sees when a version was sent back.
+ *
+ * The reviewer's decision lives on the version they judged, not on the
+ * project, so this reads it from the history — which means the feedback stays
+ * attached to the submission it was about even after the next one is filed.
+ */
+function RevisionPanel({ project }) {
+  const reviewed = [...(project.versions ?? [])]
+    .filter((v) => v.status === 'revision_required')
+    .sort((a, b) => b.sequence - a.sequence)[0]
+
+  const feedback = reviewed?.feedback ?? project.feedback
+  if (!feedback && !reviewed?.required_changes?.length) return null
+
+  return (
+    <div className="mt-4 rounded-xl border border-pink-200 bg-pink-50/70 p-4">
+      <p className="text-sm font-bold text-pink-900">
+        {reviewed ? `${reviewed.label} needs changes` : 'Changes requested'}
+      </p>
+      {feedback && (
+        <p className="mt-1.5 text-[15px] leading-[1.7] whitespace-pre-wrap text-pink-900">
+          {feedback}
+        </p>
+      )}
+      <RequiredChangesList items={reviewed?.required_changes} className="mt-4" />
+      <p className="mt-4 text-xs font-medium text-pink-800">
+        Your previous submission is kept on record. Update your project below and submit a new
+        version — nothing you already sent is lost.
+      </p>
+    </div>
   )
 }

@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Notifications\AddedToGroupNotification;
 use App\Notifications\DefenseScheduledNotification;
 use App\Notifications\ProjectDecisionNotification;
+use App\Services\ProjectVersioning;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +22,8 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
+    public function __construct(private ProjectVersioning $versioning) {}
+
     /**
      * High-level aggregate stats for the analytics dashboard.
      */
@@ -148,7 +151,7 @@ class AdminController extends Controller
 
     public function showProject(Project $project)
     {
-        return $project->load(['members.student', 'assessor', 'documents.uploader']);
+        return $project->load(self::PROJECT_RELATIONS);
     }
 
     /**
@@ -162,6 +165,8 @@ class AdminController extends Controller
         $validated = $request->validate([
             'decision' => ['required', 'in:approved,refine'],
             'feedback' => ['required_if:decision,refine', 'nullable', 'string'],
+            'required_changes' => ['sometimes', 'array', 'max:20'],
+            'required_changes.*' => ['string', 'max:255'],
         ]);
 
         if (! in_array($project->status, ['pending', 'submitted_unassigned'], true)) {
@@ -173,11 +178,23 @@ class AdminController extends Controller
             'feedback' => $validated['decision'] === 'refine' ? $validated['feedback'] : null,
         ]);
 
+        $this->versioning->recordDecision(
+            $project->fresh(),
+            $request->user(),
+            $validated['decision'],
+            $validated['feedback'] ?? null,
+            $validated['required_changes'] ?? [],
+        );
+
+        if ($validated['decision'] === 'approved') {
+            $this->versioning->advanceToFinalStage($project->fresh());
+        }
+
         foreach ($project->students as $student) {
             $student->notify(new ProjectDecisionNotification($project));
         }
 
-        return response()->json($project->fresh()->load(['members.student', 'assessor']));
+        return response()->json($project->fresh()->load(self::PROJECT_RELATIONS));
     }
 
     /**
@@ -204,6 +221,10 @@ class AdminController extends Controller
         ]);
 
         $assessor->notify(new \App\Notifications\ProjectAssignedNotification($project));
+
+        // The submitted version is now actually being looked at, which is a
+        // different thing from sitting in the queue.
+        $this->versioning->markUnderReview($project->fresh());
 
         return response()->json($project->fresh('assessor'));
     }
@@ -362,8 +383,17 @@ class AdminController extends Controller
      */
     private function projectPayload(Project $project)
     {
-        return $project->fresh()->load(['members.student', 'assessor', 'documents.uploader']);
+        return $project->fresh()->load(self::PROJECT_RELATIONS);
     }
+
+    private const PROJECT_RELATIONS = [
+        'members.student',
+        'assessor',
+        'documents.uploader',
+        'versions.submitter',
+        'versions.reviewer',
+        'versions.documents',
+    ];
 
     /**
      * Onboard a staff account (assessor or admin) via official email.

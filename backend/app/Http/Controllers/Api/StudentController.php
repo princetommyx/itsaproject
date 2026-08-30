@@ -8,17 +8,20 @@ use App\Models\ProjectMember;
 use App\Models\User;
 use App\Notifications\ProjectResubmittedNotification;
 use App\Notifications\ProjectSubmittedNotification;
+use App\Services\ProjectVersioning;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class StudentController extends Controller
 {
+    public function __construct(private ProjectVersioning $versioning) {}
+
     /**
      * The current student's project (as leader or member), if any.
      */
     public function current(Request $request)
     {
-        $project = $request->user()->projects()->with(['members.student', 'assessor', 'documents.uploader'])->first();
+        $project = $request->user()->projects()->with(self::PROJECT_RELATIONS)->first();
 
         // response()->json(null) serializes to "{}" (Symfony coerces a null
         // top-level payload to an empty object), so wrap it in an envelope
@@ -55,6 +58,8 @@ class StudentController extends Controller
             'is_leader' => true,
         ]);
 
+        $this->versioning->openInitial($project);
+
         return response()->json($this->projectPayload($project), 201);
     }
 
@@ -69,6 +74,9 @@ class StudentController extends Controller
         ]);
 
         $project->update($validated);
+        // Keep the open draft in step, so the history shows what the student
+        // actually has rather than the content the draft was opened with.
+        $this->versioning->syncDraft($project->fresh());
 
         return response()->json($this->projectPayload($project));
     }
@@ -151,12 +159,19 @@ class StudentController extends Controller
         $isResubmission = $project->status === 'refine';
         $previousAssessor = $isResubmission ? $project->assessor : null;
 
-        $project->update([
-            'status' => 'submitted_unassigned',
-            'assessor_id' => null,
-        ]);
+        // A resubmission goes back to the assessor who asked for it. They are
+        // the one who knows what they asked for, and they're the only person
+        // the comparison means anything to. Sending it to the unassigned
+        // queue instead used to notify them of a version they then couldn't
+        // open, because unassigning had just revoked their access to it.
+        $project->update($previousAssessor
+            ? ['status' => 'pending']
+            : ['status' => 'submitted_unassigned', 'assessor_id' => null]);
+
+        $this->versioning->submit($project->fresh(), $request->user());
 
         if ($previousAssessor) {
+            $this->versioning->markUnderReview($project->fresh());
             $previousAssessor->notify(new ProjectResubmittedNotification($project));
         } else {
             foreach (User::where('role', 'admin')->get() as $admin) {
@@ -195,8 +210,22 @@ class StudentController extends Controller
      */
     private function projectPayload(Project $project)
     {
-        return $project->fresh()->load(['members.student', 'assessor', 'documents.uploader']);
+        return $project->fresh()->load(self::PROJECT_RELATIONS);
     }
+
+    /**
+     * One list, used by every endpoint that returns a project, so a response
+     * the client writes into its cache is never missing a relation the page
+     * it lands on needs.
+     */
+    private const PROJECT_RELATIONS = [
+        'members.student',
+        'assessor',
+        'documents.uploader',
+        'versions.submitter',
+        'versions.reviewer',
+        'versions.documents',
+    ];
 
     private function findLinkedStudentId(string $universityId): ?int
     {

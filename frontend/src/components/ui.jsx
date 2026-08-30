@@ -143,6 +143,11 @@ export const STATUS_LABELS = {
   open: 'Open',
   in_progress: 'In Progress',
   resolved: 'Resolved',
+  // Version statuses. A version carries its own state independently of the
+  // project's: an approved project still has a v1.0 that was sent back.
+  submitted: 'Submitted',
+  under_review: 'Under Review',
+  revision_required: 'Revision Required',
 }
 
 export const STATUS_VARIANTS = {
@@ -154,6 +159,9 @@ export const STATUS_VARIANTS = {
   open: 'gold',
   in_progress: 'blue',
   resolved: 'violet',
+  submitted: 'gold',
+  under_review: 'blue',
+  revision_required: 'pink',
 }
 
 const BADGE_STYLES = {

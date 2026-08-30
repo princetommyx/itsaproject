@@ -8,11 +8,14 @@ use App\Models\ProjectDocument;
 use App\Models\User;
 use App\Notifications\DocumentSubmittedNotification;
 use Illuminate\Http\Request;
+use App\Services\ProjectVersioning;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ProjectDocumentController extends Controller
 {
+    public function __construct(private ProjectVersioning $versioning) {}
+
     /**
      * The group leader uploads a document for their project. Each upload
      * is a new row (not an overwrite), so submission history is kept —
@@ -32,6 +35,11 @@ class ProjectDocumentController extends Controller
         $path = $file->store("project-documents/{$project->id}", config('filesystems.default'));
 
         $document = $project->documents()->create([
+            // Files belong to the submission they were uploaded against, so a
+            // comparison shows what each side actually handed in rather than
+            // one flat pile per project.
+            'project_version_id' => $this->versioning->openDraftFor($project)?->id
+                ?? $project->currentVersion()?->id,
             'type' => $validated['type'],
             'original_filename' => $file->getClientOriginalName(),
             'stored_path' => $path,

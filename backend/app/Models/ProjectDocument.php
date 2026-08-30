@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['project_id', 'type', 'original_filename', 'stored_path', 'mime_type', 'size_bytes', 'uploaded_by', 'submitted_at'])]
+#[Fillable(['project_id', 'project_version_id', 'type', 'original_filename', 'stored_path', 'mime_type', 'size_bytes', 'uploaded_by', 'submitted_at'])]
 class ProjectDocument extends Model
 {
     use HasFactory;
@@ -30,6 +30,17 @@ class ProjectDocument extends Model
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
+    }
+
+    /**
+     * The submission this file was uploaded against. Null for files uploaded
+     * before versions existed — there is no version they belonged to, and
+     * inventing one would file them under a submission they were never part
+     * of.
+     */
+    public function version(): BelongsTo
+    {
+        return $this->belongsTo(ProjectVersion::class, 'project_version_id');
     }
 
     public function uploader(): BelongsTo

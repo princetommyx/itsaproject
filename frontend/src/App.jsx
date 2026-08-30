@@ -29,6 +29,7 @@ import Assignments from './pages/admin/sections/Assignments'
 import ImportStudents from './pages/admin/sections/ImportStudents'
 import Students from './pages/admin/sections/Students'
 import AdminStudentDetail from './pages/admin/sections/AdminStudentDetail'
+import CompareVersions from './pages/CompareVersions'
 import StaffManagement from './pages/admin/sections/StaffManagement'
 import LoginLogs from './pages/admin/sections/LoginLogs'
 import Complaints from './pages/admin/sections/Complaints'
@@ -75,6 +76,7 @@ export default function App() {
                 <Route element={<Layout />}>
                   <Route path="/assessor" element={<AssessorDashboard />} />
                   <Route path="/assessor/projects/:id" element={<ProjectReview />} />
+                  <Route path="/assessor/projects/:id/compare" element={<CompareVersions apiPrefix="/assessor" backTo="/assessor/projects" />} />
                   <Route path="/assessor/notifications" element={<AssessorNotifications />} />
                   <Route path="/assessor/profile" element={<AssessorProfile />} />
                 </Route>
@@ -85,6 +87,7 @@ export default function App() {
                   <Route index element={<Overview />} />
                   <Route path="projects" element={<AllProjects />} />
                   <Route path="projects/:id" element={<AdminProjectReview />} />
+                  <Route path="projects/:id/compare" element={<CompareVersions apiPrefix="/admin" backTo="/admin/projects" />} />
                   <Route path="assignments" element={<Assignments />} />
                   <Route path="students" element={<Students />} />
                   <Route path="students/:id" element={<AdminStudentDetail />} />

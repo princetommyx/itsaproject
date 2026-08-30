@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\AssessorController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\ProjectDocumentController;
+use App\Http\Controllers\Api\ProjectVersionController;
 use App\Http\Controllers\Api\StudentController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,6 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('password.changed')->group(function () {
         Route::get('/documents/{document}/download', [ProjectDocumentController::class, 'download']);
+
+        // Submission history is readable by everyone who can already see the
+        // project — the controller applies the same member/assessor/admin
+        // rule the project pages do, so this sits outside the role prefixes.
+        Route::get('/projects/{project}/versions', [ProjectVersionController::class, 'index']);
+        Route::get('/projects/{project}/compare', [ProjectVersionController::class, 'compare']);
 
         Route::middleware('is.student')->prefix('student')->group(function () {
             Route::get('/project', [StudentController::class, 'current']);

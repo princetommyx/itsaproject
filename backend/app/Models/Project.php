@@ -9,10 +9,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['title', 'description', 'status', 'assessor_id', 'feedback', 'proposal_defense_at', 'final_defense_at'])]
+#[Fillable(['title', 'description', 'status', 'stage', 'assessor_id', 'feedback', 'proposal_defense_at', 'final_defense_at'])]
 class Project extends Model
 {
     use HasFactory;
+
+    /**
+     * The database default doesn't reach a model that was just created, so a
+     * brand-new project would carry a null stage until it was re-read — long
+     * enough for its first version to be written against nothing.
+     */
+    protected $attributes = ['stage' => 'proposal'];
 
     protected function casts(): array
     {
@@ -60,5 +67,30 @@ class Project extends Model
     public function documents(): HasMany
     {
         return $this->hasMany(ProjectDocument::class)->orderByDesc('created_at');
+    }
+
+    /**
+     * The full submission history, oldest first. Nothing is ever removed from
+     * here — a version the assessor sent back stays exactly as it was
+     * submitted, which is what makes a comparison possible.
+     */
+    public function versions(): HasMany
+    {
+        return $this->hasMany(ProjectVersion::class)->orderBy('stage')->orderBy('sequence');
+    }
+
+    /**
+     * The version the project is currently working on or awaiting a decision
+     * for — the newest one in the active stage.
+     */
+    public function currentVersion(): ?ProjectVersion
+    {
+        // reorder(), not orderByDesc(): the relation already sorts ascending
+        // for the history list, and appending a second sort leaves the
+        // ascending one in front — which quietly returns the OLDEST version.
+        return $this->versions()
+            ->where('stage', $this->stage)
+            ->reorder('sequence', 'desc')
+            ->first();
     }
 }
