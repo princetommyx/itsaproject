@@ -12,9 +12,14 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
     />
+      <!-- ToastMagic runtime. Copied from the composer package into public/ —
+         see public/vendor/toast-magic/README.md. Configured before the script
+         runs, because the runtime reads window.toastMagicConfig at load. -->
+    <link rel="stylesheet" href="/vendor/toast-magic/laravel-toaster-magic.min.css" />
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+      <script src="/vendor/toast-magic/laravel-toaster-magic.js"></script>
   </body>
 </html>

@@ -16,6 +16,9 @@
 /auth.json
 /node_modules
 /public/build
+# Re-copied by laravel-toaster-magic on the first request after an install
+# or upgrade, so it is a build artifact rather than source.
+/public/packages
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage

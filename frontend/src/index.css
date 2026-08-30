@@ -285,3 +285,24 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ToastMagic pins its container to the viewport corner, which drops the toast
+   on top of the topbar's bell and avatar and lets it hang past the rounded
+   shell. Nudge it clear of both.
+
+   Deliberately outside @layer: the package's stylesheet is unlayered, and
+   unlayered CSS wins over anything in a layer no matter how specific, so a
+   rule written inside Tailwind's utilities layer would never apply. Logical
+   properties, to match what the package sets. */
+.toast-container.toast-top-end {
+  inset-block-start: 5rem;
+  inset-inline-end: 1rem;
+}
+
+@media (min-width: 640px) {
+  .toast-container.toast-top-end {
+    /* The shell's own top padding, plus the 4rem topbar, plus a gap. */
+    inset-block-start: 6.5rem;
+    inset-inline-end: 1.75rem;
+  }
+}

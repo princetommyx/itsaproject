@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { applyToastTheme } from '../lib/branding'
 
 const ThemeContext = createContext({ theme: 'light', setTheme: () => {}, resolved: 'light' })
 
@@ -46,6 +47,10 @@ export function ThemeProvider({ children }) {
     // it in step with every change after that.
     document.documentElement.classList.toggle('dark', resolved === 'dark')
     document.documentElement.style.colorScheme = resolved
+
+    // ToastMagic keys its dark palette on body[theme] and reads its colours
+    // from globals, so it has to be told separately.
+    applyToastTheme(resolved === 'dark')
   }, [resolved])
 
   const setTheme = useCallback((next) => {

@@ -125,3 +125,38 @@ export function bootTheme() {
 
   applyBranding(readCachedBranding())
 }
+
+/**
+ * ToastMagic's runtime reads its configuration from globals at load, and its
+ * dark palette is keyed on `body[theme="dark"]` rather than on the class our
+ * own tokens use. Both are set here so the toasts match the app.
+ *
+ * Called before React mounts, and again whenever the theme changes.
+ */
+export function applyToastTheme(dark) {
+  document.body.setAttribute('theme', dark ? 'dark' : 'light')
+
+  window.toastMagicConfig = {
+    ...(window.toastMagicConfig ?? {}),
+    theme: 'minimal',
+    positionClass: 'toast-top-end',
+    color_mode: false,
+  }
+
+  // Point the toast palette at our own tokens, so a toast is the same green
+  // and red as the rest of the app rather than the package's defaults — and
+  // so it follows an administrator's brand colour along with everything else.
+  const styles = getComputedStyle(document.documentElement)
+  const token = (name) => styles.getPropertyValue(name).trim()
+
+  window.toastMagicStyleVars = {
+    '--toast-magic-success': token('--success'),
+    '--toast-magic-danger': token('--destructive'),
+    '--toast-magic-warning': token('--warning'),
+    '--toast-magic-info': token('--brand-ink'),
+    '--toast-item-bg': token('--card'),
+    '--toast-item-color': token('--card-foreground'),
+    '--toast-close-btn-color': token('--muted-foreground'),
+    '--toast-custom-btn-color': token('--brand-ink'),
+  }
+}

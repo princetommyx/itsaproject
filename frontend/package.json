@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync:toast-magic": "cp ../backend/vendor/devrabiul/laravel-toaster-magic/assets/css/laravel-toaster-magic.min.css ../backend/vendor/devrabiul/laravel-toaster-magic/assets/js/laravel-toaster-magic.js public/vendor/toast-magic/"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.2.6",
