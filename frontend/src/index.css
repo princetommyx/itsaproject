@@ -36,11 +36,19 @@
   --input: oklch(0.923 0.008 250);
   --ring: var(--brand);
 
-  --chart-1: oklch(0.55 0.16 258);
-  --chart-2: oklch(0.72 0.16 75);
-  --chart-3: oklch(0.6 0.18 300);
-  --chart-4: oklch(0.65 0.18 350);
-  --chart-5: oklch(0.66 0.14 180);
+  /* The four project statuses, as marks on a chart. Chosen by running the
+     palette validator rather than by eye: the previous blue/violet pair sat
+     at ΔE 1.3 under deuteranopia — indistinguishable — and at 12 for normal
+     vision, which is below the legibility floor for anyone. These four pass
+     the lightness band, the chroma floor, CVD separation, the normal-vision
+     floor and 3:1 contrast against the light surface.
+     Ordered awaiting / reviewing / approved / needs-refinement, which also
+     reads as the semantic status palette it should have been: warning,
+     in-progress, good, needs-action. */
+  --chart-awaiting: #b45309;
+  --chart-review: #2563eb;
+  --chart-approved: #059669;
+  --chart-refine: #be123c;
 
   --radius: 0.75rem;
 
@@ -82,11 +90,13 @@
   --input: oklch(0.3 0.02 259);
   --ring: var(--brand);
 
-  --chart-1: oklch(0.66 0.16 258);
-  --chart-2: oklch(0.79 0.15 75);
-  --chart-3: oklch(0.7 0.18 300);
-  --chart-4: oklch(0.72 0.18 350);
-  --chart-5: oklch(0.74 0.13 180);
+  /* Selected against the dark surface rather than lightened from the light
+     set: the validator's dark band is L 0.48–0.67, so these are mid-tones.
+     Pastels would clear contrast but glare, and would fail the band. */
+  --chart-awaiting: #d97706;
+  --chart-review: #3b82f6;
+  --chart-approved: #059669;
+  --chart-refine: #f43f5e;
 
   /* On a dark ground the navy sidebar would disappear into the page, so the
      gradient lightens rather than darkens. */
@@ -125,11 +135,10 @@
   --color-brand-foreground: var(--brand-foreground);
   --color-gold: var(--accent-gold);
 
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  --color-chart-awaiting: var(--chart-awaiting);
+  --color-chart-review: var(--chart-review);
+  --color-chart-approved: var(--chart-approved);
+  --color-chart-refine: var(--chart-refine);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

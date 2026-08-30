@@ -39,14 +39,42 @@ class AdminController extends Controller
             ->groupBy('role')
             ->pluck('count', 'role');
 
+        // The second line on each dashboard tile. Every one of these is a real
+        // count over current data — the reference design showed trend
+        // percentages, but nothing here records history, and a made-up "+30%"
+        // is worse than no second line at all.
+        $oldestUnassigned = Project::where('status', 'submitted_unassigned')->min('updated_at');
+
         return response()->json([
             'total_submitted' => $projectCounts->except('draft')->sum(),
             'pending' => $projectCounts->get('pending', 0),
             'unassigned' => $projectCounts->get('submitted_unassigned', 0),
             'approved' => $projectCounts->get('approved', 0),
             'refine' => $projectCounts->get('refine', 0),
+            'draft' => $projectCounts->get('draft', 0),
             'total_students' => $userCounts->get('student', 0),
             'total_assessors' => $userCounts->get('assessor', 0),
+
+            'students_without_group' => User::where('role', 'student')
+                ->whereDoesntHave('projects')->count(),
+            'assessors_engaged' => Project::whereNotNull('assessor_id')
+                ->distinct()->count('assessor_id'),
+            'submitted_this_week' => Project::where('status', '!=', 'draft')
+                ->where('updated_at', '>=', now()->subDays(7))->count(),
+            'oldest_unassigned_days' => $oldestUnassigned
+                ? (int) \Illuminate\Support\Carbon::parse($oldestUnassigned)->diffInDays(now())
+                : null,
+            'defense_scheduled' => Project::where(function ($query) {
+                $query->whereNotNull('proposal_defense_at')->orWhereNotNull('final_defense_at');
+            })->count(),
+
+            // The queue an admin is meant to act on, oldest first — one
+            // request rather than a second round trip from the dashboard.
+            'needs_attention' => Project::with(['members.student:id,name', 'assessor:id,name'])
+                ->whereIn('status', ['submitted_unassigned', 'pending'])
+                ->orderBy('updated_at')
+                ->limit(5)
+                ->get(['id', 'title', 'status', 'assessor_id', 'updated_at']),
         ]);
     }
 
