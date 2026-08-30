@@ -31,13 +31,15 @@ export default function Overview() {
       const url = window.URL.createObjectURL(new Blob([res.data]))
       const link = document.createElement('a')
       link.href = url
-      link.setAttribute('download', 'project-mapping.xlsx')
+      link.setAttribute('download', 'upsa-project-data.xlsx')
       document.body.appendChild(link)
       link.click()
       link.remove()
-      toast.success('Project mapping exported.')
-    } catch (err) {
-      toast.error('Could not export project mapping. Please try again.')
+      toast.success('Project data exported', {
+        description: 'Two sheets: one per group, one per student — with topic, supervisor, and defense dates.',
+      })
+    } catch {
+      toast.error('Could not export project data. Please try again.')
     } finally {
       setExporting(false)
     }
@@ -74,7 +76,7 @@ export default function Overview() {
         description="Plan, assign, and track every final year project in one place."
         actions={
           <Button onClick={handleExport} disabled={exporting} loading={exporting}>
-            {exporting ? 'Preparing...' : 'Export to Excel'}
+            {exporting ? 'Preparing...' : 'Export Data'}
           </Button>
         }
       >

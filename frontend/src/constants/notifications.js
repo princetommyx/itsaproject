@@ -1,10 +1,34 @@
-import { CheckCircleIcon, ClipboardIcon, FileSpreadsheetIcon, FolderIcon, RefreshCwIcon } from '../components/icons'
+import {
+  CalendarIcon,
+  CheckCircleIcon,
+  ClipboardIcon,
+  FileSpreadsheetIcon,
+  FolderIcon,
+  RefreshCwIcon,
+  UsersIcon,
+} from '../components/icons'
+
+function formatShort(iso) {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return 'is scheduled'
+
+  return `is on ${date.toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })}`
+}
 
 // One entry per real notification `kind` the backend actually sends — see
 // ProjectDecisionNotification, ProjectAssignedNotification,
-// ProjectSubmittedNotification, ProjectResubmittedNotification, and
-// DocumentSubmittedNotification. Nothing here should exist without a
-// matching backend trigger.
+// ProjectSubmittedNotification, ProjectResubmittedNotification,
+// DocumentSubmittedNotification, AddedToGroupNotification, and
+// DefenseScheduledNotification. Nothing here should exist without a
+// matching backend trigger — describeNotification drops any kind that has
+// no entry, so a new backend notification is invisible until it's listed.
 export const NOTIFICATION_KIND_META = {
   approved: {
     title: 'Project Approved',
@@ -40,6 +64,27 @@ export const NOTIFICATION_KIND_META = {
     variant: 'blue',
     describe: (data) => `${data.document_label} for "${data.project_title}" has been submitted for review.`,
     linkFor: (data) => `/admin/projects/${data.project_id}`,
+  },
+  added_to_group: {
+    title: 'Added to a Project Group',
+    icon: UsersIcon,
+    variant: 'blue',
+    describe: (data) => `An administrator has added you to the group working on "${data.project_title}".`,
+    linkFor: () => '/student',
+  },
+  defense_scheduled: {
+    title: 'Defense Scheduled',
+    icon: CalendarIcon,
+    variant: 'gold',
+    describe: (data) => {
+      const dates = [
+        data.proposal_defense_at && `proposal defense ${formatShort(data.proposal_defense_at)}`,
+        data.final_defense_at && `project defense ${formatShort(data.final_defense_at)}`,
+      ].filter(Boolean)
+
+      return `Your ${dates.join(', and ')} for "${data.project_title}".`
+    },
+    linkFor: () => '/student',
   },
   submitted: {
     title: 'New Project Submitted',

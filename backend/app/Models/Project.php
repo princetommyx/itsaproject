@@ -9,10 +9,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['title', 'description', 'status', 'assessor_id', 'feedback'])]
+#[Fillable(['title', 'description', 'status', 'assessor_id', 'feedback', 'proposal_defense_at', 'final_defense_at'])]
 class Project extends Model
 {
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'proposal_defense_at' => 'datetime',
+            'final_defense_at' => 'datetime',
+        ];
+    }
 
     /**
      * The full group roster, including members added by Index Number who

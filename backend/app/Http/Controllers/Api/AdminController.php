@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Exports\ProjectMappingExport;
+use App\Exports\ProjectDataExport;
 use App\Http\Controllers\Controller;
 use App\Models\Complaint;
 use App\Models\LoginLog;
 use App\Models\Project;
+use App\Models\ProjectMember;
 use App\Models\User;
+use App\Notifications\AddedToGroupNotification;
+use App\Notifications\DefenseScheduledNotification;
 use App\Notifications\ProjectDecisionNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
@@ -124,6 +128,24 @@ class AdminController extends Controller
             ->get();
     }
 
+    /**
+     * Every group, drafts included, for the "put this student somewhere"
+     * picker. allProjects() deliberately hides drafts — it backs the review
+     * list, where an unsubmitted project is noise — but a group still short
+     * a member is almost always a draft, so hiding them there would hide
+     * exactly the groups an admin needs to reach.
+     */
+    public function groups(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        return Project::with(['members:id,project_id,university_id,name,student_id', 'assessor:id,name'])
+            ->when($search !== '', fn ($query) => $query->where('title', 'like', "%{$search}%"))
+            ->orderBy('title')
+            ->limit(50)
+            ->get(['id', 'title', 'status', 'assessor_id']);
+    }
+
     public function showProject(Project $project)
     {
         return $project->load(['members.student', 'assessor', 'documents.uploader']);
@@ -208,9 +230,139 @@ class AdminController extends Controller
                         ->orWhere('university_id', 'like', "%{$search}%");
                 });
             })
+            // The students with no group are the ones an admin has to act on,
+            // and on a roster of hundreds they're invisible among the rest —
+            // so they get their own filter rather than a scroll.
+            ->when($request->query('filter') === 'ungrouped', fn ($query) => $query->whereDoesntHave('projects'))
             ->with('projects:id,title,status')
             ->orderBy('name')
             ->simplePaginate(50, ['id', 'name', 'university_id', 'student_email', 'is_first_login', 'created_at']);
+    }
+
+    /**
+     * One student in full: their account, and the group they belong to with
+     * its assessor and fellow members. The roster list deliberately carries
+     * only enough to render a row, so this is what backs the detail view.
+     */
+    public function showStudent(User $student)
+    {
+        abort_unless($student->role === 'student', 404);
+
+        $student->load(['projects.members.student', 'projects.assessor']);
+
+        return response()->json($student);
+    }
+
+    /**
+     * Place a student into a group by hand.
+     *
+     * Groups normally form themselves — a leader adds partners by Index
+     * Number. That leaves the students nobody added: they exist on the
+     * imported roster with no group and no way to get into one, since only
+     * a leader can add members. This is the administrator's way in.
+     *
+     * The student is notified, because unlike joining through a leader they
+     * had no part in this and would otherwise never know.
+     */
+    public function addProjectMember(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'student_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
+
+        $student = User::where('id', $validated['student_id'])->where('role', 'student')->first();
+
+        if (! $student) {
+            throw ValidationException::withMessages([
+                'student_id' => ['That account is not a student.'],
+            ]);
+        }
+
+        // university_id is unique across project_student, so a student can
+        // only ever be in one group. Say which one, rather than letting the
+        // database reject it with something the admin can't act on.
+        $existing = ProjectMember::where('university_id', $student->university_id)->first();
+
+        if ($existing) {
+            $title = $existing->project?->title ?? 'another group';
+
+            throw ValidationException::withMessages([
+                'student_id' => [$existing->project_id === $project->id
+                    ? 'This student is already in this group.'
+                    : "This student is already in {$title}."],
+            ]);
+        }
+
+        $project->members()->create([
+            'university_id' => $student->university_id,
+            'name' => $student->name,
+            'student_id' => $student->id,
+            'is_leader' => false,
+        ]);
+
+        $student->notify(new AddedToGroupNotification($project));
+
+        return response()->json($this->projectPayload($project));
+    }
+
+    /**
+     * Undo a placement. An admin who can only add is stuck with their own
+     * typos, and the group leader can't remove someone the admin added.
+     */
+    public function removeProjectMember(Project $project, ProjectMember $member)
+    {
+        abort_if($member->project_id !== $project->id, 404);
+
+        if ($member->is_leader) {
+            throw ValidationException::withMessages([
+                'member' => ['The group leader cannot be removed.'],
+            ]);
+        }
+
+        $member->delete();
+
+        return response()->json($this->projectPayload($project));
+    }
+
+    /**
+     * Set (or clear) a group's defense dates and tell the group.
+     *
+     * Both fields are optional and nullable so the proposal defense can be
+     * scheduled months before the final one, and a cancelled sitting can be
+     * cleared rather than left showing a date that has passed.
+     */
+    public function setDefenseDates(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'proposal_defense_at' => ['nullable', 'date'],
+            'final_defense_at' => ['nullable', 'date'],
+        ]);
+
+        $project->update([
+            'proposal_defense_at' => $validated['proposal_defense_at'] ?? null,
+            'final_defense_at' => $validated['final_defense_at'] ?? null,
+        ]);
+
+        $project->refresh();
+
+        // Only worth a notification if there is actually a date to announce;
+        // clearing both is housekeeping, not news.
+        if ($project->proposal_defense_at || $project->final_defense_at) {
+            foreach ($project->students as $student) {
+                $student->notify(new DefenseScheduledNotification($project));
+            }
+        }
+
+        return response()->json($this->projectPayload($project));
+    }
+
+    /**
+     * The shape the admin project views read, so a mutation's response can be
+     * written straight into the client cache instead of forcing a re-fetch.
+     */
+    private function projectPayload(Project $project)
+    {
+        return $project->fresh()->load(['members.student', 'assessor', 'documents.uploader']);
     }
 
     /**
@@ -237,11 +389,12 @@ class AdminController extends Controller
     }
 
     /**
-     * Export the full Project -> Members -> Assessor mapping.
+     * Export the whole picture as a workbook: a Project Groups sheet and a
+     * Students sheet, each carrying topic, supervisor, and defense dates.
      */
     public function exportProjects()
     {
-        return Excel::download(new ProjectMappingExport, 'project-mapping.xlsx');
+        return Excel::download(new ProjectDataExport, 'upsa-project-data.xlsx');
     }
 
     public function loginLogs()

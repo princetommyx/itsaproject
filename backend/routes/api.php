@@ -58,12 +58,17 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/staff', [AdminController::class, 'createStaff']);
             Route::get('/assessors', [AdminController::class, 'assessors']);
             Route::get('/students', [AdminController::class, 'students']);
+            Route::get('/students/{student}', [AdminController::class, 'showStudent']);
             Route::get('/projects', [AdminController::class, 'allProjects']);
+            Route::get('/groups', [AdminController::class, 'groups']);
             Route::get('/projects/unassigned', [AdminController::class, 'unassignedProjects']);
             Route::get('/projects/export', [AdminController::class, 'exportProjects']);
             Route::get('/projects/{project}', [AdminController::class, 'showProject']);
             Route::post('/projects/{project}/assign', [AdminController::class, 'assignAssessor']);
             Route::post('/projects/{project}/decide', [AdminController::class, 'decideProject']);
+            Route::post('/projects/{project}/members', [AdminController::class, 'addProjectMember']);
+            Route::delete('/projects/{project}/members/{member}', [AdminController::class, 'removeProjectMember']);
+            Route::put('/projects/{project}/defense', [AdminController::class, 'setDefenseDates']);
             Route::get('/diagnostics', [AdminController::class, 'diagnostics']);
             Route::get('/login-logs', [AdminController::class, 'loginLogs']);
             Route::get('/complaints', [AdminController::class, 'complaints']);

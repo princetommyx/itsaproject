@@ -7,6 +7,7 @@ import { Alert, Avatar, Badge, Button, Card, ErrorState, Textarea } from '../../
 import { Skeleton, SkeletonCard } from '../../../components/Skeleton'
 import StatusTimeline from '../../../components/StatusTimeline'
 import ProjectDocumentList from '../../../components/ProjectDocumentList'
+import DefenseScheduleCard from '../../../components/DefenseScheduleCard'
 
 export default function AdminProjectReview() {
   const { id } = useParams()
@@ -154,6 +155,10 @@ export default function AdminProjectReview() {
           <ProjectDocumentList documents={project.documents} />
         </div>
 
+        <div className="mt-5 border-t border-slate-100 pt-5">
+          <DefenseScheduleCard project={project} onSaved={(updated) => mutateProject(updated, { revalidate: false })} />
+        </div>
+
         {awaitingDecision ? (
           <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
             {project.status === 'submitted_unassigned' ? (
@@ -204,8 +209,13 @@ export default function AdminProjectReview() {
             </div>
           </div>
         ) : (
-          <p className="mt-6 border-t border-slate-100 pt-4 text-sm text-slate-500">
-            This project has already been reviewed. Decision: <Badge status={project.status} />
+          <p className="mt-6 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4 text-sm text-slate-500">
+            {/* A draft has never been submitted, so calling it "already
+                reviewed" tells the admin the opposite of what is true. */}
+            {project.status === 'draft'
+              ? "This group is still drafting — there's nothing to decide until they submit."
+              : 'This project has already been reviewed. Decision:'}
+            {project.status !== 'draft' && <Badge status={project.status} />}
           </p>
         )}
       </Card>

@@ -20,6 +20,8 @@ const INTRO_ITEMS = {
     'Your supervisor sends feedback',
     'A revision is requested',
     'Your project is approved',
+    'An administrator adds you to a project group',
+    'Your proposal or project defense is scheduled',
   ],
   assessor: ['A new project is assigned to you', 'A student resubmits a project you sent back for revision'],
   admin: [

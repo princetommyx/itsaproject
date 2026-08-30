@@ -22,6 +22,7 @@ import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skel
 import StatusTimeline from '../../components/StatusTimeline'
 import { CORE_SUBMISSION_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
 import { memberName } from '../../lib/memberName'
+import { formatDateTime } from '../../lib/formatDate'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -158,6 +159,34 @@ function ProjectPanel({ project, user, onChange, onError }) {
             <StatCard label="Supervisor" value={project.assessor.name} variant="violet" className="animate-fade-up" style={stagger(2)} />
           )}
         </div>
+
+        {(project.proposal_defense_at || project.final_defense_at) && (
+          <div className="mt-5 rounded-xl border border-upsa-blue/15 bg-blue-50/60 p-4">
+            <p className="text-sm font-bold text-slate-800">Defense Schedule</p>
+            <dl className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {project.proposal_defense_at && (
+                <div>
+                  <dt className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+                    Proposal Defense
+                  </dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold text-slate-900">
+                    {formatDateTime(project.proposal_defense_at)}
+                  </dd>
+                </div>
+              )}
+              {project.final_defense_at && (
+                <div>
+                  <dt className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+                    Project Defense
+                  </dt>
+                  <dd className="mt-0.5 text-[15px] font-semibold text-slate-900">
+                    {formatDateTime(project.final_defense_at)}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        )}
 
         {project.status === 'refine' && project.feedback && (
           <div className="mt-4">
