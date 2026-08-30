@@ -179,6 +179,61 @@ export default function Layout({ children }) {
   const toast = useToast()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const closeButtonRef = useRef(null)
+  const toggleRef = useRef(null)
+
+  // Above md the sidebar is a permanent part of the layout, not a drawer. The
+  // difference matters for more than styling: the modal behaviours below
+  // (scroll lock, escape-to-close, hiding the panel from the tab order) are
+  // all wrong for a sidebar that is simply always there.
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
+  )
+
+  useEffect(() => {
+    const query = window.matchMedia('(min-width: 768px)')
+
+    function handleChange(event) {
+      setIsDesktop(event.matches)
+      // Rotating to landscape while the drawer is open would otherwise leave
+      // the page scroll locked with no visible drawer to close.
+      if (event.matches) setDrawerOpen(false)
+    }
+
+    query.addEventListener('change', handleChange)
+    return () => query.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
+    if (!drawerOpen || isDesktop) return
+
+    // Without this the page scrolls underneath the open drawer, which is the
+    // clearest tell that a menu isn't a real drawer.
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    function handleKey(event) {
+      if (event.key === 'Escape') setDrawerOpen(false)
+    }
+
+    window.addEventListener('keydown', handleKey)
+
+    // Move focus into the drawer so a keyboard or screen-reader user lands
+    // inside what just opened rather than behind it.
+    closeButtonRef.current?.focus()
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKey)
+    }
+  }, [drawerOpen, isDesktop])
+
+  function closeDrawer() {
+    setDrawerOpen(false)
+    // Hand focus back to the control that opened it, so the tab position
+    // isn't lost to an element that is now off-screen.
+    toggleRef.current?.focus()
+  }
   // A nav item can name a permission. Someone whose role lacks it never sees
   // the link, rather than finding a page that refuses them when they arrive.
   const links = (NAV_LINKS[user?.role] || []).filter(
@@ -199,11 +254,31 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-slate-100 md:flex">
-      {drawerOpen && <div className="fixed inset-0 z-30 md:hidden" onClick={() => setDrawerOpen(false)} />}
+      {/* Kept mounted rather than conditionally rendered, so it can fade out
+          with the drawer instead of vanishing the instant it closes. */}
+      <div
+        onClick={closeDrawer}
+        aria-hidden="true"
+        className={`fixed inset-0 z-30 bg-slate-950/50 transition-opacity duration-300 ease-out motion-reduce:transition-none md:hidden ${
+          drawerOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
+        }`}
+      />
 
+      {/* Slides in from the left edge, full height, over a dimmed page — the
+          shape every mobile OS uses for navigation. It leaves a strip of the
+          page visible on the right, which keeps you oriented and gives you an
+          obvious place to tap to dismiss.
+
+          Above md every one of these drawer properties is turned off and the
+          same element becomes the static sidebar; the markup is shared so the
+          navigation itself is defined once. */}
       <aside
-        className={`drawer-height fixed inset-x-0 top-0 z-40 flex w-full shrink-0 flex-col bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/30 transition-transform duration-200 md:static md:inset-auto md:h-auto md:max-h-none md:w-64 md:translate-y-0 md:shadow-none ${
-          drawerOpen ? 'translate-y-0' : '-translate-y-full'
+        {...(isDesktop
+          ? {}
+          : { role: 'dialog', 'aria-modal': true, 'aria-label': 'Navigation menu' })}
+        inert={!isDesktop && !drawerOpen ? true : undefined}
+        className={`fixed inset-y-0 left-0 z-40 flex w-[17.5rem] max-w-[85vw] shrink-0 flex-col bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/40 transition-transform duration-300 ease-out will-change-transform motion-reduce:transition-none md:static md:inset-auto md:w-64 md:max-w-none md:translate-x-0 md:shadow-none ${
+          drawerOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div
@@ -214,7 +289,8 @@ export default function Layout({ children }) {
             <BrandMark />
           </div>
           <button
-            onClick={() => setDrawerOpen(false)}
+            ref={closeButtonRef}
+            onClick={closeDrawer}
             aria-label="Close menu"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 md:hidden"
           >
@@ -288,8 +364,10 @@ export default function Layout({ children }) {
             <div className="flex items-center gap-1">
               <UserMenu user={user} onLogout={handleLogout} />
               <button
+                ref={toggleRef}
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open menu"
+                aria-expanded={drawerOpen}
                 className="rounded-full p-2 text-white hover:bg-white/10"
               >
                 <MenuIcon />
