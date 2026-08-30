@@ -253,3 +253,38 @@ it('does not expose the student roster to assessors', function () {
 
     $this->actingAs($assessor, 'sanctum')->getJson('/api/admin/students')->assertForbidden();
 });
+
+it('decides on a project whose group member has no email address', function () {
+    // Deliberately NOT Notification::fake(): faking notifications skips the
+    // channel entirely, which is why this bug lived here undetected. Mail::fake
+    // stops anything leaving while still running the real mail routing.
+    Illuminate\Support\Facades\Mail::fake();
+
+    $admin = User::factory()->admin()->create();
+
+    // A student imported from a roll that carried no email address. Both email
+    // columns are nullable, so this is ordinary data, not a corrupt row.
+    $student = User::factory()->student()->create([
+        'is_first_login' => false,
+        'student_email' => null,
+    ]);
+
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'submitted_unassigned']);
+    $project->members()->create([
+        'university_id' => $student->university_id,
+        'student_id' => $student->id,
+        'is_leader' => true,
+    ]);
+
+    $this->actingAs($admin, 'sanctum')
+        ->postJson("/api/admin/projects/{$project->id}/decide", [
+            'decision' => 'refine',
+            'feedback' => 'Please narrow the scope.',
+        ])
+        ->assertOk();
+
+    expect($project->fresh()->status)->toBe('refine');
+
+    // The decision must still reach them in the app, even with nowhere to mail.
+    expect($student->fresh()->notifications()->count())->toBe(1);
+});

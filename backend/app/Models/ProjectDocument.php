@@ -12,6 +12,13 @@ class ProjectDocument extends Model
 {
     use HasFactory;
 
+    /**
+     * The on-disk location is an internal detail. It was being serialised to
+     * every client that could see the document, which hands out the storage
+     * layout for free; nothing in the frontend reads it.
+     */
+    protected $hidden = ['stored_path'];
+
     protected function casts(): array
     {
         return ['submitted_at' => 'datetime'];

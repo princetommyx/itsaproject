@@ -54,10 +54,20 @@ class User extends Authenticatable
     /**
      * Students have no staff `email`; route notifications to their
      * mapped student_email instead.
+     *
+     * Nullable, and deliberately so: both columns are nullable, so a student
+     * imported from a roll without an address has nowhere to receive mail.
+     * Declaring `: string` here turned that into a TypeError deep inside the
+     * notification sender — which surfaced as a 500 on whatever action had
+     * triggered the notification, *after* that action had already been
+     * committed. Returning null instead makes Laravel skip the mail channel
+     * and still deliver the database notification.
      */
-    public function routeNotificationForMail(): string
+    public function routeNotificationForMail(): ?string
     {
-        return $this->isStudent() ? $this->student_email : $this->email;
+        $address = $this->isStudent() ? $this->student_email : $this->email;
+
+        return $address !== null && $address !== '' ? $address : null;
     }
 
     /**

@@ -55,7 +55,10 @@ class ProjectDocumentController extends Controller
             'type' => $validated['type'],
             'original_filename' => $file->getClientOriginalName(),
             'stored_path' => $path,
-            'mime_type' => $file->getClientMimeType(),
+            // Detected from the file's own bytes, not read off the upload
+            // headers: getClientMimeType() is attacker-controlled, and this
+            // value is what the browser is later told to render the file as.
+            'mime_type' => $file->getMimeType() ?: $file->getClientMimeType(),
             'size_bytes' => $file->getSize(),
             'uploaded_by' => $request->user()->id,
         ]);
