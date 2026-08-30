@@ -27,6 +27,7 @@ import AllProjects from './pages/admin/sections/AllProjects'
 import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
 import Assignments from './pages/admin/sections/Assignments'
 import ImportStudents from './pages/admin/sections/ImportStudents'
+import Students from './pages/admin/sections/Students'
 import StaffManagement from './pages/admin/sections/StaffManagement'
 import LoginLogs from './pages/admin/sections/LoginLogs'
 import Complaints from './pages/admin/sections/Complaints'
@@ -84,6 +85,7 @@ export default function App() {
                   <Route path="projects" element={<AllProjects />} />
                   <Route path="projects/:id" element={<AdminProjectReview />} />
                   <Route path="assignments" element={<Assignments />} />
+                  <Route path="students" element={<Students />} />
                   <Route path="import" element={<ImportStudents />} />
                   <Route path="staff" element={<StaffManagement />} />
                   <Route path="logs" element={<LoginLogs />} />

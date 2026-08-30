@@ -192,6 +192,28 @@ class AdminController extends Controller
     }
 
     /**
+     * The imported student roster. Eager-loads each student's project so the
+     * list can show who is already in a group without a query per row, and
+     * takes an optional `search` over name and index number — a roster runs
+     * to hundreds of rows, where paging alone is not a way to find anyone.
+     */
+    public function students(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        return User::where('role', 'student')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('university_id', 'like', "%{$search}%");
+                });
+            })
+            ->with('projects:id,title,status')
+            ->orderBy('name')
+            ->simplePaginate(50, ['id', 'name', 'university_id', 'student_email', 'is_first_login', 'created_at']);
+    }
+
+    /**
      * Onboard a staff account (assessor or admin) via official email.
      */
     public function createStaff(Request $request)

@@ -201,3 +201,55 @@ it('reports database round-trip timings to admins only', function () {
 
     $this->actingAs($assessor, 'sanctum')->getJson('/api/admin/diagnostics')->assertForbidden();
 });
+
+it('lists only students, with their project, and never leaks password hashes', function () {
+    $admin = User::factory()->admin()->create();
+    User::factory()->assessor()->create(['name' => 'Zed Assessor']);
+
+    $inGroup = User::factory()->student()->create(['name' => 'Kwame Mensah', 'university_id' => 'UPSA/1000002']);
+    User::factory()->student()->create(['name' => 'Akosua Darko', 'university_id' => 'UPSA/1000003']);
+
+    $project = Project::create(['title' => 'Campus Transport', 'description' => 'D', 'status' => 'pending']);
+    $project->members()->create(['university_id' => $inGroup->university_id, 'student_id' => $inGroup->id, 'is_leader' => true]);
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/students');
+
+    $response->assertOk();
+    $rows = $response->json('data');
+
+    // Staff must not appear in a student roster.
+    expect(collect($rows)->pluck('name'))->not->toContain('Zed Assessor');
+    expect($rows)->toHaveCount(2);
+
+    // Alphabetical, so the roster is scannable.
+    expect($rows[0]['name'])->toBe('Akosua Darko');
+
+    // The project comes back eager-loaded rather than needing a call per row.
+    $kwame = collect($rows)->firstWhere('university_id', 'UPSA/1000002');
+    expect($kwame['projects'][0]['title'])->toBe('Campus Transport');
+
+    expect(json_encode($rows))->not->toContain('password');
+});
+
+it('searches the whole student roster by name or index number', function () {
+    $admin = User::factory()->admin()->create();
+    User::factory()->student()->create(['name' => 'Kwame Mensah', 'university_id' => 'UPSA/1000002']);
+    User::factory()->student()->create(['name' => 'Akosua Darko', 'university_id' => 'UPSA/1000003']);
+
+    $byName = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/students?search=Akosua');
+    expect($byName->json('data'))->toHaveCount(1);
+    expect($byName->json('data.0.name'))->toBe('Akosua Darko');
+
+    $byIndex = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/students?search=1000002');
+    expect($byIndex->json('data'))->toHaveCount(1);
+    expect($byIndex->json('data.0.name'))->toBe('Kwame Mensah');
+
+    $noMatch = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/students?search=zzzz');
+    expect($noMatch->json('data'))->toHaveCount(0);
+});
+
+it('does not expose the student roster to assessors', function () {
+    $assessor = User::factory()->assessor()->create();
+
+    $this->actingAs($assessor, 'sanctum')->getJson('/api/admin/students')->assertForbidden();
+});

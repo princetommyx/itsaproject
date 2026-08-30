@@ -17,6 +17,7 @@ const PREFETCH_MAP = {
   '/admin': ['/admin/dashboard'],
   '/admin/projects': ['/admin/projects'],
   '/admin/assignments': ['/admin/projects/unassigned', '/admin/assessors'],
+  '/admin/students': ['/admin/students'],
   '/admin/logs': ['/admin/login-logs'],
   '/admin/complaints': ['/admin/complaints'],
 }
@@ -40,6 +41,7 @@ import {
   LogIcon,
   LogOutIcon,
   MessageIcon,
+  UploadCloudIcon,
   UserCircleIcon,
   UsersIcon,
 } from './icons'
@@ -63,7 +65,8 @@ const NAV_LINKS = {
     { to: '/admin/projects', label: 'All Projects', icon: FolderIcon },
     { to: '/admin/assignments', label: 'Assign Assessors', icon: ClipboardIcon },
     { section: 'People' },
-    { to: '/admin/import', label: 'Import Students', icon: UsersIcon },
+    { to: '/admin/students', label: 'Students', icon: UsersIcon },
+    { to: '/admin/import', label: 'Import Students', icon: UploadCloudIcon },
     { to: '/admin/staff', label: 'Staff Accounts', icon: BuildingIcon },
     { section: 'System' },
     { to: '/admin/logs', label: 'Login Logs', icon: LogIcon },
