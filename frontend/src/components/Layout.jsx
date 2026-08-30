@@ -149,7 +149,11 @@ function UserMenu({ user, onLogout }) {
         className="flex h-11 items-center gap-1 rounded-xl px-1 transition hover:bg-muted md:h-10"
       >
         <Avatar name={user?.name} className="h-8 w-8 text-[11px]" />
-        <span className={`text-muted-foreground transition-transform duration-150 ${open ? 'rotate-180' : ''}`}>
+        {/* Hidden on a phone: the avatar already reads as a menu, and the
+            chevron's 14px is width the page title needs more. */}
+        <span
+          className={`hidden text-muted-foreground transition-transform duration-150 sm:block ${open ? 'rotate-180' : ''}`}
+        >
           <ChevronDownIcon />
         </span>
       </button>
@@ -453,11 +457,19 @@ export default function Layout({ children }) {
           drawerOpen && !isDesktop && 'overflow-hidden'
         )}
       >
+        {/* A detached card rather than a strip flush to the top edge: the bar
+            is a piece of furniture on the muted page, the same as every other
+            surface in the app, so the trail and title read as belonging to the
+            page rather than to the window frame. The outer element keeps the
+            sticky positioning and paints the page colour behind the card, so
+            content scrolling underneath never shows through the gap. */}
         <header
-          className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
-          style={{ paddingTop: 'env(safe-area-inset-top)' }}
+          className="sticky top-0 z-20 bg-muted px-3 pt-4 pb-1 md:px-6"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
         >
-          <div className="flex min-h-16 items-center gap-3 px-4 py-2.5 md:px-6">
+          {/* Same max-width and gutters as <main>, so the card's edges line up
+              with the cards on the page rather than floating free of them. */}
+          <div className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 rounded-2xl bg-card px-3 py-2.5 ring-1 shadow-sm ring-border md:gap-3 md:px-5">
             <button
               ref={toggleRef}
               onClick={() => setDrawerOpen(true)}
@@ -477,7 +489,7 @@ export default function Layout({ children }) {
                 icon buttons were 36 with nothing to say what they did. On
                 desktop, where the pointer is precise and the labels would be
                 noise, they stay as icons. */}
-            <div className="ml-auto flex shrink-0 items-center gap-1.5">
+            <div className="ml-auto flex shrink-0 items-center gap-0.5 md:gap-1.5">
               <ActionTile
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                 label="Theme"
@@ -496,7 +508,8 @@ export default function Layout({ children }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 md:px-6 md:py-7">
+        {/* The bar card supplies the top gutter now, so main only pads below it. */}
+        <main className="flex-1 px-4 pt-3 pb-6 md:px-6 md:pb-7">
           <div key={location.pathname} className="animate-page-enter mx-auto max-w-6xl">
             {/* Keyed on the route so navigating away clears a crashed page. */}
             <ErrorBoundary key={location.pathname}>{children ?? <Outlet />}</ErrorBoundary>
@@ -629,13 +642,17 @@ function Breadcrumb({ role }) {
  * needs neither and the labels would only add noise beside a title.
  */
 function ActionTile({ to, onClick, icon, label, ariaLabel, badge = 0 }) {
+  // A square 44px target on a phone, 40 on desktop. It carried its label
+  // underneath for a while, which was friendlier to a thumb but cost about
+  // 30px of bar each — enough that "My Documents" truncated to "My Do…". The
+  // page title is the one thing in this bar that cannot be guessed from an
+  // icon, so it gets the width and these stay bare.
   const className =
-    'relative flex h-11 flex-col items-center justify-center gap-0.5 rounded-xl px-2.5 text-muted-foreground transition hover:bg-muted hover:text-foreground md:h-10 md:w-10 md:px-0'
+    'relative flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground transition hover:bg-muted hover:text-foreground md:h-10 md:w-10'
 
   const content = (
     <>
       {icon}
-      <span className="text-[9px] font-bold tracking-wide uppercase md:hidden">{label}</span>
       {badge > 0 && (
         <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
           {badge > 9 ? '9+' : badge}
