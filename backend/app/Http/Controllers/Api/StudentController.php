@@ -55,7 +55,7 @@ class StudentController extends Controller
             'is_leader' => true,
         ]);
 
-        return response()->json($project->load('members.student'), 201);
+        return response()->json($this->projectPayload($project), 201);
     }
 
     public function update(Request $request, Project $project)
@@ -70,7 +70,7 @@ class StudentController extends Controller
 
         $project->update($validated);
 
-        return response()->json($project->fresh()->load('members.student'));
+        return response()->json($this->projectPayload($project));
     }
 
     /**
@@ -88,9 +88,11 @@ class StudentController extends Controller
 
         $validated = $request->validate([
             'university_id' => ['required', 'string', 'max:255'],
+            'name' => ['nullable', 'string', 'max:255'],
         ]);
 
         $universityId = trim($validated['university_id']);
+        $name = trim($validated['name'] ?? '');
 
         if (ProjectMember::where('university_id', $universityId)->exists()) {
             throw ValidationException::withMessages([
@@ -98,13 +100,19 @@ class StudentController extends Controller
             ]);
         }
 
+        // Optional rather than required: when the student has already been
+        // imported their real name is shown from their account, so asking the
+        // group to retype it would be busywork. It matters for the case this
+        // was added for — a partner who isn't in the system yet, where the
+        // Index Number alone tells you nothing about who they are.
         $project->members()->create([
             'university_id' => $universityId,
+            'name' => $name !== '' ? $name : null,
             'student_id' => $this->findLinkedStudentId($universityId),
             'is_leader' => false,
         ]);
 
-        return response()->json($project->fresh()->load('members.student'));
+        return response()->json($this->projectPayload($project));
     }
 
     public function removeMember(Request $request, Project $project, ProjectMember $member)
@@ -124,7 +132,7 @@ class StudentController extends Controller
 
         $member->delete();
 
-        return response()->json($project->fresh()->load('members.student'));
+        return response()->json($this->projectPayload($project));
     }
 
     /**
@@ -156,7 +164,7 @@ class StudentController extends Controller
             }
         }
 
-        return response()->json($project->fresh()->load('members.student'));
+        return response()->json($this->projectPayload($project));
     }
 
     /**
@@ -176,6 +184,18 @@ class StudentController extends Controller
         $notification->markAsRead();
 
         return response()->json($notification->fresh());
+    }
+
+    /**
+     * The shape current() returns. Every mutating endpoint responds with this
+     * too, so the client can write the response straight into its cache
+     * instead of paying a second round trip to re-read what it just changed —
+     * which is the difference between the UI updating instantly and appearing
+     * to hang while a slow request completes.
+     */
+    private function projectPayload(Project $project)
+    {
+        return $project->fresh()->load(['members.student', 'assessor', 'documents.uploader']);
     }
 
     private function findLinkedStudentId(string $universityId): ?int

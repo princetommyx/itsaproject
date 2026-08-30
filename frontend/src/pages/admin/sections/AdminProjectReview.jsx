@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Alert, Avatar, Badge, Button, Card, Textarea } from '../../../components/ui'
+import { Alert, Avatar, Badge, Button, Card, ErrorState, Textarea } from '../../../components/ui'
 import { Skeleton, SkeletonCard } from '../../../components/Skeleton'
 import StatusTimeline from '../../../components/StatusTimeline'
 import ProjectDocumentList from '../../../components/ProjectDocumentList'
@@ -80,7 +80,24 @@ export default function AdminProjectReview() {
     )
   }
   
-  if (!project) return null;
+  // A failed load used to fall through to `return null`, which is exactly the
+  // blank page it looks like. Say what happened and offer a way back instead.
+  if (projectError || !project) {
+    return (
+      <div className="space-y-6">
+        <Link to="/admin/projects" className="text-sm text-upsa-blue hover:underline">
+          &larr; Back to all projects
+        </Link>
+        <Card>
+          <ErrorState
+            title="Couldn't load this project"
+            description="It may have been removed, or the server couldn't be reached."
+            onRetry={() => mutateProject()}
+          />
+        </Card>
+      </div>
+    )
+  }
 
   const awaitingDecision = ['pending', 'submitted_unassigned'].includes(project.status)
 

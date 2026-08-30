@@ -271,3 +271,58 @@ it('lets a student mark a notification as read', function () {
 
     expect($student->notifications()->first()->read_at)->not->toBeNull();
 });
+
+it('records a name alongside the index number when adding a member who has no account yet', function () {
+    $leader = User::factory()->student()->create(['is_first_login' => false]);
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'draft']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/members", [
+            'university_id' => 'UPSA/9000001',
+            'name' => 'Kwame Mensah',
+        ])->assertOk();
+
+    $member = App\Models\ProjectMember::where('university_id', 'UPSA/9000001')->first();
+    expect($member->name)->toBe('Kwame Mensah');
+    expect($member->student_id)->toBeNull();
+});
+
+it('keeps the name optional, so a member can still be added by index number alone', function () {
+    $leader = User::factory()->student()->create(['is_first_login' => false]);
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'draft']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/members", ['university_id' => 'UPSA/9000002'])
+        ->assertOk();
+
+    expect(App\Models\ProjectMember::where('university_id', 'UPSA/9000002')->first()->name)->toBeNull();
+});
+
+it('lets the real account name take over once that student is imported', function () {
+    $admin = User::factory()->admin()->create();
+    $leader = User::factory()->student()->create(['is_first_login' => false]);
+    $project = Project::create(['title' => 'T', 'description' => 'D', 'status' => 'draft']);
+    $project->members()->create(['university_id' => $leader->university_id, 'student_id' => $leader->id, 'is_leader' => true]);
+
+    // Added by a groupmate, spelled however they typed it.
+    $this->actingAs($leader, 'sanctum')
+        ->postJson("/api/student/projects/{$project->id}/members", [
+            'university_id' => 'UPSA/9000003',
+            'name' => 'kwame m',
+        ])->assertOk();
+
+    // The roster import then creates the real account and links it up.
+    $csv = "Student Name,Index Number,Email,Date of Birth\n".
+        "Kwame Mensah,UPSA/9000003,kwame@example.com,2002-03-15\n";
+    $this->actingAs($admin, 'sanctum')->postJson('/api/admin/students/import', [
+        'file' => Illuminate\Http\UploadedFile::fake()->createWithContent('students.csv', $csv),
+    ])->assertOk();
+
+    $member = App\Models\ProjectMember::where('university_id', 'UPSA/9000003')->first();
+    expect($member->student_id)->not->toBeNull();
+    // The typed placeholder is kept but the account name is what gets shown.
+    expect($member->name)->toBe('kwame m');
+    expect($member->student->name)->toBe('Kwame Mensah');
+});

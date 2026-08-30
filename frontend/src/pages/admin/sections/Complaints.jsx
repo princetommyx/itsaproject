@@ -1,7 +1,7 @@
 import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Avatar, Badge, Card, EmptyState, PageHeading, STATUS_LABELS } from '../../../components/ui'
+import { Avatar, Badge, Card, EmptyState, ErrorState, PageHeading, STATUS_LABELS } from '../../../components/ui'
 import { SkeletonList } from '../../../components/Skeleton'
 import { MessageIcon } from '../../../components/icons'
 
@@ -25,6 +25,8 @@ export default function Complaints() {
         <h2 className="mb-4 text-lg font-bold text-slate-900">Student Complaints</h2>
         {isLoading ? (
           <SkeletonList rows={4} />
+        ) : swrError ? (
+          <ErrorState title="Couldn't load complaints" onRetry={() => mutate()} />
         ) : complaints.length === 0 ? (
           <EmptyState icon={MessageIcon} title="No complaints have been filed" />
         ) : (

@@ -4,6 +4,7 @@ import useSWR from 'swr'
 import { Avatar, Badge, Card, EmptyState, PageHeading, stagger } from '../../../components/ui'
 import { SkeletonCardGrid } from '../../../components/Skeleton'
 import { FolderIcon } from '../../../components/icons'
+import { memberName } from '../../../lib/memberName'
 
 const FILTERS = [
   { key: 'all', label: 'All' },
@@ -61,7 +62,7 @@ export default function AllProjects() {
         <div className="grid gap-4 sm:grid-cols-2">
           {visible.map((project, i) => {
             const leader = project.members.find((m) => m.is_leader) ?? project.members[0]
-            const leaderName = leader?.student?.name ?? leader?.university_id ?? 'Unassigned'
+            const leaderName = leader ? memberName(leader) : 'Unassigned'
 
             return (
               <Link

@@ -2,9 +2,10 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Alert, Button, Card, EmptyState, PageHeading } from '../../../components/ui'
+import { Alert, Button, Card, EmptyState, ErrorState, PageHeading } from '../../../components/ui'
 import { ClipboardIcon } from '../../../components/icons'
 import { Skeleton } from '../../../components/Skeleton'
+import { memberName } from '../../../lib/memberName'
 
 function AssignmentsSkeleton() {
   return (
@@ -71,6 +72,21 @@ export default function Assignments() {
     )
   }
 
+  if (projectsError) {
+    return (
+      <div className="space-y-6">
+        <PageHeading>Assign Assessors</PageHeading>
+        <Card>
+          <ErrorState
+            title="Couldn't load projects awaiting assignment"
+            description="We couldn't reach the server. Check your connection and try again."
+            onRetry={() => mutateProjects()}
+          />
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <PageHeading>Assign Assessors</PageHeading>
@@ -90,7 +106,7 @@ export default function Assignments() {
               <div className="min-w-0">
                 <h3 className="font-semibold text-slate-800">{project.title}</h3>
                 <p className="text-sm text-slate-500 break-words">
-                  {project.members.map((m) => m.student?.name ?? m.university_id).join(', ')}
+                  {project.members.map(memberName).join(', ')}
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">

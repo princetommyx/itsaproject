@@ -1,12 +1,12 @@
 import useSWR from 'swr'
 import client from '../../../api/client'
-import { Avatar, Card, EmptyState, PageHeading } from '../../../components/ui'
+import { Avatar, Card, EmptyState, ErrorState, PageHeading } from '../../../components/ui'
 import { SkeletonTable } from '../../../components/Skeleton'
 import { LogIcon } from '../../../components/icons'
 
 export default function LoginLogs() {
   const { data: logsData, error: swrError } = useSWR('/admin/login-logs')
-  const logs = logsData?.data
+  const logs = logsData?.data ?? []
   const isLoading = !logsData && !swrError
 
   return (
@@ -16,6 +16,8 @@ export default function LoginLogs() {
         <h2 className="mb-4 text-lg font-bold text-slate-900">Login Audit Trail</h2>
         {isLoading ? (
           <SkeletonTable rows={6} cols={5} />
+        ) : swrError ? (
+          <ErrorState title="Couldn't load login logs" />
         ) : logs.length === 0 ? (
           <EmptyState icon={LogIcon} title="No login activity yet" />
         ) : (

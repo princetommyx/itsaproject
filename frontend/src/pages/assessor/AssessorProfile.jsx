@@ -2,13 +2,13 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
-import { Avatar, Card, Input, StatCard } from '../../components/ui'
+import { Avatar, Card, ErrorState, Input, StatCard } from '../../components/ui'
 import { SkeletonStatCards } from '../../components/Skeleton'
 import ProfileShell from '../../components/ProfileShell'
 
 export default function AssessorProfile() {
   const { user } = useAuth()
-  const { data: projects, error: swrError } = useSWR('/assessor/projects')
+  const { data: projects, error: swrError, mutate } = useSWR('/assessor/projects')
   const isLoading = !projects && !swrError
 
   const studentCount = projects
@@ -42,6 +42,12 @@ export default function AssessorProfile() {
           <h2 className="mb-4 text-lg font-bold text-slate-900">Assigned Work</h2>
           {isLoading ? (
             <SkeletonStatCards count={3} />
+          ) : swrError ? (
+            <ErrorState
+              title="Couldn't load your assigned work"
+              description="Your profile details above are still accurate."
+              onRetry={() => mutate()}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <StatCard label="Assigned Projects" value={projects.length} variant="blue" />

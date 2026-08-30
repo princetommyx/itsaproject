@@ -2,7 +2,7 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
-import { Button, Card, HeroStatCard, PageHeading, StatCard, stagger } from '../../../components/ui'
+import { Button, Card, ErrorState, HeroStatCard, PageHeading, StatCard, stagger } from '../../../components/ui'
 import { SkeletonCard, SkeletonHero, SkeletonStatCards } from '../../../components/Skeleton'
 import StatusBreakdownChart from '../../../components/StatusBreakdownChart'
 
@@ -20,7 +20,7 @@ const PEOPLE_METRICS = [
 
 export default function Overview() {
   const toast = useToast()
-  const { data: stats, error: swrError } = useSWR('/admin/dashboard')
+  const { data: stats, error: swrError, mutate } = useSWR('/admin/dashboard')
   const isLoading = !stats && !swrError
   const [exporting, setExporting] = useState(false)
 
@@ -41,6 +41,18 @@ export default function Overview() {
     } finally {
       setExporting(false)
     }
+  }
+
+  if (swrError) {
+    return (
+      <Card>
+        <ErrorState
+          title="Couldn't load the dashboard"
+          description="We couldn't reach the server. Check your connection and try again."
+          onRetry={() => mutate()}
+        />
+      </Card>
+    )
   }
 
   if (isLoading) {

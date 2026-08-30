@@ -8,7 +8,7 @@ import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTy
 
 const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx']
 const MAX_FILE_BYTES = 20 * 1024 * 1024
-import { Alert, Button, Card, EmptyState, PageHeading } from '../../components/ui'
+import { Alert, Button, Card, EmptyState, ErrorState, PageHeading } from '../../components/ui'
 import { SkeletonCard } from '../../components/Skeleton'
 import { FileSpreadsheetIcon, UploadCloudIcon } from '../../components/icons'
 
@@ -26,6 +26,18 @@ export default function StudentDocuments() {
 
   const project = projectData?.project
   const isLoading = !projectData && !swrError
+
+  // The upload/submit/remove endpoints each return the document they just
+  // changed, so fold it into the cached project rather than re-reading the
+  // whole project to learn what we already know. That re-read is slow enough
+  // that the page looked frozen until you reloaded it.
+  const applyDocuments = (next) =>
+    mutate({ project: { ...project, documents: next } }, { revalidate: false })
+
+  const addDocument = (document) => applyDocuments([...(project.documents ?? []), document])
+  const replaceDocument = (document) =>
+    applyDocuments((project.documents ?? []).map((d) => (d.id === document.id ? document : d)))
+  const dropDocument = (id) => applyDocuments((project.documents ?? []).filter((d) => d.id !== id))
 
   function pickFile(file) {
     if (!file) return
@@ -61,14 +73,14 @@ export default function StudentDocuments() {
       const formData = new FormData()
       formData.append('type', type)
       formData.append('file', file)
-      await client.post(`/student/projects/${project.id}/documents`, formData, {
+      const { data } = await client.post(`/student/projects/${project.id}/documents`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (e) => setProgress(Math.round((e.loaded / e.total) * 100)),
       })
+      addDocument(data)
       toast.success('Document uploaded', {
         description: `Check it's the right file, then tap Submit for Review to send it.`,
       })
-      mutate()
     } catch (err) {
       const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
       setError(message || 'Could not upload document.')
@@ -93,8 +105,8 @@ export default function StudentDocuments() {
   async function handleDelete(document) {
     try {
       await client.delete(`/student/projects/${project.id}/documents/${document.id}`)
+      dropDocument(document.id)
       toast.success('Document removed successfully')
-      mutate()
     } catch {
       toast.error('Unable to remove this document', { description: 'Please try again.' })
     }
@@ -103,11 +115,11 @@ export default function StudentDocuments() {
   async function handleSubmitDocument(document, label) {
     setSubmittingId(document.id)
     try {
-      await client.post(`/student/projects/${project.id}/documents/${document.id}/submit`)
+      const { data } = await client.post(`/student/projects/${project.id}/documents/${document.id}/submit`)
+      replaceDocument(data)
       toast.success(`${label} submitted for review`, {
         description: 'It has been sent for review and can no longer be removed.',
       })
-      mutate()
     } catch (err) {
       const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
       toast.error('Could not submit this document', {
@@ -123,6 +135,21 @@ export default function StudentDocuments() {
       <div className="space-y-6">
         <PageHeading>My Documents</PageHeading>
         <SkeletonCard lines={2} />
+      </div>
+    )
+  }
+
+  if (swrError) {
+    return (
+      <div className="space-y-6">
+        <PageHeading>My Documents</PageHeading>
+        <Card>
+          <ErrorState
+            title="Couldn't load your documents"
+            description="We couldn't reach the server. Check your connection and try again."
+            onRetry={() => mutate()}
+          />
+        </Card>
       </div>
     )
   }

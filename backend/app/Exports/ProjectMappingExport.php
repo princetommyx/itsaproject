@@ -21,7 +21,10 @@ class ProjectMappingExport implements FromCollection, WithHeadings
                 self::escapeFormula($project->title),
                 $project->status,
                 self::escapeFormula($project->members->map(
-                    fn ($member) => $member->student?->name ?? "{$member->university_id} (unregistered)"
+                    // Same precedence as the app: the linked account name wins,
+                    // then the name the group typed, then the Index Number.
+                    fn ($member) => $member->student?->name
+                        ?? ($member->name ? "{$member->name} ({$member->university_id}, unregistered)" : "{$member->university_id} (unregistered)")
                 )->implode(', ')),
                 self::escapeFormula($project->assessor?->name ?? 'Unassigned'),
                 self::escapeFormula($project->feedback),

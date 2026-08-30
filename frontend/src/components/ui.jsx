@@ -235,6 +235,28 @@ export function Alert({ children, variant = 'error' }) {
   )
 }
 
+export function ErrorState({ title = "Couldn't load this", description, onRetry }) {
+  return (
+    <div className="flex flex-col items-center gap-2 py-10 text-center">
+      <span className="mb-1 flex h-12 w-12 items-center justify-center rounded-full bg-red-50 text-xl text-red-500">
+        !
+      </span>
+      <p className="text-base font-bold text-slate-800">{title}</p>
+      <p className="max-w-xs text-sm font-medium text-slate-500">
+        {description || 'Check your connection and try again.'}
+      </p>
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          className="mt-3 rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+        >
+          Retry
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function EmptyState({ icon: Icon, title, description }) {
   return (
     <div className="flex flex-col items-center gap-2 py-10 text-center">

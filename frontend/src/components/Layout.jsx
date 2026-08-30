@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import { describeNotification } from '../constants/notifications'
 import upsaShield from '../assets/upsa-shield.png'
+import ErrorBoundary from './ErrorBoundary'
 
 const fetcher = (url) => client.get(url).then((res) => res.data)
 
@@ -302,7 +303,8 @@ export default function Layout({ children }) {
 
         <main className="flex-1 px-4 py-6 sm:py-8">
           <div key={location.pathname} className="animate-page-enter mx-auto max-w-5xl">
-            {children ?? <Outlet />}
+            {/* Keyed on the route so navigating away clears a crashed page. */}
+            <ErrorBoundary key={location.pathname}>{children ?? <Outlet />}</ErrorBoundary>
           </div>
         </main>
       </div>

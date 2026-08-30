@@ -9,6 +9,7 @@ import {
   Avatar,
   Button,
   Card,
+  ErrorState,
   Input,
   PageHeading,
   StatCard,
@@ -20,6 +21,7 @@ import {
 import { Skeleton, SkeletonList, SkeletonStatCards } from '../../components/Skeleton'
 import StatusTimeline from '../../components/StatusTimeline'
 import { CORE_SUBMISSION_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
+import { memberName } from '../../lib/memberName'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -28,6 +30,13 @@ export default function StudentDashboard() {
 
   const project = projectData?.project
   const isLoading = !projectData && !swrError
+
+  // Every mutating endpoint returns the updated project in the same shape
+  // GET /student/project uses, so write it straight into the cache. Waiting
+  // on a re-fetch to show the result is what made the page look like it
+  // hadn't reacted until you reloaded it — that round trip is slow.
+  const applyProject = (updated) =>
+    mutate({ project: updated }, { revalidate: false })
 
   if (isLoading) {
     return (
@@ -53,10 +62,18 @@ export default function StudentDashboard() {
       <PageHeading>My Project</PageHeading>
       {error && <Alert>{error}</Alert>}
 
-      {!project ? (
-        <CreateProjectForm onCreated={() => mutate()} onError={setError} />
+      {swrError ? (
+        <Card>
+          <ErrorState
+            title="Couldn't load your project"
+            description="We couldn't reach the server. Check your connection and try again."
+            onRetry={() => mutate()}
+          />
+        </Card>
+      ) : !project ? (
+        <CreateProjectForm onCreated={applyProject} onError={setError} />
       ) : (
-        <ProjectPanel project={project} user={user} onChange={() => mutate()} onError={setError} />
+        <ProjectPanel project={project} user={user} onChange={applyProject} onError={setError} />
       )}
     </div>
   )
@@ -73,11 +90,11 @@ function CreateProjectForm({ onCreated, onError }) {
     onError('')
     setSubmitting(true)
     try {
-      await client.post('/student/projects', { title, description })
+      const { data } = await client.post('/student/projects', { title, description })
       toast.success('Project draft created successfully', {
         description: 'Add your group members and documents, then submit it when you’re ready for review.',
       })
-      onCreated()
+      onCreated(data)
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not create project.')
     } finally {
@@ -221,9 +238,14 @@ function ProjectPanel({ project, user, onChange, onError }) {
             {members.map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm">
                 <span className="flex min-w-0 items-center gap-2.5">
-                  <Avatar name={m.student ? m.student.name : m.university_id} className="h-7 w-7 text-[10px]" />
+                  <Avatar name={memberName(m)} className="h-7 w-7 text-[10px]" />
                   <span className="min-w-0 truncate">
-                    {m.student ? m.student.name : m.university_id}
+                    {memberName(m)}
+                    {/* Index Number stays visible alongside a typed name — it
+                        is the identifier the group is actually matched on. */}
+                    {!m.student && m.name && (
+                      <span className="ml-1 text-xs text-slate-400">{m.university_id}</span>
+                    )}
                     {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
                     {!m.student && (
                       <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
@@ -262,13 +284,13 @@ async function submitProject(project, onChange, onError, toast, setSubmitting) {
   onError('')
   setSubmitting(true)
   try {
-    await client.post(`/student/projects/${project.id}/submit`)
+    const { data } = await client.post(`/student/projects/${project.id}/submit`)
     toast.success(isResubmission ? 'Submission resubmitted successfully' : 'Project submitted successfully', {
       description: isResubmission
         ? 'Your revised project has been sent back to your supervisor for review.'
         : 'Your final-year project has been submitted for review.',
     })
-    onChange()
+    onChange(data)
   } catch (err) {
     const message = err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : null
     onError(message || 'Could not submit project.')
@@ -283,9 +305,9 @@ async function submitProject(project, onChange, onError, toast, setSubmitting) {
 async function removeMember(projectId, memberId, onChange, onError, toast) {
   onError('')
   try {
-    await client.delete(`/student/projects/${projectId}/members/${memberId}`)
+    const { data } = await client.delete(`/student/projects/${projectId}/members/${memberId}`)
     toast.success('Group member removed successfully')
-    onChange()
+    onChange(data)
   } catch (err) {
     onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not remove member.')
   }
@@ -293,6 +315,7 @@ async function removeMember(projectId, memberId, onChange, onError, toast) {
 
 function AddMemberForm({ projectId, onChange, onError, toast }) {
   const [universityId, setUniversityId] = useState('')
+  const [name, setName] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const inputRef = useRef(null)
 
@@ -301,12 +324,16 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
     onError('')
     setSubmitting(true)
     try {
-      await client.post(`/student/projects/${projectId}/members`, { university_id: universityId })
+      const { data } = await client.post(`/student/projects/${projectId}/members`, {
+        university_id: universityId,
+        name,
+      })
       toast.success('Group member added successfully', {
-        description: `${universityId} has been added to your project group.`,
+        description: `${name.trim() || universityId} has been added to your project group.`,
       })
       setUniversityId('')
-      onChange()
+      setName('')
+      onChange(data)
       inputRef.current?.focus()
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not add member.')
@@ -320,17 +347,25 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
       <p className="mb-2 text-xs text-slate-500">
         Add as many group members as your project needs — groups are usually 2 to 4 people. If a
         partner hasn't been added to the system yet, that's fine: add their Index Number now and
-        it'll link to their account automatically once they are.
+        it'll link to their account automatically once they are. Adding their name too means the
+        group can tell who they are in the meantime.
       </p>
       <form className="flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={handleSubmit}>
         <Input
           ref={inputRef}
-          label="Add Member by Index Number"
+          label="Index Number"
           value={universityId}
           onChange={(e) => setUniversityId(e.target.value)}
           className="flex-1"
           required
           autoFocus
+        />
+        <Input
+          label="Full Name (optional)"
+          placeholder="e.g. Kwame Mensah"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="flex-1"
         />
         <Button type="submit" variant="secondary" className="sm:shrink-0" disabled={submitting} loading={submitting}>
           {submitting ? 'Adding...' : '+ Add Member'}
@@ -350,9 +385,9 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
     onError('')
     setSubmitting(true)
     try {
-      await client.put(`/student/projects/${project.id}`, { title, description })
+      const { data } = await client.put(`/student/projects/${project.id}`, { title, description })
       toast.success('Project details saved successfully')
-      onChange()
+      onChange(data)
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not save changes.')
     } finally {

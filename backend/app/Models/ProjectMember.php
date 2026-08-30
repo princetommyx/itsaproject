@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['university_id', 'student_id', 'is_leader'])]
+#[Fillable(['university_id', 'name', 'student_id', 'is_leader'])]
 class ProjectMember extends Model
 {
     protected $table = 'project_student';

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
-import { Badge, Button, Card, EmptyState, Input, PageHeading, Textarea } from '../../components/ui'
+import { Badge, Button, Card, EmptyState, ErrorState, Input, PageHeading, Textarea } from '../../components/ui'
 import { SkeletonList } from '../../components/Skeleton'
 import { MessageIcon } from '../../components/icons'
 
@@ -46,6 +46,8 @@ export default function StudentSupport() {
         <h2 className="mb-4 text-lg font-bold text-slate-900">Your Messages</h2>
         {!complaints ? (
           <SkeletonList rows={3} />
+        ) : swrError ? (
+          <ErrorState title="Couldn't load your messages" />
         ) : complaints.length === 0 ? (
           <EmptyState icon={MessageIcon} title="No messages sent yet" />
         ) : (

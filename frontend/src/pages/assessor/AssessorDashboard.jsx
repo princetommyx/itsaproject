@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import useSWR from 'swr'
 import client from '../../api/client'
-import { Badge, Card, EmptyState, PageHeading, StatCard, stagger } from '../../components/ui'
+import { Badge, Card, EmptyState, ErrorState, PageHeading, StatCard, stagger } from '../../components/ui'
 import { SkeletonCardGrid, SkeletonStatCards } from '../../components/Skeleton'
 import { ClipboardIcon } from '../../components/icons'
+import { memberName } from '../../lib/memberName'
 
 export default function AssessorDashboard() {
-  const { data: projects, error: swrError } = useSWR('/assessor/projects')
+  const { data: projects, error: swrError, mutate } = useSWR('/assessor/projects')
   const isLoading = !projects && !swrError
 
   const counts = projects && {
@@ -25,6 +26,14 @@ export default function AssessorDashboard() {
           <SkeletonStatCards count={4} />
           <SkeletonCardGrid />
         </>
+      ) : swrError ? (
+        <Card>
+          <ErrorState
+            title="Couldn't load your assigned projects"
+            description="We couldn't reach the server. Check your connection and try again."
+            onRetry={() => mutate()}
+          />
+        </Card>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -54,7 +63,7 @@ export default function AssessorDashboard() {
                     </div>
                     <p className="line-clamp-3 text-[15px] leading-[1.7] text-slate-700">{project.description}</p>
                     <p className="mt-3 text-xs text-slate-400">
-                      {project.members.map((m) => m.student?.name ?? m.university_id).join(', ')}
+                      {project.members.map(memberName).join(', ')}
                     </p>
                   </Card>
                 </Link>

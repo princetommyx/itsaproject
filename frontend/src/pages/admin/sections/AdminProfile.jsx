@@ -1,13 +1,13 @@
 import useSWR from 'swr'
 import client from '../../../api/client'
 import { useAuth } from '../../../context/AuthContext'
-import { Avatar, Card, Input, StatCard } from '../../../components/ui'
+import { Avatar, Card, ErrorState, Input, StatCard } from '../../../components/ui'
 import { SkeletonStatCards } from '../../../components/Skeleton'
 import ProfileShell from '../../../components/ProfileShell'
 
 export default function AdminProfile() {
   const { user } = useAuth()
-  const { data: stats, error: swrError } = useSWR('/admin/dashboard')
+  const { data: stats, error: swrError, mutate } = useSWR('/admin/dashboard')
   const isLoading = !stats && !swrError
 
   return (
@@ -36,6 +36,12 @@ export default function AdminProfile() {
           <h2 className="mb-4 text-lg font-bold text-slate-900">System Overview</h2>
           {isLoading ? (
             <SkeletonStatCards count={3} />
+          ) : swrError ? (
+            <ErrorState
+              title="Couldn't load the system overview"
+              description="Your profile details above are still accurate."
+              onRetry={() => mutate()}
+            />
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <StatCard label="Total Students" value={stats.total_students} variant="blue" />

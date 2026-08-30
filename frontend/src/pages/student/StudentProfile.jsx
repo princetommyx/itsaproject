@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom'
 import useSWR from 'swr'
 import client from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
-import { Avatar, Badge, Card, Input } from '../../components/ui'
+import { Avatar, Badge, Card, ErrorState, Input } from '../../components/ui'
 import { SkeletonCard } from '../../components/Skeleton'
 import ProfileShell from '../../components/ProfileShell'
 import StatusTimeline from '../../components/StatusTimeline'
 
 export default function StudentProfile() {
   const { user } = useAuth()
-  const { data: projectData, error: swrError } = useSWR('/student/project')
+  const { data: projectData, error: swrError, mutate } = useSWR('/student/project')
   
   const project = projectData?.project
   const isLoading = !projectData && !swrError
@@ -49,6 +49,12 @@ export default function StudentProfile() {
           <h2 className="mb-4 text-lg font-bold text-slate-900">Project Information</h2>
           {isLoading ? (
             <SkeletonCard lines={2} />
+          ) : swrError ? (
+            <ErrorState
+              title="Couldn't load your project"
+              description="Your details above are still accurate."
+              onRetry={() => mutate()}
+            />
           ) : project ? (
             <div className="space-y-5">
               <div className="grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">

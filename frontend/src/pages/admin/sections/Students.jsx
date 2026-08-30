@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import useSWR from 'swr'
-import { Avatar, Badge, Card, EmptyState, Input, PageHeading } from '../../../components/ui'
+import { Avatar, Badge, Card, EmptyState, ErrorState, Input, PageHeading } from '../../../components/ui'
 import { SkeletonTable } from '../../../components/Skeleton'
 import { UsersIcon } from '../../../components/icons'
 
@@ -10,10 +10,10 @@ export default function Students() {
   // Search runs server-side so it covers the whole roster, not just the page
   // currently loaded. Trimmed so a stray space doesn't fetch a new key.
   const query = search.trim()
-  const { data, error: swrError } = useSWR(
+  const { data, error: swrError, mutate } = useSWR(
     `/admin/students${query ? `?search=${encodeURIComponent(query)}` : ''}`
   )
-  const students = data?.data
+  const students = data?.data ?? []
   const isLoading = !data && !swrError
 
   return (
@@ -31,7 +31,13 @@ export default function Students() {
         />
 
         <div className="mt-5">
-          {isLoading ? (
+          {swrError ? (
+            <ErrorState
+              title="Couldn't load students"
+              description="The student roster didn't load. Check your connection and try again."
+              onRetry={() => mutate()}
+            />
+          ) : isLoading ? (
             <SkeletonTable rows={6} cols={3} />
           ) : students.length === 0 ? (
             <EmptyState
