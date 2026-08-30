@@ -27,13 +27,16 @@ export default function AllProjects() {
       </PageHeading>
 
       <div className="relative -mx-4 sm:mx-0">
-        <div className="overflow-x-auto px-4 sm:px-0">
-          <div className="flex gap-2 whitespace-nowrap">
+        {/* pb-3 keeps the horizontal scrollbar off the tabs — without it the
+            bar sits flush against them on mobile, which reads as one cramped
+            element rather than tabs with a scroll affordance under them. */}
+        <div className="overflow-x-auto px-4 pb-3 sm:px-0 sm:pb-0">
+          <div className="flex gap-2.5 whitespace-nowrap">
             {FILTERS.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                className={`shrink-0 rounded-full px-4 py-2 text-[13px] font-semibold transition ${
                   filter === f.key
                     ? 'bg-upsa-blue text-white'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
