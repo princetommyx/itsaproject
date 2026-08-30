@@ -4,16 +4,17 @@ import LoginForm from '../components/LoginForm'
 export default function StaffLogin() {
   return (
     <LoginForm
-      heading="Welcome to UPSA FYP System"
+      heading="Welcome back"
+      subtitle="Sign in with your official staff email to continue."
       identifierLabel="Official Email"
       identifierPlaceholder="upsa@mail.edu.gh"
       identifierAutoComplete="username"
       allowedRoles={['admin', 'assessor']}
       wrongRoleMessage="This looks like a student account. Please use the Student sign-in page instead."
     >
-      <p className="mt-6 text-xs text-muted-foreground">
-        Student?{' '}
-        <Link to="/login" className="text-brand-ink hover:underline">
+      <p className="text-center text-sm font-medium text-muted-foreground">
+        Are you a student?{' '}
+        <Link to="/login" className="font-semibold text-brand-ink hover:underline">
           Sign in here
         </Link>
       </p>

@@ -9,7 +9,7 @@
  */
 
 const CACHE_KEY = 'fyp_branding'
-const THEME_KEY = 'fyp_theme'
+export const THEME_KEY = 'fyp_theme'
 const FONT_LINK_ID = 'admin-font'
 
 /**

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import AuthShell from './AuthShell'
@@ -9,6 +9,7 @@ import AuthField from './AuthField'
 
 export default function LoginForm({
   heading,
+  subtitle,
   identifierLabel,
   identifierPlaceholder,
   passwordPlaceholder,
@@ -58,11 +59,17 @@ export default function LoginForm({
   }
 
   return (
-    <AuthShell>
-      <h1 className="mb-7 text-[26px] leading-snug font-extrabold tracking-tight text-foreground sm:text-3xl">{heading}</h1>
+    <AuthShell footer={children}>
+      <h1 className="text-3xl leading-tight font-extrabold tracking-tight text-foreground">
+        {heading}
+      </h1>
+      {subtitle && (
+        <p className="mt-2 text-[15px] font-medium text-muted-foreground">{subtitle}</p>
+      )}
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
+
         <AuthField
           label={identifierLabel}
           placeholder={identifierPlaceholder}
@@ -72,6 +79,7 @@ export default function LoginForm({
           required
           autoFocus
         />
+
         <AuthField
           label="Password"
           type="password"
@@ -80,24 +88,31 @@ export default function LoginForm({
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          action={
+            <Link
+              to="/forgot-password"
+              className="text-xs font-semibold text-brand-ink hover:underline"
+            >
+              Forgot password?
+            </Link>
+          }
         />
+
         <button
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-3.5 text-base font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3.5 text-[15px] font-bold text-brand-foreground transition hover:brightness-110 focus-visible:ring-[3px] focus-visible:ring-ring/40 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? 'Signing in...' : 'Login'}
+          {submitting ? 'Signing in…' : 'Sign In'}
         </button>
 
         {submitting && (
-          <div className="flex flex-col items-center gap-2 pt-2" aria-live="polite">
-            <DotSpinner size={44} />
-            <p className="text-sm font-medium text-muted-foreground">Logging you in...</p>
+          <div className="flex flex-col items-center gap-2 pt-1" aria-live="polite">
+            <DotSpinner size={40} />
+            <p className="text-sm font-medium text-muted-foreground">Logging you in…</p>
           </div>
         )}
       </form>
-
-      {children}
     </AuthShell>
   )
 }

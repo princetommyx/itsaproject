@@ -1,9 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { applyToastTheme } from '../lib/branding'
+import { applyToastTheme, THEME_KEY } from '../lib/branding'
 
 const ThemeContext = createContext({ theme: 'light', setTheme: () => {}, resolved: 'light' })
-
-const STORAGE_KEY = 'fyp_theme'
 
 /**
  * Light / dark / follow-the-system.
@@ -14,7 +12,7 @@ const STORAGE_KEY = 'fyp_theme'
  */
 function readStored() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY)
+    const saved = localStorage.getItem(THEME_KEY)
     return saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system'
   } catch {
     // Private browsing can throw on access; falling back to the system
@@ -56,14 +54,34 @@ export function ThemeProvider({ children }) {
   const setTheme = useCallback((next) => {
     setThemeState(next)
     try {
-      localStorage.setItem(STORAGE_KEY, next)
+      localStorage.setItem(THEME_KEY, next)
     } catch {
       // Not being able to remember the choice is survivable; applying it now
       // is the part that matters.
     }
   }, [])
 
-  const value = useMemo(() => ({ theme, resolved, setTheme }), [theme, resolved, setTheme])
+  /**
+   * Forget the choice and go back to following the system.
+   *
+   * Called on sign-out. This is a website on a possibly shared browser, not an
+   * installed app with an account behind it: the next person to reach the
+   * login page should not inherit whatever the last one picked.
+   */
+  const resetTheme = useCallback(() => {
+    setThemeState('system')
+    try {
+      localStorage.removeItem(THEME_KEY)
+    } catch {
+      // Nothing stored means nothing to forget; the state reset above is what
+      // actually changes the screen.
+    }
+  }, [])
+
+  const value = useMemo(
+    () => ({ theme, resolved, setTheme, resetTheme }),
+    [theme, resolved, setTheme, resetTheme]
+  )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

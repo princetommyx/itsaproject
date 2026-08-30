@@ -40,7 +40,9 @@ export default function ResetPassword() {
 
   return (
     <AuthShell>
-      <h1 className="mb-6 text-xl font-bold text-foreground">Set New Password</h1>
+      <h1 className="mb-6 text-3xl leading-tight font-extrabold tracking-tight text-foreground">
+        Set a new password
+      </h1>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}

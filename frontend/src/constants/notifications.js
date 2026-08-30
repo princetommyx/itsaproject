@@ -31,6 +31,7 @@ function formatShort(iso) {
 // no entry, so a new backend notification is invisible until it's listed.
 export const NOTIFICATION_KIND_META = {
   approved: {
+    category: 'Decision',
     title: 'Project Approved',
     icon: CheckCircleIcon,
     variant: 'violet',
@@ -38,6 +39,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: () => '/student',
   },
   refine: {
+    category: 'Decision',
     title: 'Revision Required',
     icon: RefreshCwIcon,
     variant: 'pink',
@@ -45,6 +47,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: () => '/student',
   },
   assigned: {
+    category: 'Review',
     title: 'New Project Assigned',
     icon: ClipboardIcon,
     variant: 'blue',
@@ -52,6 +55,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: (data) => `/assessor/projects/${data.project_id}`,
   },
   resubmitted: {
+    category: 'Review',
     title: 'Student Resubmitted Project',
     icon: RefreshCwIcon,
     variant: 'gold',
@@ -59,6 +63,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: (data) => `/assessor/projects/${data.project_id}`,
   },
   document_submitted: {
+    category: 'Document',
     title: 'Document Submitted',
     icon: FileSpreadsheetIcon,
     variant: 'blue',
@@ -66,6 +71,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: (data) => `/admin/projects/${data.project_id}`,
   },
   added_to_group: {
+    category: 'Group',
     title: 'Added to a Project Group',
     icon: UsersIcon,
     variant: 'blue',
@@ -73,6 +79,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: () => '/student',
   },
   defense_scheduled: {
+    category: 'Schedule',
     title: 'Defense Scheduled',
     icon: CalendarIcon,
     variant: 'gold',
@@ -87,6 +94,7 @@ export const NOTIFICATION_KIND_META = {
     linkFor: () => '/student',
   },
   submitted: {
+    category: 'Submission',
     title: 'New Project Submitted',
     icon: FolderIcon,
     variant: 'gold',

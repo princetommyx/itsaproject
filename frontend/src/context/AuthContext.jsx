@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import client from '../api/client'
+import { useTheme } from './ThemeContext'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
+  const { resetTheme } = useTheme()
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user')
     return saved ? JSON.parse(saved) : null
@@ -58,6 +60,10 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem('token')
     localStorage.removeItem('token')
     localStorage.removeItem('user')
+    // A theme is the signed-in person's choice, and this is a website on a
+    // possibly shared browser — the next person at the login screen should
+    // not inherit it.
+    resetTheme()
     setUser(null)
     try {
       await client.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } })

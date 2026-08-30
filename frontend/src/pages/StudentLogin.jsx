@@ -4,7 +4,8 @@ import LoginForm from '../components/LoginForm'
 export default function StudentLogin() {
   return (
     <LoginForm
-      heading="Welcome to UPSA FYP System"
+      heading="Welcome back"
+      subtitle="Sign in with your index number to reach your project."
       identifierLabel="Index Number"
       identifierPlaceholder="Index Number"
       passwordPlaceholder="Date of Birth eg. 20-07-2004"
@@ -12,14 +13,9 @@ export default function StudentLogin() {
       allowedRoles={['student']}
       wrongRoleMessage="This looks like a staff account. Please use the Staff / Admin sign-in page instead."
     >
-      <p className="mt-6 text-sm">
-        <Link to="/forgot-password" className="text-brand-ink hover:underline">
-          Forgot Password?
-        </Link>
-      </p>
-      <p className="mt-3 text-xs text-muted-foreground">
-        Staff or admin?{' '}
-        <Link to="/admin" className="text-brand-ink hover:underline">
+      <p className="text-center text-sm font-medium text-muted-foreground">
+        Staff or administrator?{' '}
+        <Link to="/admin" className="font-semibold text-brand-ink hover:underline">
           Sign in here
         </Link>
       </p>

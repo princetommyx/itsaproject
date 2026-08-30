@@ -34,3 +34,38 @@ export function toDateTimeLocal(value) {
 
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
+
+/**
+ * "2 min ago", "1 hr ago", "Yesterday, 11:42", "4 days ago".
+ *
+ * A relative time answers the question a notification list actually raises —
+ * how long ago, and is this still current — where an absolute timestamp makes
+ * the reader do the arithmetic. Anything older than a week falls back to a
+ * date, because "37 days ago" is not a useful way to say a date.
+ */
+export function relativeTime(value) {
+  if (!value) return ''
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+
+  const seconds = Math.round((Date.now() - date.getTime()) / 1000)
+
+  if (seconds < 60) return 'Just now'
+  if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`
+  if (seconds < 86400) {
+    const hours = Math.floor(seconds / 3600)
+    return `${hours} hr${hours === 1 ? '' : 's'} ago`
+  }
+
+  const startOfToday = new Date()
+  startOfToday.setHours(0, 0, 0, 0)
+  const days = Math.floor((startOfToday - new Date(date).setHours(0, 0, 0, 0)) / 86400000)
+
+  if (days === 1) {
+    return `Yesterday, ${date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}`
+  }
+  if (days < 7) return `${days} days ago`
+
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}

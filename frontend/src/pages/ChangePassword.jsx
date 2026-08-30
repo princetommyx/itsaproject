@@ -41,7 +41,9 @@ export default function ChangePassword() {
 
   return (
     <AuthShell>
-      <h1 className="mb-1 text-xl font-bold text-foreground">Set a New Password</h1>
+      <h1 className="mb-1 text-3xl leading-tight font-extrabold tracking-tight text-foreground">
+        Set a new password
+      </h1>
       <p className="mb-6 text-sm text-muted-foreground">
         {user?.is_first_login
           ? 'For your security, you must set a new password before continuing.'

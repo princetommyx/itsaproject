@@ -2,10 +2,19 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import useSWR from 'swr'
 import client from '../api/client'
-import { Button, Card, EmptyState, PageHeading, stagger } from './ui'
+import { Button, Card, EmptyState, ErrorState, PageHeading, stagger } from './ui'
 import { SkeletonList } from './Skeleton'
 import { InboxIcon } from './icons'
 import { describeNotification } from '../constants/notifications'
+import { relativeTime } from '../lib/formatDate'
+import { cn } from '../lib/cn'
+
+const CATEGORY_STYLES = {
+  blue: 'bg-blue-500/15 text-blue-700 dark:text-blue-300',
+  violet: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
+  pink: 'bg-pink-500/15 text-pink-700 dark:text-pink-300',
+  gold: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+}
 
 const ICON_VARIANT_STYLES = {
   blue: 'bg-blue-500/10 text-blue-600',
@@ -28,28 +37,6 @@ const INTRO_ITEMS = {
     'A student submits a project that needs an assessor assigned',
     'A group submits a project document for review',
   ],
-}
-
-function groupByDate(notifications) {
-  const groups = { Today: [], Yesterday: [], 'Earlier this week': [], Earlier: [] }
-  const now = new Date()
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-
-  for (const n of notifications) {
-    const created = new Date(n.created_at)
-    const days = Math.floor((startOfToday - new Date(created.getFullYear(), created.getMonth(), created.getDate())) / 86400000)
-
-    if (days <= 0) groups.Today.push(n)
-    else if (days === 1) groups.Yesterday.push(n)
-    else if (days <= 7) groups['Earlier this week'].push(n)
-    else groups.Earlier.push(n)
-  }
-
-  return Object.entries(groups).filter(([, items]) => items.length > 0)
-}
-
-function formatTime(iso) {
-  return new Date(iso).toLocaleString(undefined, { hour: 'numeric', minute: '2-digit' })
 }
 
 export default function NotificationsPage({ apiPrefix, role }) {
@@ -95,14 +82,23 @@ export default function NotificationsPage({ apiPrefix, role }) {
     if (info?.link) navigate(info.link)
   }
 
+  async function markAllRead() {
+    const unread = (notifications ?? []).filter((n) => !n.read_at)
+    if (unread.length === 0) return
+
+    // Written into the cache first: the list should go quiet the moment it is
+    // pressed, not after every request has come back one by one.
+    const now = new Date().toISOString()
+    mutate((prev) => prev?.map((x) => (x.read_at ? x : { ...x, read_at: now })), { revalidate: false })
+    await Promise.all(unread.map((n) => client.post(`${apiPrefix}/notifications/${n.id}/read`)))
+  }
+
   const visible = useMemo(() => {
     if (!notifications) return []
     return filter === 'unread' ? notifications.filter((n) => !n.read_at) : notifications
   }, [notifications, filter])
 
   const unreadCount = notifications?.filter((n) => !n.read_at).length ?? 0
-  const groups = groupByDate(visible)
-  let cardIndex = 0
 
   return (
     <div className="space-y-6">
@@ -131,23 +127,52 @@ export default function NotificationsPage({ apiPrefix, role }) {
         </Card>
       )}
 
-      <div className="flex gap-2">
-        {['all', 'unread'].map((key) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-              filter === key ? 'bg-brand text-white' : 'bg-muted text-muted-foreground hover:bg-accent'
-            }`}
-          >
-            {key === 'all' ? 'All' : `Unread${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
-          </button>
-        ))}
-      </div>
+      <Card className="p-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+          <div className="flex gap-2">
+            {['all', 'unread'].map((key) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                className={cn(
+                  'rounded-lg px-3.5 py-2 text-sm font-semibold transition',
+                  filter === key
+                    ? 'bg-brand text-brand-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                {key === 'all' ? 'All' : 'Unread'}
+                {key === 'unread' && unreadCount > 0 && (
+                  <span className="ml-2 rounded-full bg-gold px-1.5 py-0.5 text-[11px] font-bold text-black/80">
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
 
-      <Card>
+          {unreadCount > 0 && (
+            <button
+              onClick={markAllRead}
+              className="text-sm font-semibold text-brand-ink hover:underline"
+            >
+              Mark all as read
+            </button>
+          )}
+        </div>
+
         {isLoading ? (
-          <SkeletonList rows={3} />
+          <div className="p-4">
+            <SkeletonList rows={4} />
+          </div>
+        ) : swrError ? (
+          <div className="p-4">
+            <ErrorState
+              title="Couldn't load your notifications"
+              description="We couldn't reach the server. Check your connection and try again."
+              onRetry={() => mutate()}
+            />
+          </div>
         ) : visible.length === 0 ? (
           <EmptyState
             icon={InboxIcon}
@@ -159,50 +184,77 @@ export default function NotificationsPage({ apiPrefix, role }) {
             }
           />
         ) : (
-          <div className="space-y-6">
-            {groups.map(([label, items]) => (
-              <div key={label}>
-                <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{label}</p>
-                <ul className="divide-y divide-border">
-                  {items.map((n) => {
-                    const info = describeNotification(n)
-                    const isUnread = !n.read_at
-                    if (!info) return null
-                    const Icon = info.icon
+          <ul className="divide-y divide-border">
+            {visible.map((n, i) => {
+              const info = describeNotification(n)
+              if (!info) return null
 
-                    const delay = stagger(cardIndex++)
+              const isUnread = !n.read_at
+              const Icon = info.icon
 
-                    return (
-                      <li key={n.id} className="animate-fade-up" style={delay}>
-                        <button
-                          onClick={() => openNotification(n)}
-                          className={`flex w-full items-start gap-3 rounded-xl px-2 py-3.5 text-left transition hover:bg-muted ${
-                            isUnread ? 'bg-blue-500/10/40' : ''
-                          }`}
+              return (
+                <li key={n.id} className="animate-fade-up" style={stagger(i)}>
+                  <button
+                    onClick={() => openNotification(n)}
+                    className={cn(
+                      'flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-muted',
+                      // An unread row is tinted rather than merely bolder, so
+                      // the block of things still needing attention is visible
+                      // without reading any of them.
+                      isUnread && 'bg-brand/[0.06]'
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                        ICON_VARIANT_STYLES[info.variant]
+                      )}
+                    >
+                      <Icon size={18} />
+                    </span>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <p
+                          className={cn(
+                            'truncate text-sm',
+                            isUnread ? 'font-bold text-foreground' : 'font-semibold text-muted-foreground'
+                          )}
                         >
+                          {info.title}
+                        </p>
+                        {isUnread && (
                           <span
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${ICON_VARIANT_STYLES[info.variant]}`}
-                          >
-                            <Icon />
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-baseline justify-between gap-x-2">
-                              <p className={`text-sm ${isUnread ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}>
-                                {info.title}
-                              </p>
-                              <span className="text-xs whitespace-nowrap text-muted-foreground">{formatTime(n.created_at)}</span>
-                            </div>
-                            <p className="mt-0.5 text-[15px] leading-[1.7] break-words text-foreground">{info.description}</p>
-                          </div>
-                          {isUnread && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-gold" aria-hidden="true" />}
-                        </button>
-                      </li>
-                    )
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
+                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
+                            aria-label="Unread"
+                          />
+                        )}
+                      </div>
+                      <p className="mt-0.5 text-[15px] leading-[1.6] break-words text-muted-foreground">
+                        {info.description}
+                      </p>
+                    </div>
+
+                    <div className="flex shrink-0 flex-col items-end gap-1.5 pl-2">
+                      {info.category && (
+                        <span
+                          className={cn(
+                            'rounded-md px-2 py-0.5 text-[11px] font-bold',
+                            CATEGORY_STYLES[info.variant] ?? CATEGORY_STYLES.blue
+                          )}
+                        >
+                          {info.category}
+                        </span>
+                      )}
+                      <span className="text-xs whitespace-nowrap text-muted-foreground">
+                        {relativeTime(n.created_at)}
+                      </span>
+                    </div>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
         )}
       </Card>
     </div>

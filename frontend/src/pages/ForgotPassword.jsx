@@ -26,7 +26,9 @@ export default function ForgotPassword() {
 
   return (
     <AuthShell>
-      <h1 className="mb-6 text-xl font-bold text-foreground">Reset Student Password</h1>
+      <h1 className="mb-6 text-3xl leading-tight font-extrabold tracking-tight text-foreground">
+        Reset your password
+      </h1>
 
       {message ? (
         <Alert variant="info">{message}</Alert>
