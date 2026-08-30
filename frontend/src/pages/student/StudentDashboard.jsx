@@ -172,7 +172,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </div>
         )}
 
-        {(project.proposal_defense_at || project.final_defense_at) && (
+        {project.status === 'approved' && (project.proposal_defense_at || project.final_defense_at) && (
           <div className="mt-5 rounded-xl border border-brand-ink/20 bg-blue-500/10 p-4">
             <p className="text-sm font-bold text-foreground">Defense Schedule</p>
             <dl className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-2">

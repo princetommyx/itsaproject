@@ -173,9 +173,11 @@ export default function AdminProjectReview() {
           <SubmissionHistory versions={project.versions} compareBase={`/admin/projects/${project.id}/compare`} />
         </div>
 
-        <div className="mt-5 border-t border-border pt-5">
-          <DefenseScheduleCard project={project} onSaved={(updated) => mutateProject(updated, { revalidate: false })} />
-        </div>
+        {project.status === 'approved' && (
+          <div className="mt-5 border-t border-slate-100 pt-5">
+            <DefenseScheduleCard project={project} onSaved={(updated) => mutateProject(updated, { revalidate: false })} />
+          </div>
+        )}
 
         {awaitingDecision ? (
           <div className="mt-6 space-y-4 border-t border-border pt-6">

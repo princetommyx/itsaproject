@@ -74,6 +74,7 @@ const NAV_LINKS = {
     { to: '/admin', label: 'Dashboard', icon: DashboardIcon },
     { section: 'Projects' },
     { to: '/admin/projects', label: 'All Projects', icon: FolderIcon },
+    { to: '/admin/schedules', label: 'Defense Schedules', icon: FileSpreadsheetIcon },
     { to: '/admin/assignments', label: 'Assign Assessors', icon: ClipboardIcon },
     { section: 'People' },
     { to: '/admin/students', label: 'Students', icon: UsersIcon },
