@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Button, Card } from '../../../components/ui'
+import { Button } from '../../../components/ui'
+import { SectionCard } from '../../../components/SectionLayout'
 import { useSaveSettings } from './useSaveSettings'
 
 const TOGGLES = [
@@ -17,13 +18,16 @@ export default function NotificationSettings({ settings, onSaved }) {
   const { save, saving } = useSaveSettings(onSaved)
 
   return (
-    <Card>
-      <h2 className="text-lg font-bold text-foreground">Notifications</h2>
-      <p className="mt-1 text-sm font-medium text-muted-foreground">
-        Which events raise an alert, and whether they also go out by email.
-      </p>
-
-      <ul className="mt-5 divide-y divide-border">
+    <SectionCard
+      title="Notifications"
+      description="Which events raise an alert, and whether they also go out by email."
+      action={
+        <Button onClick={() => save(form)} loading={saving} disabled={saving}>
+          Save Changes
+        </Button>
+      }
+    >
+      <ul className="divide-y divide-border">
         {TOGGLES.map((toggle) => (
           <li key={toggle.key} className="flex items-start justify-between gap-4 py-3.5">
             <div className="min-w-0">
@@ -49,12 +53,6 @@ export default function NotificationSettings({ settings, onSaved }) {
           </li>
         ))}
       </ul>
-
-      <div className="mt-5">
-        <Button onClick={() => save(form)} loading={saving} disabled={saving}>
-          Save Changes
-        </Button>
-      </div>
-    </Card>
+    </SectionCard>
   )
 }

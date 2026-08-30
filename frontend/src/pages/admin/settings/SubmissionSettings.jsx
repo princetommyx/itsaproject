@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Button, Card, Input } from '../../../components/ui'
+import { Button, Input } from '../../../components/ui'
+import { FieldGrid, SectionCard } from '../../../components/SectionLayout'
 import { toDateTimeLocal } from '../../../lib/formatDate'
 import { useSaveSettings } from './useSaveSettings'
 
@@ -18,13 +19,28 @@ export default function SubmissionSettings({ settings, onSaved }) {
   }
 
   return (
-    <Card>
-      <h2 className="text-lg font-bold text-foreground">Submission Rules</h2>
-      <p className="mt-1 text-sm font-medium text-muted-foreground">
-        These are enforced on the server, so a change here applies to every upload immediately.
-      </p>
-
-      <div className="mt-5">
+    <SectionCard
+      title="Submission Rules"
+      description="Enforced on the server, so a change here applies to every upload immediately."
+      action={
+        <Button
+          disabled={saving || types.length === 0}
+          loading={saving}
+          onClick={() =>
+            save({
+              allowed_file_types: types,
+              max_file_size_mb: Number(maxSize) || 20,
+              max_revisions: Number(maxRevisions) || 0,
+              proposal_deadline: proposalDeadline || null,
+              final_deadline: finalDeadline || null,
+            })
+          }
+        >
+          Save Changes
+        </Button>
+      }
+    >
+      <div>
         <span className="mb-1.5 block text-sm font-semibold text-foreground">Allowed File Types</span>
         <div className="flex flex-wrap gap-2">
           {FILE_TYPES.map((type) => (
@@ -49,7 +65,7 @@ export default function SubmissionSettings({ settings, onSaved }) {
         )}
       </div>
 
-      <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+      <FieldGrid className="mt-5">
         <Input
           label="Maximum File Size (MB)"
           type="number"
@@ -78,29 +94,11 @@ export default function SubmissionSettings({ settings, onSaved }) {
           value={finalDeadline}
           onChange={(e) => setFinalDeadline(e.target.value)}
         />
-      </div>
+      </FieldGrid>
 
-      <p className="mt-2 text-xs font-medium text-muted-foreground">
+      <p className="mt-3 text-xs font-medium text-muted-foreground">
         A revision limit of 0 means unlimited. A deadline left empty never closes submissions.
       </p>
-
-      <div className="mt-5">
-        <Button
-          disabled={saving || types.length === 0}
-          loading={saving}
-          onClick={() =>
-            save({
-              allowed_file_types: types,
-              max_file_size_mb: Number(maxSize) || 20,
-              max_revisions: Number(maxRevisions) || 0,
-              proposal_deadline: proposalDeadline || null,
-              final_deadline: finalDeadline || null,
-            })
-          }
-        >
-          Save Changes
-        </Button>
-      </div>
-    </Card>
+    </SectionCard>
   )
 }

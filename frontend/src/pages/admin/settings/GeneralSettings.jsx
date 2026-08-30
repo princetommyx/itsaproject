@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Button, Card, Input } from '../../../components/ui'
+import { Button, Input } from '../../../components/ui'
+import { FieldGrid, SectionCard } from '../../../components/SectionLayout'
 import { useSaveSettings } from './useSaveSettings'
 
 export default function GeneralSettings({ settings, onSaved }) {
@@ -15,13 +16,16 @@ export default function GeneralSettings({ settings, onSaved }) {
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
   return (
-    <Card>
-      <h2 className="text-lg font-bold text-foreground">General</h2>
-      <p className="mt-1 text-sm font-medium text-muted-foreground">
-        How the institution and the current academic period are named across the system.
-      </p>
-
-      <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2">
+    <SectionCard
+      title="General"
+      description="How the institution and the current academic period are named across the system."
+      action={
+        <Button onClick={() => save(form)} loading={saving} disabled={saving}>
+          Save Changes
+        </Button>
+      }
+    >
+      <FieldGrid>
         <Input label="School Name" value={form.school_name} onChange={set('school_name')} />
         <Input
           label="Short Name"
@@ -42,13 +46,7 @@ export default function GeneralSettings({ settings, onSaved }) {
           value={form.current_session}
           onChange={set('current_session')}
         />
-      </div>
-
-      <div className="mt-5">
-        <Button onClick={() => save(form)} loading={saving} disabled={saving}>
-          Save Changes
-        </Button>
-      </div>
-    </Card>
+      </FieldGrid>
+    </SectionCard>
   )
 }
