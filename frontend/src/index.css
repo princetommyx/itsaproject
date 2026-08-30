@@ -65,6 +65,13 @@
   --brand-ink: var(--brand);
   /* UPSA gold (#c8962f). */
   --accent-gold: oklch(0.71 0.13 78);
+
+  /* Elevation for the app bar. Two layers, because one is what makes a shadow
+     look painted on: a tight contact shadow that sits the card on the page,
+     and a wide soft one that gives it height. --shadow-bar-raised is the same
+     light from further away, used once content is scrolling underneath. */
+  --shadow-bar: 0 1px 2px rgb(15 23 42 / 0.06), 0 6px 16px -8px rgb(15 23 42 / 0.14);
+  --shadow-bar-raised: 0 2px 4px rgb(15 23 42 / 0.08), 0 14px 32px -10px rgb(15 23 42 / 0.22);
 }
 
 .dark {
@@ -102,6 +109,12 @@
      gradient lightens rather than darkens. */
   --brand-2: oklch(0.4 0.09 262);
   --brand-ink: color-mix(in oklab, var(--brand) 40%, white 60%);
+
+  /* A black shadow on a near-black page is invisible, so on dark the depth
+     comes from a darker-than-background spread rather than from opacity, and
+     the card keeps its ring to draw the edge the shadow cannot. */
+  --shadow-bar: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px -10px rgb(0 0 0 / 0.7);
+  --shadow-bar-raised: 0 2px 6px rgb(0 0 0 / 0.6), 0 16px 36px -12px rgb(0 0 0 / 0.85);
 }
 
 @theme inline {

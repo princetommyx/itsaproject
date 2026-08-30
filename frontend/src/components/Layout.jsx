@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import useSWR, { preload } from 'swr'
 import client from '../api/client'
@@ -202,6 +202,21 @@ export default function Layout({ children }) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const closeButtonRef = useRef(null)
   const toggleRef = useRef(null)
+
+  // The app bar lifts once the page is scrolled. The scroller is the content
+  // column, not the document, so the listener lives on that element. State is
+  // written only when the threshold is actually crossed — a setState on every
+  // scroll event would re-render the whole shell on every wheel tick.
+  const scrollRef = useRef(null)
+  const [scrolled, setScrolled] = useState(false)
+  const scrolledRef = useRef(false)
+  const handleScroll = useCallback((e) => {
+    const next = e.currentTarget.scrollTop > 4
+    if (next !== scrolledRef.current) {
+      scrolledRef.current = next
+      setScrolled(next)
+    }
+  }, [])
 
   // Above md the sidebar is a permanent part of the layout, not a drawer. The
   // difference matters for more than styling: the modal behaviours below
@@ -450,6 +465,8 @@ export default function Layout({ children }) {
       {/* The content column: a muted panel inside the shell, so the white
           cards on it read as raised rather than flush. */}
       <div
+        ref={scrollRef}
+        onScroll={handleScroll}
         className={cn(
           'flex min-w-0 flex-1 flex-col overflow-y-auto bg-muted',
           // Locking document.body no longer holds the page still, because the
@@ -469,7 +486,13 @@ export default function Layout({ children }) {
         >
           {/* Same max-width and gutters as <main>, so the card's edges line up
               with the cards on the page rather than floating free of them. */}
-          <div className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 rounded-2xl bg-card px-3 py-2.5 ring-1 shadow-sm ring-border md:gap-3 md:px-5">
+          {/* The shadow deepens once the page is scrolled: at rest the bar sits
+              on the page, and it lifts only when there is something passing
+              underneath for it to lift above. */}
+          <div
+            className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 rounded-2xl bg-card px-3 py-2.5 ring-1 ring-border transition-shadow duration-300 md:gap-3 md:px-5"
+            style={{ boxShadow: `var(${scrolled ? '--shadow-bar-raised' : '--shadow-bar'})` }}
+          >
             <button
               ref={toggleRef}
               onClick={() => setDrawerOpen(true)}
