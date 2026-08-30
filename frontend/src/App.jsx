@@ -28,6 +28,7 @@ import AssessorNotifications from './pages/assessor/AssessorNotifications'
 import Overview from './pages/admin/sections/Overview'
 import AllProjects from './pages/admin/sections/AllProjects'
 import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
+import DefenseSchedules from './pages/admin/sections/DefenseSchedules'
 import Assignments from './pages/admin/sections/Assignments'
 import ImportStudents from './pages/admin/sections/ImportStudents'
 import Students from './pages/admin/sections/Students'
@@ -95,6 +96,7 @@ export default function App() {
                   <Route path="projects" element={<AllProjects />} />
                   <Route path="projects/:id" element={<AdminProjectReview />} />
                   <Route path="projects/:id/compare" element={<CompareVersions apiPrefix="/admin" backTo="/admin/projects" />} />
+                  <Route path="schedules" element={<DefenseSchedules />} />
                   <Route path="assignments" element={<Assignments />} />
                   <Route path="students" element={<Students />} />
                   <Route path="students/:id" element={<AdminStudentDetail />} />

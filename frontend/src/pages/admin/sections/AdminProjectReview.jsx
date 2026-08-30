@@ -24,10 +24,12 @@ export default function AdminProjectReview() {
   const [assigning, setAssigning] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
-  // Which decision is in flight, not just whether one is: a single boolean
-  // put the spinner on both buttons, so pressing Approve looked like it had
-  // also sent the project back for refinement.
-  const [deciding, setDeciding] = useState(null)
+  // Holds WHICH decision is in flight, not merely that one is: a single
+  // boolean put the spinner on both buttons, so pressing Approve looked
+  // like it had also sent the project back for refinement. Both stay
+  // disabled together — a second decision mid-flight is exactly what
+  // should be prevented.
+  const [submitting, setSubmitting] = useState(null)
 
   async function assign() {
     setError('')
@@ -58,7 +60,7 @@ export default function AdminProjectReview() {
       setError('Feedback is required when sending a project back for refinement.')
       return
     }
-    setDeciding(decision)
+    setSubmitting(decision)
     try {
       await client.post(`/admin/projects/${id}/decide`, { decision, feedback })
       toast.success('Project status updated successfully', {
@@ -73,7 +75,7 @@ export default function AdminProjectReview() {
       setError(message)
       toast.error('Unable to update project', { description: message })
     } finally {
-      setDeciding(null)
+      setSubmitting(null)
     }
   }
 
@@ -177,9 +179,11 @@ export default function AdminProjectReview() {
           <SubmissionHistory versions={project.versions} compareBase={`/admin/projects/${project.id}/compare`} />
         </div>
 
-        <div className="mt-5 border-t border-border pt-5">
-          <DefenseScheduleCard project={project} onSaved={(updated) => mutateProject(updated, { revalidate: false })} />
-        </div>
+        {project.status === 'approved' && (
+          <div className="mt-5 border-t border-slate-100 pt-5">
+            <DefenseScheduleCard project={project} onSaved={(updated) => mutateProject(updated, { revalidate: false })} />
+          </div>
+        )}
 
         {awaitingDecision ? (
           <div className="mt-6 space-y-4 border-t border-border pt-6">
@@ -222,10 +226,10 @@ export default function AdminProjectReview() {
               onChange={(e) => setFeedback(e.target.value)}
             />
             <div className="flex flex-wrap gap-2">
-              <Button variant="success" onClick={() => decide('approved')} disabled={Boolean(deciding)} loading={deciding === 'approved'}>
+              <Button variant="success" onClick={() => decide('approved')} disabled={!!submitting} loading={submitting === 'approved'}>
                 Approve
               </Button>
-              <Button variant="danger" onClick={() => decide('refine')} disabled={Boolean(deciding)} loading={deciding === 'refine'}>
+              <Button variant="danger" onClick={() => decide('refine')} disabled={!!submitting} loading={submitting === 'refine'}>
                 Send Back for Refinement
               </Button>
             </div>
