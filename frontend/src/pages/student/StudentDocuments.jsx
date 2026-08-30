@@ -10,6 +10,7 @@ const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx']
 const MAX_FILE_BYTES = 20 * 1024 * 1024
 import { Alert, Button, Card, EmptyState, ErrorState, PageHeading } from '../../components/ui'
 import { SkeletonCard } from '../../components/Skeleton'
+import DocumentPreview from '../../components/DocumentPreview'
 import { FileSpreadsheetIcon, UploadCloudIcon } from '../../components/icons'
 
 export default function StudentDocuments() {
@@ -22,6 +23,9 @@ export default function StudentDocuments() {
   const [error, setError] = useState('')
   const [expandedType, setExpandedType] = useState(null)
   const [submittingId, setSubmittingId] = useState(null)
+  // Which document the preview overlay is showing, with the label of the slot
+  // it belongs to so the dialog can name it.
+  const [preview, setPreview] = useState(null)
   const inputRef = useRef(null)
 
   const project = projectData?.project
@@ -277,6 +281,15 @@ export default function StudentDocuments() {
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
                     {current && (
+                      <Button
+                        variant="secondary"
+                        className="text-xs"
+                        onClick={() => setPreview({ document: current, label: t.label })}
+                      >
+                        Preview
+                      </Button>
+                    )}
+                    {current && (
                       <Button variant="secondary" className="text-xs" onClick={() => handleDownload(current)}>
                         Download
                       </Button>
@@ -321,9 +334,17 @@ export default function StudentDocuments() {
                         <span className="truncate">
                           {doc.original_filename} · {new Date(doc.created_at).toLocaleDateString()}
                         </span>
-                        <button onClick={() => handleDownload(doc)} className="shrink-0 text-brand-ink hover:underline">
-                          Download
-                        </button>
+                        <span className="flex shrink-0 items-center gap-3">
+                          <button
+                            onClick={() => setPreview({ document: doc, label: `${t.label} (earlier upload)` })}
+                            className="text-brand-ink hover:underline"
+                          >
+                            Preview
+                          </button>
+                          <button onClick={() => handleDownload(doc)} className="text-brand-ink hover:underline">
+                            Download
+                          </button>
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -333,6 +354,15 @@ export default function StudentDocuments() {
           })}
         </ul>
       </Card>
+
+      {preview && (
+        <DocumentPreview
+          document={preview.document}
+          label={preview.label}
+          onClose={() => setPreview(null)}
+          onDownload={handleDownload}
+        />
+      )}
     </div>
   )
 }

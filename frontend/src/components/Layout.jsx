@@ -467,6 +467,9 @@ export default function Layout({ children }) {
       <div
         ref={scrollRef}
         onScroll={handleScroll}
+        // Named so an overlay can find the real scroller: it is this column,
+        // not the document, so locking <body> would do nothing.
+        data-app-scroll=""
         className={cn(
           'flex min-w-0 flex-1 flex-col overflow-y-auto bg-muted',
           // Locking document.body no longer holds the page still, because the

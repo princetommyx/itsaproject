@@ -25,6 +25,8 @@ import { memberName } from '../../lib/memberName'
 import { formatDateTime } from '../../lib/formatDate'
 import SubmissionHistory from '../../components/SubmissionHistory'
 import RequiredChangesList from '../../components/RequiredChangesList'
+import DocumentPreview from '../../components/DocumentPreview'
+import { downloadDocument } from '../../lib/downloadDocument'
 
 export default function StudentDashboard() {
   const { user } = useAuth()
@@ -135,6 +137,7 @@ function ProjectPanel({ project, user, onChange, onError }) {
   const isLeader = members.some((m) => m.student_id === user.id && m.is_leader)
   const editable = ['draft', 'refine'].includes(project.status)
   const isResubmission = project.status === 'refine'
+  const [preview, setPreview] = useState(null)
 
   return (
     <div className="space-y-6">
@@ -245,9 +248,12 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </div>
           <ul className="space-y-2">
             {CORE_SUBMISSION_TYPES.map((key) => {
-              const uploaded = (project.documents ?? []).some((d) => d.type === key)
+              // The most recent upload of this type, if any — the one that
+              // would go for review, and so the one worth looking at.
+              const current = (project.documents ?? []).find((d) => d.type === key)
+              const uploaded = Boolean(current)
               return (
-                <li key={key} className="flex items-center gap-2 text-sm">
+                <li key={key} className="flex flex-wrap items-center gap-2 text-sm">
                   <span
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white ${
                       uploaded ? 'bg-emerald-500' : 'bg-accent text-muted-foreground'
@@ -259,6 +265,18 @@ function ProjectPanel({ project, user, onChange, onError }) {
                     {DOCUMENT_TYPE_LABELS[key]}
                   </span>
                   {!uploaded && <span className="text-xs text-muted-foreground">— Pending</span>}
+                  {/* Checking the file is possible from here, rather than only
+                      after a trip to My Documents: this panel is where a
+                      student lands, and next to "Submit" the useful question
+                      is "is this the right file?" */}
+                  {current && (
+                    <button
+                      onClick={() => setPreview({ document: current, label: DOCUMENT_TYPE_LABELS[key] })}
+                      className="ml-auto text-xs font-semibold text-brand-ink hover:underline"
+                    >
+                      Preview
+                    </button>
+                  )}
                 </li>
               )
             })}
@@ -310,6 +328,15 @@ function ProjectPanel({ project, user, onChange, onError }) {
           <EditAndSubmit project={project} onChange={onChange} onError={onError} toast={toast} />
         )}
       </Card>
+
+      {preview && (
+        <DocumentPreview
+          document={preview.document}
+          label={preview.label}
+          onClose={() => setPreview(null)}
+          onDownload={downloadDocument}
+        />
+      )}
     </div>
   )
 }
