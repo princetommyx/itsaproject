@@ -4,6 +4,8 @@ import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Button, Card, ErrorState, Input, Textarea } from '../../../components/ui'
 import { SkeletonCard } from '../../../components/Skeleton'
+import PermissionsCatalogue from './PermissionsCatalogue'
+import { cn } from '../../../lib/cn'
 
 const BASE_ROLES = [
   { key: 'admin', label: 'Administration', hint: 'Lands in the admin area.' },
@@ -23,10 +25,50 @@ const EMPTY = { name: '', description: '', base_role: 'admin', permissions: [] }
  * guarded, and the server sends the catalogue with the roles so this page
  * can't drift out of step with what actually exists.
  */
+const VIEWS = [
+  { key: 'roles', label: 'Roles' },
+  { key: 'permissions', label: 'Permissions' },
+]
+
 export default function RolesSettings() {
   const toast = useToast()
   const { data, error: swrError, mutate } = useSWR('/admin/roles')
   const [editing, setEditing] = useState(null)
+  const [view, setView] = useState('roles')
+
+  // Two different things live under this heading: the roles an institution
+  // defines, and the fixed catalogue of capabilities those roles draw on.
+  // Stacking both in one column made the page read as one very long list.
+  const switcher = (
+    <div className="flex gap-1 rounded-lg bg-muted p-1">
+      {VIEWS.map((v) => (
+        <button
+          key={v.key}
+          onClick={() => {
+            setView(v.key)
+            setEditing(null)
+          }}
+          className={cn(
+            'rounded-md px-3.5 py-1.5 text-sm font-semibold transition',
+            view === v.key
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
+        >
+          {v.label}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (view === 'permissions') {
+    return (
+      <div className="space-y-5">
+        {switcher}
+        <PermissionsCatalogue />
+      </div>
+    )
+  }
 
   if (swrError) {
     return (
@@ -73,7 +115,9 @@ export default function RolesSettings() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {switcher}
+
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

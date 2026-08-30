@@ -104,6 +104,9 @@ Route::middleware('auth:sanctum')->group(function () {
                 Route::put('/roles/{role}', [RoleController::class, 'update']);
                 Route::delete('/roles/{role}', [RoleController::class, 'destroy']);
                 Route::put('/users/{user}/role', [RoleController::class, 'assign']);
+                Route::get('/permissions', [RoleController::class, 'permissions']);
+                Route::put('/permissions/{permission}', [RoleController::class, 'updatePermission']);
+                Route::delete('/permissions/{permission}', [RoleController::class, 'resetPermission']);
             });
 
             Route::get('/audit-logs', [AdminController::class, 'auditLogs'])

@@ -35,6 +35,8 @@ class AuditLog extends Model
         'role.created' => 'Created a role',
         'role.updated' => 'Updated a role',
         'role.deleted' => 'Deleted a role',
+        'permission.updated' => 'Reworded a permission',
+        'permission.reset' => 'Reset a permission\'s wording',
         'user.role_assigned' => 'Changed a user\'s role',
         'students.imported' => 'Imported a student roster',
         'staff.created' => 'Created a staff account',

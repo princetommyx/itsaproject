@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\PermissionLabel;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\Permissions;
@@ -23,8 +24,9 @@ class RoleController extends Controller
             'roles' => Role::withCount('users')->orderByDesc('is_system')->orderBy('name')->get(),
             // The catalogue travels with the list so the builder renders the
             // permissions that exist right now, rather than a copy in the
-            // client that goes stale the moment one is added.
-            'catalogue' => Permissions::CATALOGUE,
+            // client that goes stale the moment one is added — and with any
+            // wording the institution has changed already applied.
+            'catalogue' => Permissions::catalogueForBuilder(),
         ]);
     }
 
@@ -120,6 +122,72 @@ class RoleController extends Controller
         ]);
 
         return response()->json($user->fresh()->load('assignedRole'));
+    }
+
+    /**
+     * The permission catalogue, with how many roles hold each one.
+     *
+     * The count is what makes this more than a glossary: it answers "is
+     * anyone actually granted this" before an administrator rewords it, and
+     * shows at a glance which capabilities nobody has been given.
+     */
+    public function permissions()
+    {
+        $roles = Role::get(['id', 'name', 'permissions']);
+
+        return response()->json([
+            'permissions' => collect(Permissions::describe())->map(function ($permission) use ($roles) {
+                $holders = $roles->filter(fn ($role) => in_array($permission['key'], $role->permissions ?? [], true));
+
+                return [
+                    ...$permission,
+                    'role_count' => $holders->count(),
+                    'roles' => $holders->pluck('name')->values(),
+                ];
+            })->values(),
+            'groups' => array_keys(Permissions::CATALOGUE),
+        ]);
+    }
+
+    /**
+     * Reword one permission.
+     *
+     * The key is not editable and is not accepted here: it is what every
+     * `can.do:` route checks, so changing it would revoke the permission
+     * everywhere it is used without anything appearing to break.
+     */
+    public function updatePermission(Request $request, string $permission)
+    {
+        abort_unless(Permissions::exists($permission), 404);
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'description' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        PermissionLabel::updateOrCreate(['permission' => $permission], $validated);
+
+        activity_log('permission.updated', null, [
+            'permission' => $permission,
+            'name' => $validated['name'],
+        ]);
+
+        return response()->json(
+            collect(Permissions::describe())->firstWhere('key', $permission)
+        );
+    }
+
+    /** Put a permission's wording back to what the code ships. */
+    public function resetPermission(string $permission)
+    {
+        abort_unless(Permissions::exists($permission), 404);
+
+        PermissionLabel::where('permission', $permission)->delete();
+        activity_log('permission.reset', null, ['permission' => $permission]);
+
+        return response()->json(
+            collect(Permissions::describe())->firstWhere('key', $permission)
+        );
     }
 
     private function validateRole(Request $request, ?Role $role = null): array

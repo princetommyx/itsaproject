@@ -292,3 +292,93 @@ it('exposes every catalogued permission through the builder', function () {
     $flat = collect($catalogue)->flatMap(fn ($group) => array_keys($group))->all();
     expect($flat)->toEqualCanonicalizing(Permissions::all());
 });
+
+// ------------------------------------------------ permission catalogue
+
+it('lists every permission with how many roles hold it', function () {
+    $admin = User::factory()->admin()->create();
+
+    $response = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/permissions');
+
+    $response->assertOk();
+    expect($response->json('permissions'))->toHaveCount(count(Permissions::all()));
+
+    $viewAll = collect($response->json('permissions'))->firstWhere('key', 'projects.view_all');
+    expect($viewAll['name'])->toBe('View every project');
+    expect($viewAll['description'])->not->toBeNull();
+    expect($viewAll['customised'])->toBeFalse();
+    // Administrator and Project Coordinator both hold it in the seeded set.
+    expect($viewAll['role_count'])->toBeGreaterThan(0);
+    expect($viewAll['roles'])->toContain('Administrator');
+});
+
+it('lets an admin reword a permission without touching its key', function () {
+    $admin = User::factory()->admin()->create();
+
+    $response = $this->actingAs($admin, 'sanctum')
+        ->putJson('/api/admin/permissions/projects.view_all', [
+            'name' => 'View all supervisions',
+            'description' => 'See every supervision in the department.',
+        ]);
+
+    $response->assertOk();
+    expect($response->json('key'))->toBe('projects.view_all');
+    expect($response->json('name'))->toBe('View all supervisions');
+    expect($response->json('default_name'))->toBe('View every project');
+    expect($response->json('customised'))->toBeTrue();
+
+    // The reworded label reaches the role builder too.
+    $builder = $this->actingAs($admin, 'sanctum')->getJson('/api/admin/roles')->json('catalogue');
+    expect($builder['Projects']['projects.view_all'])->toBe('View all supervisions');
+});
+
+// The key is what every can.do: route checks. If rewording could change it,
+// a permission would be silently revoked everywhere it is used.
+it('never lets the key be changed through the rewording endpoint', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin, 'sanctum')
+        ->putJson('/api/admin/permissions/projects.view_all', [
+            'key' => 'projects.something_else',
+            'name' => 'Renamed',
+        ])
+        ->assertOk();
+
+    expect(Permissions::exists('projects.view_all'))->toBeTrue();
+    expect(Permissions::exists('projects.something_else'))->toBeFalse();
+
+    // And the role that holds it still does.
+    $role = Role::where('slug', 'administrator')->first();
+    expect($role->hasPermission('projects.view_all'))->toBeTrue();
+});
+
+it('rejects a permission that does not exist', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin, 'sanctum')
+        ->putJson('/api/admin/permissions/made.up', ['name' => 'Nope'])
+        ->assertNotFound();
+});
+
+it('resets a reworded permission back to the built-in wording', function () {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin, 'sanctum')
+        ->putJson('/api/admin/permissions/roles.manage', ['name' => 'Custom wording'])
+        ->assertOk();
+
+    $response = $this->actingAs($admin, 'sanctum')
+        ->deleteJson('/api/admin/permissions/roles.manage');
+
+    $response->assertOk();
+    expect($response->json('name'))->toBe('Create and edit roles');
+    expect($response->json('customised'))->toBeFalse();
+});
+
+it('keeps the permission catalogue behind roles.manage', function () {
+    $assessor = User::factory()->assessor()->create();
+
+    $this->actingAs($assessor, 'sanctum')
+        ->getJson('/api/admin/permissions')
+        ->assertForbidden();
+});
