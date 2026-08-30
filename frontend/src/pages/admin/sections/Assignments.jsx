@@ -11,7 +11,7 @@ function AssignmentsSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="animate-pulse rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm shadow-slate-200/60">
+        <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-6 shadow-sm shadow-slate-200/60">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0 space-y-2">
               <Skeleton className="h-4 w-40" />
@@ -104,14 +104,14 @@ export default function Assignments() {
           <Card key={project.id}>
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="min-w-0">
-                <h3 className="font-semibold text-slate-800">{project.title}</h3>
-                <p className="text-sm text-slate-500 break-words">
+                <h3 className="font-semibold text-foreground">{project.title}</h3>
+                <p className="text-sm text-muted-foreground break-words">
                   {project.members.map(memberName).join(', ')}
                 </p>
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
                 <select
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-[15px] font-medium text-slate-900 transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-auto"
+                  className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-auto"
                   value={selection[project.id] || ''}
                   onChange={(e) => setSelection({ ...selection, [project.id]: e.target.value })}
                 >

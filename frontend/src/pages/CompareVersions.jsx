@@ -30,7 +30,7 @@ export default function CompareVersions({ apiPrefix, backTo }) {
   const isLoading = !data && !swrError
 
   const back = (
-    <Link to={`${backTo}/${id}`} className="text-sm text-upsa-blue hover:underline">
+    <Link to={`${backTo}/${id}`} className="text-sm text-brand hover:underline">
       &larr; Back to project
     </Link>
   )
@@ -88,14 +88,14 @@ export default function CompareVersions({ apiPrefix, backTo }) {
 
           {changes?.length > 0 && (
             <Card>
-              <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+              <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
                 Change Detected
               </p>
               <ul className="mt-2 space-y-1.5">
                 {changes.map((change, i) => (
-                  <li key={i} className="flex items-start gap-2 text-[15px] font-medium text-slate-800">
+                  <li key={i} className="flex items-start gap-2 text-[15px] font-medium text-foreground">
                     <span
-                      className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-upsa-blue"
+                      className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
                       aria-hidden="true"
                     />
                     {change}
@@ -120,9 +120,9 @@ export default function CompareVersions({ apiPrefix, backTo }) {
         />
       ) : (
         <Card>
-          <p className="text-sm font-medium text-slate-500">
+          <p className="text-sm font-medium text-muted-foreground">
             {current.label} has already been reviewed — decision:{' '}
-            <span className="font-semibold text-slate-800">
+            <span className="font-semibold text-foreground">
               {current.status === 'approved' ? 'Approved' : 'Revision Required'}
             </span>
             .
@@ -137,18 +137,18 @@ function VersionPanel({ version, tone }) {
   const isCurrent = tone === 'current'
 
   return (
-    <Card className={isCurrent ? 'border-upsa-blue/30' : ''}>
+    <Card className={isCurrent ? 'border-brand/30' : ''}>
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5">
-          <span className="text-base font-extrabold text-slate-900">{version.label}</span>
-          <span className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+          <span className="text-base font-extrabold text-foreground">{version.label}</span>
+          <span className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
             {isCurrent ? 'Current' : 'Previous'}
           </span>
         </div>
         <Badge status={version.status} />
       </div>
 
-      <p className="mt-1 text-xs font-medium text-slate-500">
+      <p className="mt-1 text-xs font-medium text-muted-foreground">
         {version.submitted_at
           ? `Submitted ${formatDateTime(version.submitted_at, { empty: '' })}`
           : 'Not submitted yet'}
@@ -157,19 +157,19 @@ function VersionPanel({ version, tone }) {
 
       <div className="mt-5 space-y-5">
         <div>
-          <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Title</p>
-          <p className="mt-1 text-[15px] font-semibold break-words text-slate-900">{version.title}</p>
+          <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">Title</p>
+          <p className="mt-1 text-[15px] font-semibold break-words text-foreground">{version.title}</p>
         </div>
 
         <div>
-          <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Description</p>
-          <p className="mt-1 text-[15px] leading-[1.75] whitespace-pre-wrap text-slate-800">
+          <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">Description</p>
+          <p className="mt-1 text-[15px] leading-[1.75] whitespace-pre-wrap text-foreground">
             {version.description}
           </p>
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-bold tracking-wide text-slate-500 uppercase">Documents</p>
+          <p className="mb-2 text-xs font-bold tracking-wide text-muted-foreground uppercase">Documents</p>
           <ProjectDocumentList documents={version.documents ?? []} />
         </div>
 
@@ -237,8 +237,8 @@ function DecisionCard({ projectId, apiPrefix, onDecided, toast }) {
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">Your Decision</h2>
-      <p className="mt-1 text-sm font-medium text-slate-500">
+      <h2 className="text-lg font-bold text-foreground">Your Decision</h2>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
         Requesting a revision keeps this version on record permanently and lets the group submit a
         new one beside it.
       </p>
@@ -259,10 +259,10 @@ function DecisionCard({ projectId, apiPrefix, onDecided, toast }) {
         />
 
         <div>
-          <span className="mb-1.5 block text-sm font-semibold text-slate-800">
+          <span className="mb-1.5 block text-sm font-semibold text-foreground">
             Required Changes (optional)
           </span>
-          <p className="mb-2 text-xs font-medium text-slate-500">
+          <p className="mb-2 text-xs font-medium text-muted-foreground">
             A short checklist the group can work through, alongside your written feedback.
           </p>
           <div className="space-y-2">
@@ -272,14 +272,14 @@ function DecisionCard({ projectId, apiPrefix, onDecided, toast }) {
                 value={change}
                 onChange={(e) => setChangeAt(i, e.target.value)}
                 placeholder={i === 0 ? 'e.g. Narrow project scope' : 'Add another change'}
-                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-[15px] font-medium text-slate-900 transition duration-150 placeholder:font-normal placeholder:text-slate-400 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 placeholder:font-normal placeholder:text-muted-foreground hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
               />
             ))}
           </div>
           <button
             type="button"
             onClick={() => setChanges((prev) => [...prev, ''])}
-            className="mt-2 text-xs font-semibold text-upsa-blue hover:underline"
+            className="mt-2 text-xs font-semibold text-brand hover:underline"
           >
             + Add another
           </button>

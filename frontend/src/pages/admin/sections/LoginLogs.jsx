@@ -13,7 +13,7 @@ export default function LoginLogs() {
     <div className="space-y-6">
       <PageHeading description="A record of every sign-in across the system.">Login Logs</PageHeading>
       <Card>
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Login Audit Trail</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">Login Audit Trail</h2>
         {isLoading ? (
           <SkeletonTable rows={6} cols={5} />
         ) : swrError ? (
@@ -25,17 +25,17 @@ export default function LoginLogs() {
             {/* Below sm, a 5-column table has no room to show every column, and a
                 horizontal scroll hides Device/Time with no hint they exist — so
                 mobile gets a stacked card per entry instead of a squeezed table. */}
-            <ul className="divide-y divide-slate-100 sm:hidden">
+            <ul className="divide-y divide-border sm:hidden">
               {logs.map((log) => (
                 <li key={log.id} className="flex items-start gap-3 py-3.5 first:pt-0 last:pb-0">
                   <Avatar name={log.user?.name} className="mt-0.5 h-9 w-9 shrink-0 text-xs" />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-baseline justify-between gap-x-2">
-                      <p className="font-medium text-slate-800">{log.user?.name}</p>
-                      <p className="text-xs text-slate-400">{new Date(log.login_time).toLocaleString()}</p>
+                      <p className="font-medium text-foreground">{log.user?.name}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(log.login_time).toLocaleString()}</p>
                     </div>
-                    <p className="text-xs text-slate-500 capitalize">{log.user?.role} &middot; {log.ip_address}</p>
-                    <p className="mt-0.5 truncate text-xs text-slate-400">{log.user_agent}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{log.user?.role} &middot; {log.ip_address}</p>
+                    <p className="mt-0.5 truncate text-xs text-muted-foreground">{log.user_agent}</p>
                   </div>
                 </li>
               ))}
@@ -44,7 +44,7 @@ export default function LoginLogs() {
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                  <tr className="border-b border-border text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                     <th className="py-2 pr-4">User</th>
                     <th className="py-2 pr-4">Role</th>
                     <th className="py-2 pr-4">IP Address</th>
@@ -52,9 +52,9 @@ export default function LoginLogs() {
                     <th className="py-2 pr-4">Time</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-border">
                   {logs.map((log) => (
-                    <tr key={log.id} className="transition hover:bg-slate-50">
+                    <tr key={log.id} className="transition hover:bg-muted">
                       <td className="py-2.5 pr-4">
                         <div className="flex items-center gap-2.5">
                           <Avatar name={log.user?.name} className="h-7 w-7 text-[10px]" />

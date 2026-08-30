@@ -16,8 +16,8 @@ export default function GeneralSettings({ settings, onSaved }) {
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">General</h2>
-      <p className="mt-1 text-sm font-medium text-slate-500">
+      <h2 className="text-lg font-bold text-foreground">General</h2>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
         How the institution and the current academic period are named across the system.
       </p>
 

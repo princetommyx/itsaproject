@@ -186,16 +186,16 @@ export default function StudentDocuments() {
 
       {editable ? (
         <Card>
-          <h2 className="mb-4 text-lg font-bold text-slate-900">Upload a Document</h2>
+          <h2 className="mb-4 text-lg font-bold text-foreground">Upload a Document</h2>
           {error && <Alert>{error}</Alert>}
 
           <label className="mb-4 block text-sm">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-800">Document Type</span>
+            <span className="mb-1.5 block text-sm font-semibold text-foreground">Document Type</span>
             <select
               value={type}
               onChange={(e) => setType(e.target.value)}
               disabled={submitting}
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-[15px] font-medium text-slate-900 transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-72"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-72"
             >
               {DOCUMENT_TYPES.map((t) => (
                 <option key={t.key} value={t.key}>
@@ -214,17 +214,17 @@ export default function StudentDocuments() {
             onDrop={handleDrop}
             onClick={() => !submitting && inputRef.current?.click()}
             className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
-              dragging ? 'border-upsa-blue bg-blue-50' : 'border-slate-300 hover:border-slate-400'
+              dragging ? 'border-brand bg-blue-50' : 'border-border hover:border-ring/60'
             } ${submitting ? 'pointer-events-none opacity-60' : ''}`}
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-upsa-blue">
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-brand">
               <UploadCloudIcon />
             </span>
             <div>
-              <p className="text-sm font-medium text-slate-700">
+              <p className="text-sm font-medium text-foreground">
                 {submitting ? `Uploading... ${progress}%` : 'Drag your file here'}
               </p>
-              <p className="text-xs text-slate-400">or, click to browse (PDF or Word — 20MB max)</p>
+              <p className="text-xs text-muted-foreground">or, click to browse (PDF or Word — 20MB max)</p>
             </div>
             <input
               ref={inputRef}
@@ -243,8 +243,8 @@ export default function StudentDocuments() {
       )}
 
       <Card>
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Your Documents</h2>
-        <ul className="divide-y divide-slate-100">
+        <h2 className="mb-4 text-lg font-bold text-foreground">Your Documents</h2>
+        <ul className="divide-y divide-border">
           {DOCUMENT_TYPES.map((t) => {
             const versions = byType[t.key]
             const current = versions[0]
@@ -254,10 +254,10 @@ export default function StudentDocuments() {
               <li key={t.key} className="py-4 first:pt-0 last:pb-0">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-700">{t.label}</p>
+                    <p className="text-sm font-semibold text-foreground">{t.label}</p>
                     {current ? (
                       <>
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-xs text-muted-foreground">
                           {current.original_filename} · {formatFileSize(current.size_bytes)} ·{' '}
                           {new Date(current.created_at).toLocaleDateString()}
                         </p>
@@ -272,7 +272,7 @@ export default function StudentDocuments() {
                         )}
                       </>
                     ) : (
-                      <p className="text-xs text-slate-400">Not yet uploaded</p>
+                      <p className="text-xs text-muted-foreground">Not yet uploaded</p>
                     )}
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -306,7 +306,7 @@ export default function StudentDocuments() {
                     {history.length > 0 && (
                       <button
                         onClick={() => setExpandedType(expandedType === t.key ? null : t.key)}
-                        className="text-xs text-upsa-blue hover:underline"
+                        className="text-xs text-brand hover:underline"
                       >
                         {expandedType === t.key ? 'Hide' : `History (${history.length})`}
                       </button>
@@ -315,13 +315,13 @@ export default function StudentDocuments() {
                 </div>
 
                 {expandedType === t.key && history.length > 0 && (
-                  <ul className="mt-3 space-y-1.5 border-l-2 border-slate-100 pl-3">
+                  <ul className="mt-3 space-y-1.5 border-l-2 border-border pl-3">
                     {history.map((doc) => (
-                      <li key={doc.id} className="flex items-center justify-between gap-3 text-xs text-slate-400">
+                      <li key={doc.id} className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
                         <span className="truncate">
                           {doc.original_filename} · {new Date(doc.created_at).toLocaleDateString()}
                         </span>
-                        <button onClick={() => handleDownload(doc)} className="shrink-0 text-upsa-blue hover:underline">
+                        <button onClick={() => handleDownload(doc)} className="shrink-0 text-brand hover:underline">
                           Download
                         </button>
                       </li>

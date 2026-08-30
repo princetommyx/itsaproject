@@ -19,13 +19,13 @@ export default function SubmissionSettings({ settings, onSaved }) {
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">Submission Rules</h2>
-      <p className="mt-1 text-sm font-medium text-slate-500">
+      <h2 className="text-lg font-bold text-foreground">Submission Rules</h2>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
         These are enforced on the server, so a change here applies to every upload immediately.
       </p>
 
       <div className="mt-5">
-        <span className="mb-1.5 block text-sm font-semibold text-slate-800">Allowed File Types</span>
+        <span className="mb-1.5 block text-sm font-semibold text-foreground">Allowed File Types</span>
         <div className="flex flex-wrap gap-2">
           {FILE_TYPES.map((type) => (
             <button
@@ -34,8 +34,8 @@ export default function SubmissionSettings({ settings, onSaved }) {
               onClick={() => toggleType(type)}
               className={`rounded-full px-4 py-2 text-[13px] font-semibold uppercase transition ${
                 types.includes(type)
-                  ? 'bg-upsa-blue text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  ? 'bg-brand text-white'
+                  : 'bg-muted text-muted-foreground hover:bg-accent'
               }`}
             >
               {type}
@@ -80,7 +80,7 @@ export default function SubmissionSettings({ settings, onSaved }) {
         />
       </div>
 
-      <p className="mt-2 text-xs font-medium text-slate-500">
+      <p className="mt-2 text-xs font-medium text-muted-foreground">
         A revision limit of 0 means unlimited. A deadline left empty never closes submissions.
       </p>
 

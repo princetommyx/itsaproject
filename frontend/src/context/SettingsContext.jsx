@@ -37,9 +37,12 @@ function applyTheme(settings) {
 
   const root = document.documentElement
   const map = {
-    '--color-upsa-blue': settings.primary_color,
-    '--color-upsa-blue-dark': settings.secondary_color,
-    '--color-upsa-gold': settings.accent_color,
+    // --brand is the token the whole design system is built on: the sidebar
+    // gradient, primary buttons, links, focus rings and the active nav pill
+    // all resolve through it, so one write re-skins the app.
+    '--brand': settings.primary_color,
+    '--brand-2': settings.secondary_color,
+    '--accent-gold': settings.accent_color,
   }
 
   for (const [token, value] of Object.entries(map)) {
@@ -48,7 +51,10 @@ function applyTheme(settings) {
 
   const font = FONT_OPTIONS.find((f) => f.name === settings.font_family)
   if (font) {
-    root.style.setProperty('--font-sans', font.stack)
+    // --app-font, not --font-sans directly: the theme declares
+    // `--font-sans: var(--app-font, <default stack>)`, so an unset or unknown
+    // font falls back rather than leaving the app with no font at all.
+    root.style.setProperty('--app-font', font.stack)
 
     // The face has to be fetched before it can render. One reused link
     // element, so switching fonts replaces the request rather than stacking

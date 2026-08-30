@@ -26,7 +26,7 @@ export default function ForgotPassword() {
 
   return (
     <AuthShell>
-      <h1 className="mb-6 text-xl font-bold text-slate-800">Reset Student Password</h1>
+      <h1 className="mb-6 text-xl font-bold text-foreground">Reset Student Password</h1>
 
       {message ? (
         <Alert variant="info">{message}</Alert>
@@ -42,7 +42,7 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={submitting}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-3 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting && <Spinner className="h-4 w-4" light />}
             {submitting ? 'Sending...' : 'Reset Password'}
@@ -50,12 +50,12 @@ export default function ForgotPassword() {
         </form>
       )}
 
-      <p className="mt-6 text-xs text-slate-400">
-        <Link to="/reset-password" className="text-upsa-blue hover:underline">
+      <p className="mt-6 text-xs text-muted-foreground">
+        <Link to="/reset-password" className="text-brand hover:underline">
           Already have a token?
         </Link>
         <span className="mx-2">·</span>
-        <Link to="/login" className="text-upsa-blue hover:underline">
+        <Link to="/login" className="text-brand hover:underline">
           Back to login
         </Link>
       </p>

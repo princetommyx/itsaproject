@@ -58,11 +58,11 @@ export default function AssessorDashboard() {
                 >
                   <Card interactive className="h-full">
                     <div className="mb-2 flex items-start justify-between gap-3">
-                      <h2 className="min-w-0 break-words font-semibold text-slate-800">{project.title}</h2>
+                      <h2 className="min-w-0 break-words font-semibold text-foreground">{project.title}</h2>
                       <Badge status={project.status} />
                     </div>
-                    <p className="line-clamp-3 text-[15px] leading-[1.7] text-slate-700">{project.description}</p>
-                    <p className="mt-3 text-xs text-slate-400">
+                    <p className="line-clamp-3 text-[15px] leading-[1.7] text-foreground">{project.description}</p>
+                    <p className="mt-3 text-xs text-muted-foreground">
                       {project.members.map(memberName).join(', ')}
                     </p>
                   </Card>

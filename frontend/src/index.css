@@ -1,46 +1,161 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
-@theme {
-  /* --color-upsa-blue-dark is sampled directly from a reference navbar the
-     user pointed to as the target shade (a brighter, less indigo navy than
-     our previous #0a0d2e). --color-upsa-blue is a lighter step in the same
-     hue for gradients/lighter surfaces. */
-  --color-upsa-blue: #0f2d5c;
-  --color-upsa-blue-dark: #071e3d;
-  --color-upsa-gold: #c8962f;
+/* The design system from the Smart Home dashboard template, retargeted to
+   UPSA. The template ships a full light/dark token set plus a --brand hook it
+   switches with a data attribute; both are kept as-is, because the brand hook
+   is exactly the mechanism the admin appearance settings already need, and
+   the dark set is what makes a theme toggle possible at all.
+   What changed is the values: the brand is UPSA navy rather than the
+   template's purple, and the accent is the UPSA gold. */
 
-  /* Roboto, identified from the reference screenshot's letterforms
-     (single-storey hooked 'g', angled cut on 't', spurred 'u', pointed 'A').
-     Deliberately a neutral grotesque rather than a geometric sans like
-     Poppins/Outfit — the geometric ones read as template-y. */
-  --font-sans:
-    'Roboto', Arial, Helvetica, sans-serif;
+@custom-variant dark (&:is(.dark *));
 
-  /* Muted text across the app used slate-400/500, which on white sit at
-     roughly 2.6:1 and 4.8:1 contrast — the 400 in particular fails WCAG AA
-     (4.5:1) and is what reads as washed out / "blurry". Each muted step is
-     shifted one notch darker here (400 takes 500's old value, 500 takes
-     600's), which lifts every one of the ~75 muted-text usages at once
-     instead of editing them file by file. Both are used almost exclusively
-     for text, so nothing else shifts meaningfully. */
-  --color-slate-400: #64748b;
-  --color-slate-500: #475569;
+:root {
+  --background: oklch(0.985 0.002 250);
+  --foreground: oklch(0.21 0.03 258);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.21 0.03 258);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.21 0.03 258);
+  --primary: var(--brand);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.968 0.005 248);
+  --secondary-foreground: oklch(0.28 0.03 258);
+  --muted: oklch(0.968 0.005 248);
+  /* One step darker than the template's muted text. Ours failed WCAG AA at
+     the template's value, which is what read as washed out before. */
+  --muted-foreground: oklch(0.5 0.02 257);
+  --accent: oklch(0.968 0.005 248);
+  --accent-foreground: oklch(0.28 0.03 258);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+  --success: oklch(0.63 0.15 155);
+  --warning: oklch(0.72 0.16 75);
+  --border: oklch(0.923 0.008 250);
+  --input: oklch(0.923 0.008 250);
+  --ring: var(--brand);
+
+  --chart-1: oklch(0.55 0.16 258);
+  --chart-2: oklch(0.72 0.16 75);
+  --chart-3: oklch(0.6 0.18 300);
+  --chart-4: oklch(0.65 0.18 350);
+  --chart-5: oklch(0.66 0.14 180);
+
+  --radius: 0.75rem;
+
+  /* UPSA navy (#0f2d5c) and the darker step used for the sidebar gradient.
+     --brand is overridden at runtime by the admin appearance setting. */
+  --brand: oklch(0.32 0.083 262);
+  --brand-2: oklch(0.24 0.072 264);
+  --brand-foreground: oklch(0.99 0 0);
+  /* UPSA gold (#c8962f). */
+  --accent-gold: oklch(0.71 0.13 78);
 }
 
+.dark {
+  --background: oklch(0.16 0.014 258);
+  --foreground: oklch(0.97 0.003 250);
+  --card: oklch(0.213 0.019 259);
+  --card-foreground: oklch(0.97 0.003 250);
+  --popover: oklch(0.213 0.019 259);
+  --popover-foreground: oklch(0.97 0.003 250);
+  --primary: var(--brand);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.27 0.02 259);
+  --secondary-foreground: oklch(0.97 0.003 250);
+  --muted: oklch(0.27 0.02 259);
+  --muted-foreground: oklch(0.72 0.015 255);
+  --accent: oklch(0.27 0.02 259);
+  --accent-foreground: oklch(0.97 0.003 250);
+  --destructive: oklch(0.65 0.2 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --success: oklch(0.7 0.15 155);
+  --warning: oklch(0.79 0.15 75);
+  --border: oklch(0.3 0.02 259);
+  --input: oklch(0.3 0.02 259);
+  --ring: var(--brand);
 
-body {
-  margin: 0;
-  background-color: #f4f6f9;
-  color: #0f172a;
-  /* Tailwind's base is 1.5. The reference article runs ~1.83, which is what
-     makes its text feel roomy — the size is actually smaller than ours. 1.6
-     is the compromise: noticeably more air everywhere without inflating the
-     dense parts of a dashboard (table rows, badges, buttons). Genuine prose
-     blocks go further, to leading-[1.75], at their call sites. */
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  --chart-1: oklch(0.66 0.16 258);
+  --chart-2: oklch(0.79 0.15 75);
+  --chart-3: oklch(0.7 0.18 300);
+  --chart-4: oklch(0.72 0.18 350);
+  --chart-5: oklch(0.74 0.13 180);
+
+  /* On a dark ground the navy sidebar would disappear into the page, so the
+     gradient lightens rather than darkens. */
+  --brand-2: oklch(0.4 0.09 262);
+}
+
+@theme inline {
+  --font-sans: var(--app-font, 'Roboto', Arial, Helvetica, sans-serif);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-gold: var(--accent-gold);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--background);
+    color: var(--foreground);
+    /* Tailwind's base is 1.5, which reads cramped in prose. 1.6 gives every
+       block more air without inflating dense dashboard rows; genuine prose
+       goes further at its call sites. */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
+
+@layer utilities {
+  /* The template's sidebar treatment: a vertical gradient between the two
+     brand steps, so the panel reads as one surface rather than a flat block. */
+  .bg-sidebar-gradient {
+    background: linear-gradient(to bottom, var(--brand), var(--brand-2));
+  }
 }
 
 @keyframes toast-in {

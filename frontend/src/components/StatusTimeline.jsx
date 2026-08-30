@@ -52,24 +52,24 @@ export default function StatusTimeline({ status }) {
                   isRefineHere
                     ? 'border-amber-400 bg-amber-400'
                     : isCompleted
-                      ? 'border-upsa-blue bg-upsa-blue'
+                      ? 'border-brand bg-brand'
                       : isCurrent
-                        ? 'border-upsa-blue bg-white text-upsa-blue'
-                        : 'border-slate-200 bg-white text-slate-300'
+                        ? 'border-brand bg-card text-brand'
+                        : 'border-border bg-card text-muted-foreground'
                 }`}
               >
                 {isRefineHere ? <WarningIcon /> : isCompleted ? <CheckIcon /> : <span className="h-2 w-2 rounded-full bg-current" />}
               </div>
               <p
                 className={`mt-1.5 max-w-[5.5rem] text-center text-[11px] leading-tight font-medium ${
-                  isRefineHere ? 'text-amber-600' : isCompleted || isCurrent ? 'text-slate-700' : 'text-slate-400'
+                  isRefineHere ? 'text-amber-600' : isCompleted || isCurrent ? 'text-foreground' : 'text-muted-foreground'
                 }`}
               >
                 {isRefineHere ? 'Needs Refinement' : stage.label}
               </p>
             </div>
             {i < STAGES.length - 1 && (
-              <div className={`mt-3.5 h-0.5 flex-1 ${i < currentIndex ? 'bg-upsa-blue' : 'bg-slate-200'}`} />
+              <div className={`mt-3.5 h-0.5 flex-1 ${i < currentIndex ? 'bg-brand' : 'bg-accent'}`} />
             )}
           </div>
         )

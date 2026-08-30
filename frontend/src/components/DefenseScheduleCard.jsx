@@ -50,8 +50,8 @@ export default function DefenseScheduleCard({ project, onSaved }) {
 
   return (
     <div>
-      <h3 className="mb-1 text-sm font-semibold text-slate-700">Defense Schedule</h3>
-      <p className="mb-4 text-xs font-medium text-slate-500">
+      <h3 className="mb-1 text-sm font-semibold text-foreground">Defense Schedule</h3>
+      <p className="mb-4 text-xs font-medium text-muted-foreground">
         Proposal defense: {formatDateTime(project.proposal_defense_at)} · Project defense:{' '}
         {formatDateTime(project.final_defense_at)}. Saving notifies the group.
       </p>

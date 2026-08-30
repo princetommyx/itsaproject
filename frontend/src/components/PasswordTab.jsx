@@ -23,7 +23,7 @@ function PasswordField({ label, value, onChange, error, autoComplete }) {
         type="button"
         onClick={() => setVisible((v) => !v)}
         aria-label={visible ? 'Hide password' : 'Show password'}
-        className="absolute top-[34px] right-2.5 text-slate-400 hover:text-slate-600"
+        className="absolute top-[34px] right-2.5 text-muted-foreground hover:text-foreground"
       >
         {visible ? <EyeOffIcon /> : <EyeIcon />}
       </button>
@@ -101,7 +101,7 @@ export default function PasswordTab() {
         error={errors.password}
         autoComplete="new-password"
       />
-      <p className="-mt-3 text-xs text-slate-400">Must be at least 8 characters.</p>
+      <p className="-mt-3 text-xs text-muted-foreground">Must be at least 8 characters.</p>
       <PasswordField
         label="Retype New Password"
         value={confirmation}

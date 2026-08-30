@@ -41,8 +41,8 @@ export default function ChangePassword() {
 
   return (
     <AuthShell>
-      <h1 className="mb-1 text-xl font-bold text-slate-800">Set a New Password</h1>
-      <p className="mb-6 text-sm text-slate-500">
+      <h1 className="mb-1 text-xl font-bold text-foreground">Set a New Password</h1>
+      <p className="mb-6 text-sm text-muted-foreground">
         {user?.is_first_login
           ? 'For your security, you must set a new password before continuing.'
           : 'Update your account password.'}
@@ -76,7 +76,7 @@ export default function ChangePassword() {
         <button
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-3 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting && <Spinner className="h-4 w-4" light />}
           {submitting ? 'Saving...' : 'Save Password'}
@@ -84,7 +84,7 @@ export default function ChangePassword() {
         <button
           type="button"
           onClick={logout}
-          className="w-full text-center text-sm text-slate-400 hover:underline"
+          className="w-full text-center text-sm text-muted-foreground hover:underline"
         >
           Log out
         </button>

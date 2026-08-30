@@ -19,7 +19,7 @@ const STAGE_LABELS = {
  */
 export default function SubmissionHistory({ versions = [], compareBase = null }) {
   if (versions.length === 0) {
-    return <p className="text-sm font-medium text-slate-500">No submissions yet.</p>
+    return <p className="text-sm font-medium text-muted-foreground">No submissions yet.</p>
   }
 
   const ordered = [...versions].sort((a, b) =>
@@ -28,24 +28,24 @@ export default function SubmissionHistory({ versions = [], compareBase = null })
   const showStage = new Set(versions.map((v) => v.stage)).size > 1
 
   return (
-    <ol className="relative space-y-4 border-l-2 border-slate-100 pl-5">
+    <ol className="relative space-y-4 border-l-2 border-border pl-5">
       {ordered.map((version, i) => (
         <li key={version.id} className="relative">
           <span
             className={`absolute top-1.5 -left-[26px] h-3 w-3 rounded-full ring-4 ring-white ${
-              i === 0 ? 'bg-upsa-blue' : 'bg-slate-300'
+              i === 0 ? 'bg-brand' : 'bg-muted-foreground/20'
             }`}
             aria-hidden="true"
           />
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-            <span className="text-sm font-bold text-slate-900">{version.label}</span>
+            <span className="text-sm font-bold text-foreground">{version.label}</span>
             <Badge status={version.status} />
             {i === 0 && (
-              <span className="text-xs font-semibold text-upsa-blue">Current</span>
+              <span className="text-xs font-semibold text-brand">Current</span>
             )}
           </div>
 
-          <p className="mt-1 text-xs font-medium text-slate-500">
+          <p className="mt-1 text-xs font-medium text-muted-foreground">
             {showStage && <span>{STAGE_LABELS[version.stage] ?? version.stage} · </span>}
             {version.submitted_at
               ? `Submitted ${formatDateTime(version.submitted_at, { empty: '' })}`
@@ -62,7 +62,7 @@ export default function SubmissionHistory({ versions = [], compareBase = null })
           {compareBase && version.sequence > 1 && (
             <Link
               to={`${compareBase}?current=${version.id}`}
-              className="mt-2 inline-block text-xs font-semibold text-upsa-blue hover:underline"
+              className="mt-2 inline-block text-xs font-semibold text-brand hover:underline"
             >
               Compare with previous version
             </Link>

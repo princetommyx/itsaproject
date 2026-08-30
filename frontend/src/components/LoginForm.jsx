@@ -59,7 +59,7 @@ export default function LoginForm({
 
   return (
     <AuthShell>
-      <h1 className="mb-7 text-[26px] leading-snug font-extrabold tracking-tight text-slate-900 sm:text-3xl">{heading}</h1>
+      <h1 className="mb-7 text-[26px] leading-snug font-extrabold tracking-tight text-foreground sm:text-3xl">{heading}</h1>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
@@ -84,7 +84,7 @@ export default function LoginForm({
         <button
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3.5 text-base font-bold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-3.5 text-base font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting ? 'Signing in...' : 'Login'}
         </button>
@@ -92,7 +92,7 @@ export default function LoginForm({
         {submitting && (
           <div className="flex flex-col items-center gap-2 pt-2" aria-live="polite">
             <DotSpinner size={44} />
-            <p className="text-sm font-medium text-slate-500">Logging you in...</p>
+            <p className="text-sm font-medium text-muted-foreground">Logging you in...</p>
           </div>
         )}
       </form>

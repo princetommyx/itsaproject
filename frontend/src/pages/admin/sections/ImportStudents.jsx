@@ -76,7 +76,7 @@ export default function ImportStudents() {
     <div className="space-y-6">
       <PageHeading description="Bulk-create student accounts from a CSV roster.">Import Students</PageHeading>
       <Card className="max-w-xl">
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Upload CSV File</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">Upload CSV File</h2>
 
         {error && <Alert>{error}</Alert>}
 
@@ -89,15 +89,15 @@ export default function ImportStudents() {
           onDrop={handleDrop}
           onClick={() => inputRef.current?.click()}
           className={`flex cursor-pointer flex-col items-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
-            dragging ? 'border-upsa-blue bg-blue-50' : 'border-slate-300 hover:border-slate-400'
+            dragging ? 'border-brand bg-blue-50' : 'border-border hover:border-ring/60'
           }`}
         >
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-upsa-blue">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-brand">
             <UploadCloudIcon />
           </span>
           <div>
-            <p className="text-sm font-medium text-slate-700">Drag CSV here</p>
-            <p className="text-xs text-slate-400">or, click to browse (4 MB max)</p>
+            <p className="text-sm font-medium text-foreground">Drag CSV here</p>
+            <p className="text-xs text-muted-foreground">or, click to browse (4 MB max)</p>
           </div>
           <input
             ref={inputRef}
@@ -108,26 +108,26 @@ export default function ImportStudents() {
           />
         </div>
 
-        <p className="mt-3 text-xs text-slate-400">
-          Columns required: <code className="rounded bg-slate-100 px-1">Student Name</code>,{' '}
-          <code className="rounded bg-slate-100 px-1">Index Number</code>,{' '}
-          <code className="rounded bg-slate-100 px-1">Email</code>,{' '}
-          <code className="rounded bg-slate-100 px-1">Date of Birth</code>. The hashed DOB (YYYYMMDD)
+        <p className="mt-3 text-xs text-muted-foreground">
+          Columns required: <code className="rounded bg-muted px-1">Student Name</code>,{' '}
+          <code className="rounded bg-muted px-1">Index Number</code>,{' '}
+          <code className="rounded bg-muted px-1">Email</code>,{' '}
+          <code className="rounded bg-muted px-1">Date of Birth</code>. The hashed DOB (YYYYMMDD)
           becomes each student's initial password.
         </p>
 
         {file && (
-          <div className="mt-4 flex items-center gap-3 rounded-lg border border-slate-200 p-3">
+          <div className="mt-4 flex items-center gap-3 rounded-lg border border-border p-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-emerald-50 text-emerald-600">
               <FileSpreadsheetIcon />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-slate-700">{file.name}</p>
-              <p className="text-xs text-slate-400">{formatSize(file.size)}</p>
+              <p className="truncate text-sm font-medium text-foreground">{file.name}</p>
+              <p className="text-xs text-muted-foreground">{formatSize(file.size)}</p>
               {submitting && (
-                <div className="mt-1.5 h-1.5 w-full rounded-full bg-slate-100">
+                <div className="mt-1.5 h-1.5 w-full rounded-full bg-muted">
                   <div
-                    className="h-1.5 rounded-full bg-upsa-blue transition-all"
+                    className="h-1.5 rounded-full bg-brand transition-all"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -137,7 +137,7 @@ export default function ImportStudents() {
               <button
                 onClick={discard}
                 aria-label="Remove file"
-                className="shrink-0 rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                className="shrink-0 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <XIcon />
               </button>

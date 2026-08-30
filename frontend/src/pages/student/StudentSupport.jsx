@@ -32,7 +32,7 @@ export default function StudentSupport() {
       <PageHeading description="Send a message and track its status here.">Messages</PageHeading>
 
       <Card>
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Send a New Message</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">Send a New Message</h2>
         <form className="space-y-3" onSubmit={handleSubmit}>
           <Input label="Subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
           <Textarea label="Message" rows={4} value={message} onChange={(e) => setMessage(e.target.value)} required />
@@ -43,7 +43,7 @@ export default function StudentSupport() {
       </Card>
 
       <Card>
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Your Messages</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">Your Messages</h2>
         {!complaints ? (
           <SkeletonList rows={3} />
         ) : swrError ? (
@@ -51,12 +51,12 @@ export default function StudentSupport() {
         ) : complaints.length === 0 ? (
           <EmptyState icon={MessageIcon} title="No messages sent yet" />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {complaints.map((c) => (
               <li key={c.id} className="flex items-center justify-between gap-3 py-3 text-sm">
                 <div className="min-w-0">
-                  <p className="font-medium text-slate-700">{c.subject}</p>
-                  <p className="text-slate-500">{c.message}</p>
+                  <p className="font-medium text-foreground">{c.subject}</p>
+                  <p className="text-muted-foreground">{c.message}</p>
                 </div>
                 <Badge status={c.status} />
               </li>

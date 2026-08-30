@@ -69,8 +69,8 @@ export default function AuditLogSettings() {
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">Audit Logs</h2>
-      <p className="mt-1 text-sm font-medium text-slate-500">
+      <h2 className="text-lg font-bold text-foreground">Audit Logs</h2>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
         Who changed what, and when. Entries are kept even after the account that made them is
         removed.
       </p>
@@ -82,8 +82,8 @@ export default function AuditLogSettings() {
             onClick={() => setFilter(f.key)}
             className={`rounded-full px-4 py-2 text-[13px] font-semibold transition ${
               filter === f.key
-                ? 'bg-upsa-blue text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-brand text-white'
+                : 'bg-muted text-muted-foreground hover:bg-accent'
             }`}
           >
             {f.label}
@@ -107,7 +107,7 @@ export default function AuditLogSettings() {
             description="Administrative actions will appear here as they happen."
           />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {entries.map((entry) => {
               const detail = describe(entry)
 
@@ -118,13 +118,13 @@ export default function AuditLogSettings() {
                     className="mt-0.5 h-8 w-8 shrink-0 text-[10px]"
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-slate-900">
+                    <p className="text-sm font-semibold text-foreground">
                       {ACTION_LABELS[entry.action] ?? entry.action}
                     </p>
                     {detail && (
-                      <p className="mt-0.5 text-sm font-medium break-words text-slate-600">{detail}</p>
+                      <p className="mt-0.5 text-sm font-medium break-words text-muted-foreground">{detail}</p>
                     )}
-                    <p className="mt-0.5 text-xs font-medium text-slate-500">
+                    <p className="mt-0.5 text-xs font-medium text-muted-foreground">
                       {entry.actor_name ?? 'A removed account'}
                       {entry.actor_role && ` (${entry.actor_role})`} ·{' '}
                       {formatDateTime(entry.created_at, { empty: 'unknown time' })}

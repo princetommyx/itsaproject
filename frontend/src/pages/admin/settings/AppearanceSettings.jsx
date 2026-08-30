@@ -67,8 +67,8 @@ export default function AppearanceSettings({ settings, onSaved }) {
   return (
     <div className="space-y-6">
       <Card>
-        <h2 className="text-lg font-bold text-slate-900">Colours</h2>
-        <p className="mt-1 text-sm font-medium text-slate-500">
+        <h2 className="text-lg font-bold text-foreground">Colours</h2>
+        <p className="mt-1 text-sm font-medium text-muted-foreground">
           Changes preview live. Nothing is stored until you save.
         </p>
 
@@ -80,17 +80,17 @@ export default function AppearanceSettings({ settings, onSaved }) {
                 aria-label={color.label}
                 value={form[color.key]}
                 onChange={(e) => preview({ ...form, [color.key]: e.target.value })}
-                className="h-11 w-14 shrink-0 cursor-pointer rounded-lg border border-slate-200 bg-white p-1"
+                className="h-11 w-14 shrink-0 cursor-pointer rounded-lg border border-border bg-card p-1"
               />
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-slate-800">{color.label}</p>
-                <p className="text-xs font-medium text-slate-500">{color.hint}</p>
+                <p className="text-sm font-semibold text-foreground">{color.label}</p>
+                <p className="text-xs font-medium text-muted-foreground">{color.hint}</p>
               </div>
               <input
                 aria-label={`${color.label} hex value`}
                 value={form[color.key]}
                 onChange={(e) => preview({ ...form, [color.key]: e.target.value })}
-                className="w-28 shrink-0 rounded-lg border border-slate-200 px-3 py-2 font-mono text-sm text-slate-900 uppercase focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none"
+                className="w-28 shrink-0 rounded-lg border border-border px-3 py-2 font-mono text-sm text-foreground uppercase focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
               />
             </div>
           ))}
@@ -98,8 +98,8 @@ export default function AppearanceSettings({ settings, onSaved }) {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-bold text-slate-900">Font</h2>
-        <p className="mt-1 text-sm font-medium text-slate-500">
+        <h2 className="text-lg font-bold text-foreground">Font</h2>
+        <p className="mt-1 text-sm font-medium text-muted-foreground">
           Each option previews in its own typeface. Pick one to apply it across the system.
         </p>
 
@@ -111,13 +111,13 @@ export default function AppearanceSettings({ settings, onSaved }) {
               onClick={() => preview({ ...form, font_family: font.name })}
               className={`rounded-xl border-2 px-4 py-3 text-left transition ${
                 form.font_family === font.name
-                  ? 'border-upsa-blue bg-upsa-blue/5'
-                  : 'border-slate-200 hover:border-slate-300'
+                  ? 'border-brand bg-brand/5'
+                  : 'border-border hover:border-ring/60'
               }`}
             >
-              <span className="block text-sm font-bold text-slate-900">{font.name}</span>
+              <span className="block text-sm font-bold text-foreground">{font.name}</span>
               <span
-                className="mt-0.5 block text-[15px] text-slate-600"
+                className="mt-0.5 block text-[15px] text-muted-foreground"
                 style={{ fontFamily: font.stack }}
               >
                 Final Year Project
@@ -128,8 +128,8 @@ export default function AppearanceSettings({ settings, onSaved }) {
       </Card>
 
       <Card>
-        <h2 className="text-lg font-bold text-slate-900">Logo</h2>
-        <p className="mt-1 text-sm font-medium text-slate-500">
+        <h2 className="text-lg font-bold text-foreground">Logo</h2>
+        <p className="mt-1 text-sm font-medium text-muted-foreground">
           Shown in the navigation. PNG, JPG, SVG or WebP, up to 2MB.
         </p>
 
@@ -138,10 +138,10 @@ export default function AppearanceSettings({ settings, onSaved }) {
             <img
               src={settings.logo_url}
               alt="Current logo"
-              className="h-14 w-14 rounded-xl border border-slate-200 bg-white object-contain p-1"
+              className="h-14 w-14 rounded-xl border border-border bg-card object-contain p-1"
             />
           )}
-          <label className="cursor-pointer rounded-lg border-2 border-upsa-blue px-4 py-2.5 text-sm font-semibold text-upsa-blue transition hover:bg-upsa-blue/5">
+          <label className="cursor-pointer rounded-lg border-2 border-brand px-4 py-2.5 text-sm font-semibold text-brand transition hover:bg-brand/5">
             {uploading ? 'Uploading…' : settings.logo_url ? 'Replace Logo' : 'Upload Logo'}
             <input
               type="file"

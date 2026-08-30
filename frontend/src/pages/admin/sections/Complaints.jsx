@@ -22,7 +22,7 @@ export default function Complaints() {
     <div className="space-y-6">
       <PageHeading description="Messages and complaints filed by students, all in one place.">Complaints</PageHeading>
       <Card>
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Student Complaints</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">Student Complaints</h2>
         {isLoading ? (
           <SkeletonList rows={4} />
         ) : swrError ? (
@@ -30,21 +30,21 @@ export default function Complaints() {
         ) : complaints.length === 0 ? (
           <EmptyState icon={MessageIcon} title="No complaints have been filed" />
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {complaints.map((c) => (
               <li key={c.id} className="flex flex-wrap items-start justify-between gap-3 py-4 first:pt-0 last:pb-0">
                 <div className="flex min-w-0 items-start gap-3">
                   <Avatar name={c.student?.name} className="mt-0.5" />
                   <div className="min-w-0">
-                    <p className="font-medium text-slate-800">{c.subject}</p>
-                    <p className="text-[15px] leading-[1.75] text-slate-800">{c.message}</p>
-                    <p className="mt-1 text-xs text-slate-400">Filed by {c.student?.name}</p>
+                    <p className="font-medium text-foreground">{c.subject}</p>
+                    <p className="text-[15px] leading-[1.75] text-foreground">{c.message}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">Filed by {c.student?.name}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge status={c.status} />
                   <select
-                    className="rounded-lg border border-slate-200 px-2 py-1 text-xs transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none"
+                    className="rounded-lg border border-border px-2 py-1 text-xs transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
                     value={c.status}
                     onChange={(e) => updateStatus(c.id, e.target.value)}
                   >

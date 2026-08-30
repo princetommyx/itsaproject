@@ -1,8 +1,10 @@
 const METER_STYLES = {
-  gold: { track: 'bg-amber-100', fill: 'bg-amber-500', text: 'text-amber-700' },
-  blue: { track: 'bg-blue-100', fill: 'bg-blue-500', text: 'text-blue-700' },
-  violet: { track: 'bg-violet-100', fill: 'bg-violet-500', text: 'text-violet-700' },
-  pink: { track: 'bg-pink-100', fill: 'bg-pink-500', text: 'text-pink-700' },
+  // Tracks are a tint of the fill rather than a fixed light step, so the bar
+  // still reads as an empty channel on a dark card instead of a white slab.
+  gold: { track: 'bg-amber-500/20', fill: 'bg-amber-500', text: 'text-amber-700 dark:text-amber-300' },
+  blue: { track: 'bg-blue-500/20', fill: 'bg-blue-500', text: 'text-blue-700 dark:text-blue-300' },
+  violet: { track: 'bg-violet-500/20', fill: 'bg-violet-500', text: 'text-violet-700 dark:text-violet-300' },
+  pink: { track: 'bg-pink-500/20', fill: 'bg-pink-500', text: 'text-pink-700 dark:text-pink-300' },
 }
 
 /**
@@ -21,7 +23,7 @@ export default function StatusBreakdownChart({ rows }) {
 
         return (
           <div key={row.label} className="flex items-center gap-3">
-            <span className="w-36 shrink-0 truncate text-[13px] font-semibold text-slate-700">{row.label}</span>
+            <span className="w-36 shrink-0 truncate text-[13px] font-semibold text-foreground">{row.label}</span>
             <div className={`h-2 flex-1 overflow-hidden rounded-full ${style.track}`}>
               <div
                 className={`h-full rounded-full ${style.fill} transition-all duration-500`}

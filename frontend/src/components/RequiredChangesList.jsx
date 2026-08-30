@@ -8,10 +8,10 @@ export default function RequiredChangesList({ items = [], className = '' }) {
 
   return (
     <div className={className}>
-      <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Required Changes</p>
+      <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">Required Changes</p>
       <ul className="mt-2 space-y-1.5">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm font-medium text-slate-800">
+          <li key={i} className="flex items-start gap-2 text-sm font-medium text-foreground">
             <span
               className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-pink-500"
               aria-hidden="true"

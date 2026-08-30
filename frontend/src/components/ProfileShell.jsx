@@ -13,24 +13,24 @@ export default function ProfileShell({ homePath, homeLabel, children }) {
 
   return (
     <div className="space-y-6">
-      <nav className="flex items-center gap-1.5 text-xs text-slate-400" aria-label="Breadcrumb">
-        <Link to={homePath} className="hover:text-upsa-blue hover:underline">
+      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-label="Breadcrumb">
+        <Link to={homePath} className="hover:text-brand hover:underline">
           {homeLabel}
         </Link>
         <span>/</span>
-        <span className="font-medium text-slate-500">Profile</span>
+        <span className="font-medium text-muted-foreground">Profile</span>
       </nav>
 
       <PageHeading description="Your account details and security settings.">Profile</PageHeading>
 
-      <div className="border-b border-slate-200">
+      <div className="border-b border-border">
         <div className="flex gap-6">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`relative -mb-px border-b-2 px-1 pb-3 text-sm font-medium transition duration-150 ${
-                tab === t.key ? 'border-upsa-blue text-upsa-blue' : 'border-transparent text-slate-500 hover:text-slate-700'
+                tab === t.key ? 'border-brand text-brand' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
               {t.label}

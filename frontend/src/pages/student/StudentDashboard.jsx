@@ -107,8 +107,8 @@ function CreateProjectForm({ onCreated, onError }) {
 
   return (
     <Card>
-      <h2 className="mb-4 text-lg font-bold text-slate-900">Start a Project Draft</h2>
-      <p className="mb-4 text-sm text-slate-500">
+      <h2 className="mb-4 text-lg font-bold text-foreground">Start a Project Draft</h2>
+      <p className="mb-4 text-sm text-muted-foreground">
         As the group leader, create your project draft, then add your group members by Index Number.
       </p>
       <form className="space-y-4" onSubmit={handleSubmit}>
@@ -140,11 +140,11 @@ function ProjectPanel({ project, user, onChange, onError }) {
     <div className="space-y-6">
       <Card>
         <div className="min-w-0">
-          <h2 className="text-lg font-semibold break-words text-slate-800">{project.title}</h2>
-          <p className="mt-1.5 text-[15px] leading-[1.75] text-slate-800">{project.description}</p>
+          <h2 className="text-lg font-semibold break-words text-foreground">{project.title}</h2>
+          <p className="mt-1.5 text-[15px] leading-[1.75] text-foreground">{project.description}</p>
         </div>
 
-        <div className="mt-5 border-t border-slate-100 pt-5">
+        <div className="mt-5 border-t border-border pt-5">
           <StatusTimeline status={project.status} />
         </div>
 
@@ -163,8 +163,8 @@ function ProjectPanel({ project, user, onChange, onError }) {
         </div>
 
         {(project.versions?.length ?? 0) > 0 && (
-          <div className="mt-5 border-t border-slate-100 pt-5">
-            <h3 className="mb-3 text-sm font-semibold text-slate-700">Submission History</h3>
+          <div className="mt-5 border-t border-border pt-5">
+            <h3 className="mb-3 text-sm font-semibold text-foreground">Submission History</h3>
             {/* Every version stays here. A submission that was sent back is
                 not replaced by the one that answers it — both are part of the
                 academic record. */}
@@ -173,25 +173,25 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         {(project.proposal_defense_at || project.final_defense_at) && (
-          <div className="mt-5 rounded-xl border border-upsa-blue/15 bg-blue-50/60 p-4">
-            <p className="text-sm font-bold text-slate-800">Defense Schedule</p>
+          <div className="mt-5 rounded-xl border border-brand/20 bg-blue-50/60 p-4">
+            <p className="text-sm font-bold text-foreground">Defense Schedule</p>
             <dl className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {project.proposal_defense_at && (
                 <div>
-                  <dt className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+                  <dt className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
                     Proposal Defense
                   </dt>
-                  <dd className="mt-0.5 text-[15px] font-semibold text-slate-900">
+                  <dd className="mt-0.5 text-[15px] font-semibold text-foreground">
                     {formatDateTime(project.proposal_defense_at)}
                   </dd>
                 </div>
               )}
               {project.final_defense_at && (
                 <div>
-                  <dt className="text-xs font-bold tracking-wide text-slate-500 uppercase">
+                  <dt className="text-xs font-bold tracking-wide text-muted-foreground uppercase">
                     Project Defense
                   </dt>
-                  <dd className="mt-0.5 text-[15px] font-semibold text-slate-900">
+                  <dd className="mt-0.5 text-[15px] font-semibold text-foreground">
                     {formatDateTime(project.final_defense_at)}
                   </dd>
                 </div>
@@ -215,12 +215,12 @@ function ProjectPanel({ project, user, onChange, onError }) {
         )}
 
         {isLeader && editable && (
-          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-upsa-blue/15 bg-blue-50/60 p-4">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-brand/20 bg-blue-50/60 p-4">
             <div>
-              <p className="text-sm font-semibold text-slate-800">
+              <p className="text-sm font-semibold text-foreground">
                 {isResubmission ? 'Ready to resubmit?' : 'Ready to submit?'}
               </p>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-muted-foreground">
                 {isResubmission
                   ? 'Once you’ve made the requested changes, resubmit for another review.'
                   : 'You can submit as soon as your group and documents are set — or keep editing below first.'}
@@ -236,10 +236,10 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </div>
         )}
 
-        <div className="mt-5 rounded-xl border border-slate-100 p-4">
+        <div className="mt-5 rounded-xl border border-border p-4">
           <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-slate-700">Submission Status</h3>
-            <Link to="/student/documents" className="text-xs text-upsa-blue hover:underline">
+            <h3 className="text-sm font-semibold text-foreground">Submission Status</h3>
+            <Link to="/student/documents" className="text-xs text-brand hover:underline">
               Manage Documents
             </Link>
           </div>
@@ -250,15 +250,15 @@ function ProjectPanel({ project, user, onChange, onError }) {
                 <li key={key} className="flex items-center gap-2 text-sm">
                   <span
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white ${
-                      uploaded ? 'bg-emerald-500' : 'bg-slate-200 text-slate-400'
+                      uploaded ? 'bg-emerald-500' : 'bg-accent text-muted-foreground'
                     }`}
                   >
                     {uploaded ? '✓' : ''}
                   </span>
-                  <span className={uploaded ? 'text-slate-700' : 'text-slate-400'}>
+                  <span className={uploaded ? 'text-foreground' : 'text-muted-foreground'}>
                     {DOCUMENT_TYPE_LABELS[key]}
                   </span>
-                  {!uploaded && <span className="text-xs text-slate-400">— Pending</span>}
+                  {!uploaded && <span className="text-xs text-muted-foreground">— Pending</span>}
                 </li>
               )
             })}
@@ -266,10 +266,10 @@ function ProjectPanel({ project, user, onChange, onError }) {
         </div>
 
         <div className="mt-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-700">
-            Group Members <span className="font-normal text-slate-400">({members.length})</span>
+          <h3 className="mb-2 text-sm font-semibold text-foreground">
+            Group Members <span className="font-normal text-muted-foreground">({members.length})</span>
           </h3>
-          <ul className="divide-y divide-slate-100 rounded-xl border border-slate-100">
+          <ul className="divide-y divide-border rounded-xl border border-border">
             {members.map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm">
                 <span className="flex min-w-0 items-center gap-2.5">
@@ -279,9 +279,9 @@ function ProjectPanel({ project, user, onChange, onError }) {
                     {/* Index Number stays visible alongside a typed name — it
                         is the identifier the group is actually matched on. */}
                     {!m.student && m.name && (
-                      <span className="ml-1 text-xs text-slate-400">{m.university_id}</span>
+                      <span className="ml-1 text-xs text-muted-foreground">{m.university_id}</span>
                     )}
-                    {m.is_leader && <span className="ml-1 text-xs text-upsa-blue">(Leader)</span>}
+                    {m.is_leader && <span className="ml-1 text-xs text-brand">(Leader)</span>}
                     {!m.student && (
                       <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
                         (Not yet registered)
@@ -378,8 +378,8 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
   }
 
   return (
-    <div className="mt-4 border-t border-slate-100 pt-4">
-      <p className="mb-2 text-xs text-slate-500">
+    <div className="mt-4 border-t border-border pt-4">
+      <p className="mb-2 text-xs text-muted-foreground">
         Add as many group members as your project needs — groups are usually 2 to 4 people. If a
         partner hasn't been added to the system yet, that's fine: add their Index Number now and
         it'll link to their account automatically once they are. Adding their name too means the
@@ -431,8 +431,8 @@ function EditAndSubmit({ project, onChange, onError, toast }) {
   }
 
   return (
-    <form className="mt-6 space-y-4 border-t border-slate-100 pt-6" onSubmit={saveEdits}>
-      <h3 className="text-sm font-semibold text-slate-700">Edit Project</h3>
+    <form className="mt-6 space-y-4 border-t border-border pt-6" onSubmit={saveEdits}>
+      <h3 className="text-sm font-semibold text-foreground">Edit Project</h3>
       <Input label="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
       <Textarea label="Description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
       <div className="flex flex-wrap gap-2">

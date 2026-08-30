@@ -5,6 +5,7 @@ import client from './api/client'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import { SettingsProvider } from './context/SettingsContext'
+import { ThemeProvider } from './context/ThemeContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import PageLoader from './components/PageLoader'
@@ -48,6 +49,7 @@ function HomeRedirect() {
 
 export default function App() {
   return (
+    <ThemeProvider>
     <BrowserRouter>
       <SWRConfig 
         value={{
@@ -111,5 +113,6 @@ export default function App() {
       </ToastProvider>
       </SWRConfig>
     </BrowserRouter>
+    </ThemeProvider>
   )
 }

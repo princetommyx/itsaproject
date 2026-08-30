@@ -37,8 +37,8 @@ export default function StaffManagement() {
         Staff Accounts
       </PageHeading>
       <Card className="max-w-lg">
-        <h2 className="mb-4 text-lg font-bold text-slate-900">Onboard a Staff Account</h2>
-        <p className="mb-4 text-sm text-slate-500">
+        <h2 className="mb-4 text-lg font-bold text-foreground">Onboard a Staff Account</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
           Create an Assessor or Admin account using their official UPSA email.
         </p>
 
@@ -54,9 +54,9 @@ export default function StaffManagement() {
             required
           />
           <label className="block text-sm">
-            <span className="mb-1.5 block text-sm font-semibold text-slate-800">Role</span>
+            <span className="mb-1.5 block text-sm font-semibold text-foreground">Role</span>
             <select
-              className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-[15px] font-medium text-slate-900 transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none"
+              className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none"
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >

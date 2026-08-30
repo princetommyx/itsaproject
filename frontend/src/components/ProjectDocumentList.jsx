@@ -11,7 +11,7 @@ export default function ProjectDocumentList({ documents }) {
   const [downloadingId, setDownloadingId] = useState(null)
 
   if (!documents || documents.length === 0) {
-    return <p className="text-sm text-slate-500">No documents have been submitted yet.</p>
+    return <p className="text-sm text-muted-foreground">No documents have been submitted yet.</p>
   }
 
   const byType = {}
@@ -30,14 +30,14 @@ export default function ProjectDocumentList({ documents }) {
   }
 
   return (
-    <ul className="divide-y divide-slate-100">
+    <ul className="divide-y divide-border">
       {Object.entries(byType).map(([type, versions]) => {
         const current = versions[0]
         return (
           <li key={type} className="flex flex-wrap items-center justify-between gap-3 py-2.5 text-sm">
             <div className="min-w-0">
-              <p className="font-medium text-slate-700">{DOCUMENT_TYPE_LABELS[type] || type}</p>
-              <p className="truncate text-xs text-slate-400">
+              <p className="font-medium text-foreground">{DOCUMENT_TYPE_LABELS[type] || type}</p>
+              <p className="truncate text-xs text-muted-foreground">
                 {current.original_filename} · {formatFileSize(current.size_bytes)} ·{' '}
                 {new Date(current.created_at).toLocaleDateString()}
                 {versions.length > 1 && ` · ${versions.length} versions`}

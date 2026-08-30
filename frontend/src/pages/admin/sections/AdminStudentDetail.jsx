@@ -23,7 +23,7 @@ export default function AdminStudentDetail() {
   const isLoading = !student && !swrError
 
   const back = (
-    <Link to="/admin/students" className="text-sm text-upsa-blue hover:underline">
+    <Link to="/admin/students" className="text-sm text-brand hover:underline">
       &larr; Back to students
     </Link>
   )
@@ -62,8 +62,8 @@ export default function AdminStudentDetail() {
         <div className="flex items-center gap-4">
           <Avatar name={student.name} className="h-16 w-16 text-lg" />
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-extrabold text-slate-900">{student.name}</h1>
-            <p className="text-sm font-medium text-slate-600">{student.university_id}</p>
+            <h1 className="truncate text-xl font-extrabold text-foreground">{student.name}</h1>
+            <p className="text-sm font-medium text-muted-foreground">{student.university_id}</p>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ function GroupCard({ project }) {
   return (
     <Card>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <h2 className="min-w-0 text-lg font-bold text-slate-900">{project.title}</h2>
+        <h2 className="min-w-0 text-lg font-bold text-foreground">{project.title}</h2>
         <Badge status={project.status} />
       </div>
 
@@ -106,17 +106,17 @@ function GroupCard({ project }) {
       </div>
 
       <div className="mt-5">
-        <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">Group Members</p>
-        <ul className="mt-2 divide-y divide-slate-100">
+        <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">Group Members</p>
+        <ul className="mt-2 divide-y divide-border">
           {(project.members ?? []).map((m) => (
             <li key={m.id} className="flex items-center gap-3 py-2.5">
               <Avatar name={memberName(m)} className="h-8 w-8 text-[11px]" />
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-800">{memberName(m)}</p>
-                <p className="text-xs text-slate-500">{m.university_id}</p>
+                <p className="truncate text-sm font-semibold text-foreground">{memberName(m)}</p>
+                <p className="text-xs text-muted-foreground">{m.university_id}</p>
               </div>
               {m.is_leader && (
-                <span className="ml-auto shrink-0 text-xs font-semibold text-upsa-blue">Leader</span>
+                <span className="ml-auto shrink-0 text-xs font-semibold text-brand">Leader</span>
               )}
             </li>
           ))}
@@ -176,8 +176,8 @@ function AssignGroupCard({ student, onAssigned, toast }) {
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">Assign to a Group</h2>
-      <p className="mt-1 text-sm font-medium text-slate-500">
+      <h2 className="text-lg font-bold text-foreground">Assign to a Group</h2>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
         {student.name} is not in a project group. Pick the group they belong to and they&apos;ll be
         added and notified.
       </p>
@@ -195,18 +195,18 @@ function AssignGroupCard({ student, onAssigned, toast }) {
         {projectsError ? (
           <ErrorState title="Couldn't load the list of groups" />
         ) : !projects ? (
-          <p className="py-4 text-sm font-medium text-slate-500">Loading groups…</p>
+          <p className="py-4 text-sm font-medium text-muted-foreground">Loading groups…</p>
         ) : matches.length === 0 ? (
-          <p className="py-4 text-sm font-medium text-slate-500">
+          <p className="py-4 text-sm font-medium text-muted-foreground">
             {search.trim() ? 'No group matches that topic.' : 'There are no project groups yet.'}
           </p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {matches.map((project) => (
               <li key={project.id} className="flex flex-wrap items-center gap-3 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-800">{project.title}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="truncate text-sm font-semibold text-foreground">{project.title}</p>
+                  <p className="text-xs text-muted-foreground">
                     {project.members?.length ?? 0} member
                     {(project.members?.length ?? 0) !== 1 ? 's' : ''} ·{' '}
                     {project.assessor?.name ?? 'No supervisor yet'}

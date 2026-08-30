@@ -77,8 +77,8 @@ export default function RolesSettings() {
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-bold text-slate-900">Roles</h2>
-            <p className="mt-1 text-sm font-medium text-slate-500">
+            <h2 className="text-lg font-bold text-foreground">Roles</h2>
+            <p className="mt-1 text-sm font-medium text-muted-foreground">
               Define the roles your institution actually uses, and choose exactly what each one can
               do.
             </p>
@@ -86,22 +86,22 @@ export default function RolesSettings() {
           <Button onClick={() => setEditing({ ...EMPTY })}>New Role</Button>
         </div>
 
-        <ul className="mt-5 divide-y divide-slate-100">
+        <ul className="mt-5 divide-y divide-border">
           {roles.map((role) => (
             <li key={role.id} className="flex flex-wrap items-start gap-3 py-4 first:pt-0 last:pb-0">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold text-slate-900">{role.name}</p>
+                  <p className="font-semibold text-foreground">{role.name}</p>
                   {role.is_system && (
-                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold tracking-wide text-slate-600 uppercase">
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-bold tracking-wide text-muted-foreground uppercase">
                       Built-in
                     </span>
                   )}
                 </div>
                 {role.description && (
-                  <p className="mt-0.5 text-sm font-medium text-slate-600">{role.description}</p>
+                  <p className="mt-0.5 text-sm font-medium text-muted-foreground">{role.description}</p>
                 )}
-                <p className="mt-1 text-xs font-medium text-slate-500">
+                <p className="mt-1 text-xs font-medium text-muted-foreground">
                   {role.permissions?.length ?? 0} permission
                   {(role.permissions?.length ?? 0) !== 1 ? 's' : ''} · {role.users_count} user
                   {role.users_count !== 1 ? 's' : ''} · {role.base_role} area
@@ -176,7 +176,7 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
   return (
     <div className="space-y-6">
       <Card>
-        <h2 className="text-lg font-bold text-slate-900">{isNew ? 'New Role' : `Edit ${role.name}`}</h2>
+        <h2 className="text-lg font-bold text-foreground">{isNew ? 'New Role' : `Edit ${role.name}`}</h2>
 
         <div className="mt-5 space-y-5">
           <Input
@@ -194,8 +194,8 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
           />
 
           <div>
-            <span className="mb-1.5 block text-sm font-semibold text-slate-800">Area</span>
-            <p className="mb-2 text-xs font-medium text-slate-500">
+            <span className="mb-1.5 block text-sm font-semibold text-foreground">Area</span>
+            <p className="mb-2 text-xs font-medium text-muted-foreground">
               Which part of the system holders of this role work in. This can&apos;t be changed for
               built-in roles.
             </p>
@@ -208,8 +208,8 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
                   onClick={() => setForm((f) => ({ ...f, base_role: base.key }))}
                   className={`rounded-full px-4 py-2 text-[13px] font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${
                     form.base_role === base.key
-                      ? 'bg-upsa-blue text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      ? 'bg-brand text-white'
+                      : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
                   {base.label}
@@ -221,8 +221,8 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
       </Card>
 
       <Card>
-        <h3 className="text-base font-bold text-slate-900">Permissions</h3>
-        <p className="mt-1 text-sm font-medium text-slate-500">
+        <h3 className="text-base font-bold text-foreground">Permissions</h3>
+        <p className="mt-1 text-sm font-medium text-muted-foreground">
           {form.permissions.length} selected.
         </p>
 
@@ -234,11 +234,11 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
             return (
               <div key={group}>
                 <div className="mb-2 flex items-center justify-between gap-3">
-                  <p className="text-xs font-bold tracking-wide text-slate-500 uppercase">{group}</p>
+                  <p className="text-xs font-bold tracking-wide text-muted-foreground uppercase">{group}</p>
                   <button
                     type="button"
                     onClick={() => toggleGroup(keys, allOn)}
-                    className="text-xs font-semibold text-upsa-blue hover:underline"
+                    className="text-xs font-semibold text-brand hover:underline"
                   >
                     {allOn ? 'Clear all' : 'Select all'}
                   </button>
@@ -247,7 +247,7 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
                   {Object.entries(permissions).map(([key, label]) => (
                     <label
                       key={key}
-                      className="flex cursor-pointer items-start gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-slate-50"
+                      className="flex cursor-pointer items-start gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-muted"
                     >
                       <input
                         type="checkbox"
@@ -255,7 +255,7 @@ function RoleEditor({ role, catalogue, onCancel, onSaved, toast }) {
                         onChange={() => toggle(key)}
                         className="mt-0.5 h-4 w-4 shrink-0 accent-upsa-blue"
                       />
-                      <span className="text-sm font-medium text-slate-800">{label}</span>
+                      <span className="text-sm font-medium text-foreground">{label}</span>
                     </label>
                   ))}
                 </div>
@@ -307,17 +307,17 @@ function AssignRoles({ roles, toast }) {
 
   return (
     <Card>
-      <h2 className="text-lg font-bold text-slate-900">Who Has Which Role</h2>
-      <p className="mt-1 text-sm font-medium text-slate-500">
+      <h2 className="text-lg font-bold text-foreground">Who Has Which Role</h2>
+      <p className="mt-1 text-sm font-medium text-muted-foreground">
         A staff member with no role assigned keeps the default permissions for their area.
       </p>
 
-      <ul className="mt-5 divide-y divide-slate-100">
+      <ul className="mt-5 divide-y divide-border">
         {staff.map((user) => (
           <li key={user.id} className="flex flex-wrap items-center gap-3 py-3.5">
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-slate-900">{user.name}</p>
-              <p className="text-xs font-medium text-slate-500">
+              <p className="font-semibold text-foreground">{user.name}</p>
+              <p className="text-xs font-medium text-muted-foreground">
                 {user.email} · {user.role}
               </p>
             </div>
@@ -325,7 +325,7 @@ function AssignRoles({ roles, toast }) {
               disabled={saving === user.id}
               value={user.role_id ?? ''}
               onChange={(e) => assign(user, e.target.value ? Number(e.target.value) : null)}
-              className="w-full shrink-0 rounded-lg border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-900 transition hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-56"
+              className="w-full shrink-0 rounded-lg border border-border px-3 py-2.5 text-sm font-medium text-foreground transition hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-56"
             >
               <option value="">Default permissions</option>
               {roles

@@ -65,7 +65,7 @@ export default function ProjectReview() {
   if (swrError || !project) {
     return (
       <div className="space-y-6">
-        <Link to="/assessor" className="text-sm text-upsa-blue hover:underline">
+        <Link to="/assessor" className="text-sm text-brand hover:underline">
           &larr; Back to assigned projects
         </Link>
         <Card>
@@ -81,31 +81,31 @@ export default function ProjectReview() {
 
   return (
     <div className="space-y-6">
-      <Link to="/assessor" className="text-sm text-upsa-blue hover:underline">
+      <Link to="/assessor" className="text-sm text-brand hover:underline">
         &larr; Back to assigned projects
       </Link>
 
       <Card>
         <div className="mb-4 flex items-start justify-between gap-3">
-          <h1 className="min-w-0 break-words text-xl font-semibold text-slate-800">{project.title}</h1>
+          <h1 className="min-w-0 break-words text-xl font-semibold text-foreground">{project.title}</h1>
           <Badge status={project.status} />
         </div>
-        <p className="text-[15px] leading-[1.75] whitespace-pre-wrap text-slate-800">{project.description}</p>
+        <p className="text-[15px] leading-[1.75] whitespace-pre-wrap text-foreground">{project.description}</p>
 
-        <div className="mt-5 border-t border-slate-100 pt-5">
+        <div className="mt-5 border-t border-border pt-5">
           <StatusTimeline status={project.status} />
         </div>
 
         <div className="mt-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-700">Group Members</h3>
+          <h3 className="mb-2 text-sm font-semibold text-foreground">Group Members</h3>
           <ul className="space-y-2">
             {project.members.map((m) => {
               const name = m.student ? m.student.name : m.university_id
               return (
-                <li key={m.id} className="flex items-center gap-2.5 text-sm text-slate-600">
+                <li key={m.id} className="flex items-center gap-2.5 text-sm text-muted-foreground">
                   <Avatar name={name} className="h-7 w-7 text-[10px]" />
                   {name}
-                  {m.is_leader && <span className="text-xs text-upsa-blue">(Leader)</span>}
+                  {m.is_leader && <span className="text-xs text-brand">(Leader)</span>}
                   {!m.student && <span className="text-xs text-amber-600">(Not yet registered)</span>}
                 </li>
               )
@@ -113,20 +113,20 @@ export default function ProjectReview() {
           </ul>
         </div>
 
-        <div className="mt-5 border-t border-slate-100 pt-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-700">Submitted Documents</h3>
+        <div className="mt-5 border-t border-border pt-5">
+          <h3 className="mb-2 text-sm font-semibold text-foreground">Submitted Documents</h3>
           <ProjectDocumentList documents={project.documents} />
         </div>
 
         {/* Nothing here is ever removed — the version an earlier review sent
             back stays put, which is what makes a comparison possible. */}
-        <div className="mt-5 border-t border-slate-100 pt-5">
+        <div className="mt-5 border-t border-border pt-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-slate-700">Submission History</h3>
+            <h3 className="text-sm font-semibold text-foreground">Submission History</h3>
             {(project.versions?.length ?? 0) > 1 && (
               <Link
                 to={`/assessor/projects/${project.id}/compare`}
-                className="text-sm font-semibold text-upsa-blue hover:underline"
+                className="text-sm font-semibold text-brand hover:underline"
               >
                 Compare versions
               </Link>
@@ -136,7 +136,7 @@ export default function ProjectReview() {
         </div>
 
         {project.status === 'pending' ? (
-          <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
+          <div className="mt-6 space-y-4 border-t border-border pt-6">
             {error && <Alert>{error}</Alert>}
             <Textarea
               label="Feedback (required if sending back for refinement)"
@@ -154,7 +154,7 @@ export default function ProjectReview() {
             </div>
           </div>
         ) : (
-          <p className="mt-6 border-t border-slate-100 pt-4 text-sm text-slate-500">
+          <p className="mt-6 border-t border-border pt-4 text-sm text-muted-foreground">
             This project has already been reviewed. Decision: <Badge status={project.status} />
           </p>
         )}

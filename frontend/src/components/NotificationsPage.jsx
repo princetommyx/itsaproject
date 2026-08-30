@@ -109,13 +109,13 @@ export default function NotificationsPage({ apiPrefix, role }) {
       <PageHeading description="Updates on your project, all in one place.">Notifications</PageHeading>
 
       {showIntro && (
-        <Card className="bg-gradient-to-br from-blue-50 to-white">
-          <h2 className="text-base font-semibold text-slate-800">Get notified about important project updates</h2>
-          <p className="mt-1 text-sm text-slate-500">We'll notify you when:</p>
+        <Card className="bg-gradient-to-br from-blue-50 to-card">
+          <h2 className="text-base font-semibold text-foreground">Get notified about important project updates</h2>
+          <p className="mt-1 text-sm text-muted-foreground">We'll notify you when:</p>
           <ul className="mt-3 space-y-1.5">
             {(INTRO_ITEMS[role] || []).map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-upsa-blue" />
+              <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
                 {item}
               </li>
             ))}
@@ -137,7 +137,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
             key={key}
             onClick={() => setFilter(key)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-              filter === key ? 'bg-upsa-blue text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              filter === key ? 'bg-brand text-white' : 'bg-muted text-muted-foreground hover:bg-accent'
             }`}
           >
             {key === 'all' ? 'All' : `Unread${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
@@ -162,8 +162,8 @@ export default function NotificationsPage({ apiPrefix, role }) {
           <div className="space-y-6">
             {groups.map(([label, items]) => (
               <div key={label}>
-                <p className="mb-2 text-xs font-semibold tracking-wide text-slate-400 uppercase">{label}</p>
-                <ul className="divide-y divide-slate-100">
+                <p className="mb-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase">{label}</p>
+                <ul className="divide-y divide-border">
                   {items.map((n) => {
                     const info = describeNotification(n)
                     const isUnread = !n.read_at
@@ -176,7 +176,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
                       <li key={n.id} className="animate-fade-up" style={delay}>
                         <button
                           onClick={() => openNotification(n)}
-                          className={`flex w-full items-start gap-3 rounded-xl px-2 py-3.5 text-left transition hover:bg-slate-50 ${
+                          className={`flex w-full items-start gap-3 rounded-xl px-2 py-3.5 text-left transition hover:bg-muted ${
                             isUnread ? 'bg-blue-50/40' : ''
                           }`}
                         >
@@ -187,14 +187,14 @@ export default function NotificationsPage({ apiPrefix, role }) {
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-baseline justify-between gap-x-2">
-                              <p className={`text-sm ${isUnread ? 'font-semibold text-slate-800' : 'font-medium text-slate-600'}`}>
+                              <p className={`text-sm ${isUnread ? 'font-semibold text-foreground' : 'font-medium text-muted-foreground'}`}>
                                 {info.title}
                               </p>
-                              <span className="text-xs whitespace-nowrap text-slate-400">{formatTime(n.created_at)}</span>
+                              <span className="text-xs whitespace-nowrap text-muted-foreground">{formatTime(n.created_at)}</span>
                             </div>
-                            <p className="mt-0.5 text-[15px] leading-[1.7] break-words text-slate-700">{info.description}</p>
+                            <p className="mt-0.5 text-[15px] leading-[1.7] break-words text-foreground">{info.description}</p>
                           </div>
-                          {isUnread && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-upsa-gold" aria-hidden="true" />}
+                          {isUnread && <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-gold" aria-hidden="true" />}
                         </button>
                       </li>
                     )

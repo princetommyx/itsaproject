@@ -21,11 +21,11 @@ export default function StudentProfile() {
           <div className="flex items-center gap-4">
             <Avatar name={user?.name} className="h-16 w-16 text-lg" />
             <div>
-              <h2 className="text-lg font-bold text-slate-900">{user?.name}</h2>
-              <p className="text-sm text-slate-500">{user?.university_id}</p>
+              <h2 className="text-lg font-bold text-foreground">{user?.name}</h2>
+              <p className="text-sm text-muted-foreground">{user?.university_id}</p>
             </div>
           </div>
-          <p className="mt-3 text-xs text-slate-400">
+          <p className="mt-3 text-xs text-muted-foreground">
             These details are managed by the university. Contact your administrator to update them.
           </p>
 
@@ -46,7 +46,7 @@ export default function StudentProfile() {
         </Card>
 
         <Card>
-          <h2 className="mb-4 text-lg font-bold text-slate-900">Project Information</h2>
+          <h2 className="mb-4 text-lg font-bold text-foreground">Project Information</h2>
           {isLoading ? (
             <SkeletonCard lines={2} />
           ) : swrError ? (
@@ -62,7 +62,7 @@ export default function StudentProfile() {
                 <Input label="Supervisor" value={project.assessor?.name ?? 'Not yet assigned'} disabled />
               </div>
               <div>
-                <p className="mb-2 text-sm font-medium text-slate-700">Project Progress</p>
+                <p className="mb-2 text-sm font-medium text-foreground">Project Progress</p>
                 <StatusTimeline status={project.status} />
               </div>
               <div>
@@ -70,9 +70,9 @@ export default function StudentProfile() {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-muted-foreground">
               You haven't started a project yet.{' '}
-              <Link to="/student" className="font-medium text-upsa-blue hover:underline">
+              <Link to="/student" className="font-medium text-brand hover:underline">
                 Get started
               </Link>
               .

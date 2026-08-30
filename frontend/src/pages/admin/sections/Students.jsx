@@ -62,8 +62,8 @@ export default function Students() {
               onClick={() => setFilter(f.key)}
               className={`rounded-full px-4 py-2 text-[13px] font-semibold transition ${
                 filter === f.key
-                  ? "bg-upsa-blue text-white"
-                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  ? "bg-brand text-white"
+                  : "bg-muted text-muted-foreground hover:bg-accent"
               }`}
             >
               {f.label}
@@ -99,7 +99,7 @@ export default function Students() {
               }
             />
           ) : (
-            <ul className="divide-y divide-slate-100">
+            <ul className="divide-y divide-border">
               {students.map((student) => {
                 const project = student.projects?.[0];
 
@@ -107,7 +107,7 @@ export default function Students() {
                   <li key={student.id}>
                     <Link
                       to={`/admin/students/${student.id}`}
-                      className="-mx-2 flex items-start gap-3 rounded-xl px-2 py-3.5 transition hover:bg-slate-50"
+                      className="-mx-2 flex items-start gap-3 rounded-xl px-2 py-3.5 transition hover:bg-muted"
                     >
                       <Avatar
                         name={student.name}
@@ -115,7 +115,7 @@ export default function Students() {
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                          <p className="font-semibold text-slate-900">
+                          <p className="font-semibold text-foreground">
                             {student.name}
                           </p>
                           {/* Until a student first signs in they still hold the
@@ -131,24 +131,24 @@ export default function Students() {
                             </span>
                           )}
                         </div>
-                        <p className="text-sm font-medium text-slate-600">
+                        <p className="text-sm font-medium text-muted-foreground">
                           {student.university_id}
                         </p>
                         {student.student_email && (
-                          <p className="truncate text-xs text-slate-500">
+                          <p className="truncate text-xs text-muted-foreground">
                             {student.student_email}
                           </p>
                         )}
                         <div className="mt-1.5">
                           {project ? (
                             <span className="flex flex-wrap items-center gap-2">
-                              <span className="truncate text-xs text-slate-500">
+                              <span className="truncate text-xs text-muted-foreground">
                                 {project.title}
                               </span>
                               <Badge status={project.status} />
                             </span>
                           ) : (
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-muted-foreground">
                               Not in a project group yet
                             </span>
                           )}

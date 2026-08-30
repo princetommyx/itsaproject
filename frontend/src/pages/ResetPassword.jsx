@@ -40,7 +40,7 @@ export default function ResetPassword() {
 
   return (
     <AuthShell>
-      <h1 className="mb-6 text-xl font-bold text-slate-800">Set New Password</h1>
+      <h1 className="mb-6 text-xl font-bold text-foreground">Set New Password</h1>
 
       <form className="space-y-6" onSubmit={handleSubmit}>
         {error && <Alert>{error}</Alert>}
@@ -65,15 +65,15 @@ export default function ResetPassword() {
         <button
           type="submit"
           disabled={submitting}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-upsa-blue py-3 font-semibold text-white transition hover:bg-upsa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand py-3 font-semibold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {submitting && <Spinner className="h-4 w-4" light />}
           {submitting ? 'Resetting...' : 'Reset Password'}
         </button>
       </form>
 
-      <p className="mt-6 text-xs text-slate-400">
-        <Link to="/login" className="text-upsa-blue hover:underline">
+      <p className="mt-6 text-xs text-muted-foreground">
+        <Link to="/login" className="text-brand hover:underline">
           Back to login
         </Link>
       </p>

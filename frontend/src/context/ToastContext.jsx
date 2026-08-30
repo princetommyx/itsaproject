@@ -101,7 +101,7 @@ function ToastItem({ toast, onDismiss }) {
   return (
     <div
       role="status"
-      className={`relative overflow-hidden rounded-2xl bg-white p-4 shadow-lg shadow-slate-900/10 ring-1 ${styles.ring} ${
+      className={`relative overflow-hidden rounded-2xl bg-card p-4 shadow-lg shadow-slate-900/10 ring-1 ${styles.ring} ${
         toast.leaving ? 'animate-toast-out' : 'animate-toast-in'
       }`}
     >
@@ -115,8 +115,8 @@ function ToastItem({ toast, onDismiss }) {
         </span>
 
         <div className="min-w-0 flex-1 pt-0.5">
-          <p className="text-sm font-semibold text-slate-800">{toast.title}</p>
-          {toast.description && <p className="mt-1 text-sm leading-snug text-slate-500">{toast.description}</p>}
+          <p className="text-sm font-semibold text-foreground">{toast.title}</p>
+          {toast.description && <p className="mt-1 text-sm leading-snug text-muted-foreground">{toast.description}</p>}
 
           {toast.actions?.length > 0 && (
             <div className="mt-2.5 flex items-center gap-4">
@@ -128,7 +128,7 @@ function ToastItem({ toast, onDismiss }) {
                     if (action.dismissOnClick !== false) onDismiss()
                   }}
                   className={`text-sm font-semibold ${
-                    action.variant === 'muted' ? 'text-slate-400 hover:text-slate-500' : styles.action
+                    action.variant === 'muted' ? 'text-muted-foreground hover:text-foreground' : styles.action
                   }`}
                 >
                   {action.label}
@@ -141,7 +141,7 @@ function ToastItem({ toast, onDismiss }) {
         <button
           onClick={onDismiss}
           aria-label="Dismiss notification"
-          className="relative shrink-0 rounded-md p-1 text-slate-300 hover:bg-slate-100 hover:text-slate-500"
+          className="relative shrink-0 rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
             <path d="M6 6l12 12M18 6L6 18" />

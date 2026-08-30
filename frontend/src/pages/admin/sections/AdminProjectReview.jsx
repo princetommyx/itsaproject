@@ -87,7 +87,7 @@ export default function AdminProjectReview() {
   if (projectError || !project) {
     return (
       <div className="space-y-6">
-        <Link to="/admin/projects" className="text-sm text-upsa-blue hover:underline">
+        <Link to="/admin/projects" className="text-sm text-brand hover:underline">
           &larr; Back to all projects
         </Link>
         <Card>
@@ -105,32 +105,32 @@ export default function AdminProjectReview() {
 
   return (
     <div className="space-y-6">
-      <Link to="/admin/projects" className="text-sm text-upsa-blue hover:underline">
+      <Link to="/admin/projects" className="text-sm text-brand hover:underline">
         &larr; Back to all projects
       </Link>
 
       <Card>
         <div className="mb-4 flex items-start justify-between gap-3">
-          <h1 className="min-w-0 break-words text-xl font-semibold text-slate-800">{project.title}</h1>
+          <h1 className="min-w-0 break-words text-xl font-semibold text-foreground">{project.title}</h1>
           <Badge status={project.status} />
         </div>
-        <p className="text-[15px] leading-[1.75] whitespace-pre-wrap text-slate-800">{project.description}</p>
+        <p className="text-[15px] leading-[1.75] whitespace-pre-wrap text-foreground">{project.description}</p>
 
-        <div className="mt-5 border-t border-slate-100 pt-5">
+        <div className="mt-5 border-t border-border pt-5">
           <StatusTimeline status={project.status} />
         </div>
 
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <div>
-            <h3 className="mb-2 text-sm font-semibold text-slate-700">Group Members</h3>
+            <h3 className="mb-2 text-sm font-semibold text-foreground">Group Members</h3>
             <ul className="space-y-2">
               {project.members.map((m) => {
                 const name = m.student ? m.student.name : m.university_id
                 return (
-                  <li key={m.id} className="flex items-center gap-2.5 text-sm text-slate-600">
+                  <li key={m.id} className="flex items-center gap-2.5 text-sm text-muted-foreground">
                     <Avatar name={name} className="h-7 w-7 text-[10px]" />
                     {name}
-                    {m.is_leader && <span className="text-xs text-upsa-blue">(Leader)</span>}
+                    {m.is_leader && <span className="text-xs text-brand">(Leader)</span>}
                     {!m.student && <span className="text-xs text-amber-600">(Not yet registered)</span>}
                   </li>
                 )
@@ -138,8 +138,8 @@ export default function AdminProjectReview() {
             </ul>
           </div>
           <div>
-            <h3 className="mb-2 text-sm font-semibold text-slate-700">Assessor</h3>
-            <p className="text-sm text-slate-600">{project.assessor?.name ?? 'Unassigned'}</p>
+            <h3 className="mb-2 text-sm font-semibold text-foreground">Assessor</h3>
+            <p className="text-sm text-muted-foreground">{project.assessor?.name ?? 'Unassigned'}</p>
           </div>
         </div>
 
@@ -151,20 +151,20 @@ export default function AdminProjectReview() {
           </div>
         )}
 
-        <div className="mt-5 border-t border-slate-100 pt-5">
-          <h3 className="mb-2 text-sm font-semibold text-slate-700">Submitted Documents</h3>
+        <div className="mt-5 border-t border-border pt-5">
+          <h3 className="mb-2 text-sm font-semibold text-foreground">Submitted Documents</h3>
           <ProjectDocumentList documents={project.documents} />
         </div>
 
         {/* Nothing here is ever removed — the version an earlier review sent
             back stays put, which is what makes a comparison possible. */}
-        <div className="mt-5 border-t border-slate-100 pt-5">
+        <div className="mt-5 border-t border-border pt-5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold text-slate-700">Submission History</h3>
+            <h3 className="text-sm font-semibold text-foreground">Submission History</h3>
             {(project.versions?.length ?? 0) > 1 && (
               <Link
                 to={`/admin/projects/${project.id}/compare`}
-                className="text-sm font-semibold text-upsa-blue hover:underline"
+                className="text-sm font-semibold text-brand hover:underline"
               >
                 Compare versions
               </Link>
@@ -173,21 +173,21 @@ export default function AdminProjectReview() {
           <SubmissionHistory versions={project.versions} compareBase={`/admin/projects/${project.id}/compare`} />
         </div>
 
-        <div className="mt-5 border-t border-slate-100 pt-5">
+        <div className="mt-5 border-t border-border pt-5">
           <DefenseScheduleCard project={project} onSaved={(updated) => mutateProject(updated, { revalidate: false })} />
         </div>
 
         {awaitingDecision ? (
-          <div className="mt-6 space-y-4 border-t border-slate-100 pt-6">
+          <div className="mt-6 space-y-4 border-t border-border pt-6">
             {project.status === 'submitted_unassigned' ? (
               <>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-muted-foreground">
                   This project hasn't been assigned an assessor yet. You can assign one to review it, or decide on
                   it yourself right now.
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <select
-                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-[15px] font-medium text-slate-900 transition duration-150 hover:border-slate-300 focus:border-upsa-blue focus:ring-4 focus:ring-upsa-blue/10 focus:outline-none sm:w-auto"
+                    className="w-full rounded-lg border border-border px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 hover:border-ring/60 focus:border-brand focus:ring-4 focus:ring-ring/25 focus:outline-none sm:w-auto"
                     value={selectedAssessor}
                     onChange={(e) => setSelectedAssessor(e.target.value)}
                   >
@@ -202,10 +202,10 @@ export default function AdminProjectReview() {
                     Assign Assessor
                   </Button>
                 </div>
-                <p className="text-xs text-slate-400">— or —</p>
+                <p className="text-xs text-muted-foreground">— or —</p>
               </>
             ) : (
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-muted-foreground">
                 This project is assigned to {project.assessor?.name ?? 'an assessor'}. As an admin you can
                 also decide on it directly — for example if the assessor is unavailable.
               </p>
@@ -227,7 +227,7 @@ export default function AdminProjectReview() {
             </div>
           </div>
         ) : (
-          <p className="mt-6 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-4 text-sm text-slate-500">
+          <p className="mt-6 flex flex-wrap items-center gap-2 border-t border-border pt-4 text-sm text-muted-foreground">
             {/* A draft has never been submitted, so calling it "already
                 reviewed" tells the admin the opposite of what is true. */}
             {project.status === 'draft'
