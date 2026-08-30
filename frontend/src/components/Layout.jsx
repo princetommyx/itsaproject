@@ -191,7 +191,7 @@ export default function Layout({ children }) {
       {drawerOpen && <div className="fixed inset-0 z-30 md:hidden" onClick={() => setDrawerOpen(false)} />}
 
       <aside
-        className={`drawer-height fixed inset-x-0 top-0 z-40 flex w-full shrink-0 flex-col rounded-b-3xl bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/30 transition-transform duration-200 md:static md:inset-auto md:h-auto md:max-h-none md:w-64 md:translate-y-0 md:rounded-none md:shadow-none ${
+        className={`drawer-height fixed inset-x-0 top-0 z-40 flex w-full shrink-0 flex-col bg-gradient-to-b from-upsa-blue to-upsa-blue-dark shadow-2xl shadow-black/30 transition-transform duration-200 md:static md:inset-auto md:h-auto md:max-h-none md:w-64 md:translate-y-0 md:shadow-none ${
           drawerOpen ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
