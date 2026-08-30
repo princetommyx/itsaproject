@@ -52,8 +52,6 @@ export default function StudentProfile() {
 
   return (
     <ProfileShell
-      homePath="/student"
-      homeLabel="My Project"
       subtitle="Student"
       extraSections={[{ key: 'project', label: 'My Project', icon: FolderIcon, content: projectSection }]}
     >

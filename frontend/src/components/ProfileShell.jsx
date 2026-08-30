@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Avatar, PageHeading } from './ui'
 import SectionLayout, { IdentityHeader, SectionCard } from './SectionLayout'
 import PasswordTab from './PasswordTab'
@@ -13,7 +12,7 @@ import { IdCardIcon, LockIcon } from './icons'
  * assessor's assigned work — as a real section in the rail rather than a card
  * stacked under the personal details, where it read as an afterthought.
  */
-export default function ProfileShell({ homePath, homeLabel, subtitle, extraSections = [], children }) {
+export default function ProfileShell({ subtitle, extraSections = [], children }) {
   const { user } = useAuth()
   const [section, setSection] = useState('profile')
 
@@ -27,14 +26,8 @@ export default function ProfileShell({ homePath, homeLabel, subtitle, extraSecti
 
   return (
     <div className="space-y-5">
-      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground" aria-label="Breadcrumb">
-        <Link to={homePath} className="hover:text-brand-ink hover:underline">
-          {homeLabel}
-        </Link>
-        <span>/</span>
-        <span className="font-medium text-muted-foreground">Profile</span>
-      </nav>
-
+      {/* No breadcrumb of its own any more — the app bar carries one for every
+          page, and two trails saying the same thing is worse than one. */}
       <PageHeading description="Your account details and security settings.">Profile</PageHeading>
 
       <SectionLayout

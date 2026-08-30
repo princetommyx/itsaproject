@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from './context/AuthContext'
 import { ToastProvider } from './context/ToastContext'
 import { SettingsProvider } from './context/SettingsContext'
 import { ThemeProvider } from './context/ThemeContext'
+import { PageMetaProvider } from './context/PageMetaContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import PageLoader from './components/PageLoader'
@@ -60,6 +61,7 @@ export default function App() {
         <ToastProvider>
           <AuthProvider>
           <SettingsProvider>
+          <PageMetaProvider>
             <Routes>
               <Route path="/" element={<HomeRedirect />} />
               <Route path="/login" element={<StudentLogin />} />
@@ -108,6 +110,7 @@ export default function App() {
 
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+          </PageMetaProvider>
           </SettingsProvider>
         </AuthProvider>
       </ToastProvider>

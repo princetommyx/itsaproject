@@ -1,6 +1,7 @@
 import { forwardRef } from 'react'
 import Spinner from './Spinner'
 import { cn } from '../lib/cn'
+import { usePublishTitle } from '../context/PageMetaContext'
 
 export function Field({ label, value }) {
   return (
@@ -17,13 +18,25 @@ export function stagger(i, stepMs = 40, maxSteps = 8) {
   return { animationDelay: `${Math.min(i, maxSteps) * stepMs}ms` }
 }
 
+/**
+ * A page's heading.
+ *
+ * The title itself is published to the app bar rather than printed here — the
+ * bar is on screen at all times, so it is where "which page is this" belongs,
+ * and repeating it immediately underneath was saying the same thing twice.
+ * The description and any actions stay in the page, where there is room for
+ * them.
+ */
 export function PageHeading({ children, description, actions, className = '' }) {
+  usePublishTitle(typeof children === 'string' ? children : null)
+
+  if (!description && !actions) return null
+
   return (
     <div className={`flex flex-wrap items-start justify-between gap-4 ${className}`}>
-      <div>
-        <h1 className="text-2xl font-extrabold tracking-tight text-foreground sm:text-3xl">{children}</h1>
-        {description && <p className="mt-1.5 text-[15px] font-medium text-muted-foreground">{description}</p>}
-      </div>
+      {description && (
+        <p className="max-w-2xl text-[15px] font-medium text-muted-foreground">{description}</p>
+      )}
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   )

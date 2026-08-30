@@ -38,8 +38,6 @@ export default function AssessorProfile() {
 
   return (
     <ProfileShell
-      homePath="/assessor"
-      homeLabel="Assigned Projects"
       subtitle="Assessor"
       extraSections={[
         { key: 'work', label: 'Assigned Work', icon: ClipboardIcon, content: assignedWork },

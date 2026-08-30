@@ -36,8 +36,6 @@ export default function AdminProfile() {
 
   return (
     <ProfileShell
-      homePath="/admin"
-      homeLabel="Dashboard"
       subtitle="Administrator"
       extraSections={[{ key: 'overview', label: 'System Overview', icon: ChartIcon, content: overview }]}
     >

@@ -4,6 +4,7 @@ import useSWR, { preload } from 'swr'
 import client from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { useSettings } from '../context/SettingsContext'
+import { usePageMeta } from '../context/PageMetaContext'
 import { useTheme } from '../context/ThemeContext'
 import { cn } from '../lib/cn'
 import { useToast } from '../context/ToastContext'
@@ -87,6 +88,24 @@ const NAV_LINKS = {
   ],
 }
 
+/**
+ * Extra crumbs for routes that aren't in the sidebar — detail pages reached
+ * from a list, which still need to say where they sit.
+ */
+const EXTRA_CRUMBS = {
+  '/admin/projects/:id': 'Project',
+  '/admin/projects/:id/compare': 'Compare',
+  '/admin/students/:id': 'Student',
+  '/assessor/projects/:id': 'Project',
+  '/assessor/projects/:id/compare': 'Compare',
+}
+
+const ROLE_HOME = {
+  admin: { to: '/admin', label: 'Dashboard' },
+  assessor: { to: '/assessor', label: 'Assigned Projects' },
+  student: { to: '/student', label: 'My Project' },
+}
+
 const PROFILE_PATH = {
   student: '/student/profile',
   assessor: '/assessor/profile',
@@ -127,7 +146,7 @@ function UserMenu({ user, onLogout }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="menu"
         aria-expanded={open}
-        className="flex items-center gap-1 rounded-full py-0.5 pr-1.5 pl-0.5 transition hover:bg-muted"
+        className="flex h-11 items-center gap-1 rounded-xl px-1 transition hover:bg-muted md:h-10"
       >
         <Avatar name={user?.name} className="h-8 w-8 text-[11px]" />
         <span className={`text-muted-foreground transition-transform duration-150 ${open ? 'rotate-180' : ''}`}>
@@ -173,6 +192,7 @@ function UserMenu({ user, onLogout }) {
 
 export default function Layout({ children }) {
   const { user, logout } = useAuth()
+  const { resolved: resolvedTheme, setTheme } = useTheme()
   const toast = useToast()
   const location = useLocation()
   const [drawerOpen, setDrawerOpen] = useState(false)
@@ -437,28 +457,39 @@ export default function Layout({ children }) {
           className="sticky top-0 z-20 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60"
           style={{ paddingTop: 'env(safe-area-inset-top)' }}
         >
-          <div className="flex h-16 items-center gap-3 px-4 md:px-6">
+          <div className="flex min-h-16 items-center gap-3 px-4 py-2.5 md:px-6">
             <button
               ref={toggleRef}
               onClick={() => setDrawerOpen(true)}
               aria-label="Open menu"
               aria-expanded={drawerOpen}
-              className="-ml-1 rounded-full p-2 text-foreground hover:bg-muted md:hidden"
+              className="-ml-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-foreground transition hover:bg-muted md:hidden"
             >
               <MenuIcon />
             </button>
 
-            {/* On mobile the sidebar is closed, so the topbar carries the
-                brand; on desktop the sidebar already shows it. */}
-            <div className="flex items-center gap-2.5 md:hidden">
-              <BrandMarkCompact />
-            </div>
+            {/* The bar answers "where am I" now, so it carries the trail and
+                the page title rather than sitting empty beside three icons. */}
+            <Breadcrumb role={user?.role} />
 
-            <div className="ml-auto flex items-center gap-1">
-              <ThemeToggle />
-              <NotificationsButton
+            {/* On a phone these are labelled tiles rather than bare icons:
+                44px is the smallest target a thumb hits reliably, and the old
+                icon buttons were 36 with nothing to say what they did. On
+                desktop, where the pointer is precise and the labels would be
+                noise, they stay as icons. */}
+            <div className="ml-auto flex shrink-0 items-center gap-1.5">
+              <ActionTile
+                onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                label="Theme"
+                ariaLabel={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`}
+                icon={resolvedTheme === 'dark' ? <SunIcon /> : <MoonIcon />}
+              />
+              <ActionTile
                 to={NOTIFICATIONS_PATH[user?.role]}
-                count={unreadCount}
+                label="Alerts"
+                ariaLabel={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
+                icon={<BellIcon />}
+                badge={unreadCount}
               />
               <UserMenu user={user} onLogout={handleLogout} />
             </div>
@@ -477,53 +508,7 @@ export default function Layout({ children }) {
   )
 }
 
-/**
- * Light / dark, with the system option folded in: the button shows what you'd
- * get if you pressed it, and pressing it commits to that rather than leaving
- * you on "system" wondering why it changed at sunset.
- */
-function ThemeToggle() {
-  const { resolved, setTheme } = useTheme()
-  const next = resolved === 'dark' ? 'light' : 'dark'
 
-  return (
-    <button
-      onClick={() => setTheme(next)}
-      aria-label={`Switch to ${next} mode`}
-      title={`Switch to ${next} mode`}
-      className="rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-    >
-      {resolved === 'dark' ? <SunIcon /> : <MoonIcon />}
-    </button>
-  )
-}
-
-/**
- * A link, not a dropdown: the notifications page already renders the list with
- * grouping, filtering and read state, and a second miniature copy in a menu
- * would be one more thing to keep in step for no gain.
- */
-function NotificationsButton({ to, count }) {
-  if (!to) return null
-
-  return (
-    <Link
-      to={to}
-      aria-label={count > 0 ? `Notifications, ${count} unread` : 'Notifications'}
-      className="relative rounded-full p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-    >
-      <BellIcon />
-      {count > 0 && (
-        // A fixed red rather than the destructive token: that token lightens
-        // in dark mode for use as text, which drops white-on-red below AA at
-        // this size. red-600 clears 4.5:1 against white in both themes.
-        <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
-          {count > 9 ? '9+' : count}
-        </span>
-      )}
-    </Link>
-  )
-}
 
 /**
  * The mark in the navigation. Falls back to the built-in UPSA shield and
@@ -552,23 +537,124 @@ function BrandMark({ hideWordmark = false }) {
   )
 }
 
-/** The topbar's mark, which sits on the page ground rather than the gradient. */
-function BrandMarkCompact() {
-  const { settings } = useSettings()
+
+
+
+
+/**
+ * Where you are, in the app bar.
+ *
+ * The crumbs come from the sidebar's own labels, so a section is never named
+ * two different things in two places. The last crumb is the page title the
+ * page published; a page that publishes none falls back to its nav label,
+ * which is why a detail page still reads sensibly.
+ */
+function Breadcrumb({ role }) {
+  const location = useLocation()
+  const { title } = usePageMeta()
+
+  const home = ROLE_HOME[role]
+  if (!home) return null
+
+  const links = NAV_LINKS[role] ?? []
+  const path = location.pathname
+
+  // The deepest nav link this route sits under — /admin/projects/12 belongs to
+  // "All Projects", not to whatever happens to match first.
+  const section = links
+    .filter((link) => link.to && link.to !== home.to && path.startsWith(link.to))
+    .sort((a, b) => b.to.length - a.to.length)[0]
+
+  const detail = Object.entries(EXTRA_CRUMBS).find(([pattern]) => {
+    const regex = new RegExp('^' + pattern.replace(/:\w+/g, '[^/]+') + '$')
+    return regex.test(path)
+  })?.[1]
+
+  const crumbs = [
+    { label: home.label, to: home.to },
+    section && { label: section.label, to: section.to },
+    detail && { label: detail },
+  ].filter(Boolean)
+
+  const heading = title ?? crumbs[crumbs.length - 1]?.label ?? home.label
+
+  // The title the page published stands in for the crumb it would otherwise
+  // end on. Dropped when they say the same thing — a section's own index page
+  // ("Students" / "Students") or a near-match like "My Profile" against
+  // "Profile", both of which read as a stutter.
+  const last = crumbs[crumbs.length - 1]?.label?.toLowerCase() ?? ''
+  const lowerHeading = heading.toLowerCase()
+  const trail = last.endsWith(lowerHeading) || lowerHeading.endsWith(last)
+    ? crumbs.slice(0, -1)
+    : crumbs
 
   return (
-    <>
-      <img
-        src={settings.logo_url || upsaShield}
-        alt={settings.school_name || 'UPSA'}
-        className="h-8 w-8 shrink-0 rounded-lg bg-card object-contain p-1 ring-1 ring-border"
-      />
-      <span className="truncate text-base font-extrabold tracking-tight text-foreground">
-        {settings.short_name?.trim() || 'UPSA'}
-      </span>
-    </>
+    <div className="min-w-0">
+      {/* Hidden on the landing page, where the trail is empty and the crumb
+          would just be the title printed twice — and hidden on phones, where
+          there isn't width for it: it truncated to "Dashboard / All …" above a
+          title already reading "All Projects", which is noise, not context. */}
+      {trail.length > 0 && (
+        <nav
+          aria-label="Breadcrumb"
+          className="hidden items-center gap-1.5 text-xs font-medium sm:flex"
+        >
+          {trail.map((crumb) => (
+            <span key={crumb.label} className="flex items-center gap-1.5">
+              {crumb.to ? (
+                <Link to={crumb.to} className="text-muted-foreground transition hover:text-foreground">
+                  {crumb.label}
+                </Link>
+              ) : (
+                <span className="text-muted-foreground">{crumb.label}</span>
+              )}
+              {/* Full muted ink, not /60: at 60% the separator measured 2.51:1,
+                  and it is still plainly recessive against the title above it. */}
+              <span className="text-muted-foreground">/</span>
+            </span>
+          ))}
+          <span className="truncate text-muted-foreground">{heading}</span>
+        </nav>
+      )}
+      <p className="truncate text-lg font-extrabold tracking-tight text-foreground">{heading}</p>
+    </div>
   )
 }
 
+/**
+ * One action in the app bar.
+ *
+ * A labelled 44px tile on a phone, a bare icon button on desktop. The two
+ * cases genuinely differ: a thumb needs the size and the label, a pointer
+ * needs neither and the labels would only add noise beside a title.
+ */
+function ActionTile({ to, onClick, icon, label, ariaLabel, badge = 0 }) {
+  const className =
+    'relative flex h-11 flex-col items-center justify-center gap-0.5 rounded-xl px-2.5 text-muted-foreground transition hover:bg-muted hover:text-foreground md:h-10 md:w-10 md:px-0'
 
+  const content = (
+    <>
+      {icon}
+      <span className="text-[9px] font-bold tracking-wide uppercase md:hidden">{label}</span>
+      {badge > 0 && (
+        <span className="absolute top-0.5 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+          {badge > 9 ? '9+' : badge}
+        </span>
+      )}
+    </>
+  )
 
+  if (to) {
+    return (
+      <Link to={to} aria-label={ariaLabel ?? label} className={className}>
+        {content}
+      </Link>
+    )
+  }
+
+  return (
+    <button onClick={onClick} aria-label={ariaLabel ?? label} className={className}>
+      {content}
+    </button>
+  )
+}
