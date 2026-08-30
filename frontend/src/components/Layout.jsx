@@ -490,8 +490,10 @@ export default function Layout({ children }) {
               on the page, and it lifts only when there is something passing
               underneath for it to lift above. */}
           <div
-            className="mx-auto flex min-h-16 max-w-6xl items-center gap-2 rounded-2xl bg-card px-3 py-2.5 ring-1 ring-border transition-shadow duration-300 md:gap-3 md:px-5"
-            style={{ boxShadow: `var(${scrolled ? '--shadow-bar-raised' : '--shadow-bar'})` }}
+            className={cn(
+              'mx-auto flex min-h-16 max-w-6xl items-center gap-2 rounded-2xl bg-card px-3 py-2.5 ring-1 ring-border transition-shadow duration-300 md:gap-3 md:px-5',
+              scrolled ? 'shadow-bar-raised' : 'shadow-bar'
+            )}
           >
             <button
               ref={toggleRef}

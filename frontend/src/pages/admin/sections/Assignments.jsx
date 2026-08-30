@@ -11,7 +11,7 @@ function AssignmentsSkeleton() {
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-6 shadow-sm shadow-slate-200/60">
+        <div key={i} className="animate-pulse rounded-2xl border border-border bg-card p-6 shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0 space-y-2">
               <Skeleton className="h-4 w-40" />

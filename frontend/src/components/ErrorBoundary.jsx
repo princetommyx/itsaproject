@@ -29,7 +29,7 @@ export default class ErrorBoundary extends Component {
     if (!this.state.hasError) return this.props.children
 
     return (
-      <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-6 text-center shadow-card">
         <p className="text-base font-bold text-foreground">This page didn&apos;t load properly</p>
         <p className="mx-auto mt-1 max-w-sm text-sm font-medium text-muted-foreground">
           Something went wrong while displaying it. Try again, and if it keeps happening let your

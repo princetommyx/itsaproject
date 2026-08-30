@@ -66,12 +66,19 @@
   /* UPSA gold (#c8962f). */
   --accent-gold: oklch(0.71 0.13 78);
 
-  /* Elevation for the app bar. Two layers, because one is what makes a shadow
-     look painted on: a tight contact shadow that sits the card on the page,
-     and a wide soft one that gives it height. --shadow-bar-raised is the same
-     light from further away, used once content is scrolling underneath. */
-  --shadow-bar: 0 1px 2px rgb(15 23 42 / 0.06), 0 6px 16px -8px rgb(15 23 42 / 0.14);
-  --shadow-bar-raised: 0 2px 4px rgb(15 23 42 / 0.08), 0 14px 32px -10px rgb(15 23 42 / 0.22);
+  /* The elevation ramp. Every step is two layers, because a single layer is
+     what makes a shadow look painted on: a tight, barely-there contact shadow
+     that sits the surface on the page, plus a wide soft one from the same
+     light further away that gives it height. Opacity stays low and blur stays
+     generous — a dense shadow reads as a border, not as air.
+
+     The steps are roles rather than numbers, so a surface picks the one that
+     matches what it *is*: cards rest, the bar floats above them, and a lifted
+     card on hover comes forward without ever outranking the bar. */
+  --elevation-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 12px -4px rgb(15 23 42 / 0.1);
+  --elevation-card-hover: 0 2px 4px rgb(15 23 42 / 0.06), 0 16px 28px -10px rgb(15 23 42 / 0.18);
+  --elevation-bar: 0 1px 2px rgb(15 23 42 / 0.06), 0 6px 16px -8px rgb(15 23 42 / 0.14);
+  --elevation-bar-raised: 0 2px 4px rgb(15 23 42 / 0.08), 0 14px 32px -10px rgb(15 23 42 / 0.22);
 }
 
 .dark {
@@ -110,15 +117,26 @@
   --brand-2: oklch(0.4 0.09 262);
   --brand-ink: color-mix(in oklab, var(--brand) 40%, white 60%);
 
-  /* A black shadow on a near-black page is invisible, so on dark the depth
-     comes from a darker-than-background spread rather than from opacity, and
-     the card keeps its ring to draw the edge the shadow cannot. */
-  --shadow-bar: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px -10px rgb(0 0 0 / 0.7);
-  --shadow-bar-raised: 0 2px 6px rgb(0 0 0 / 0.6), 0 16px 36px -12px rgb(0 0 0 / 0.85);
+  /* A black shadow on a near-black page is invisible, so the whole ramp is
+     re-cut for dark rather than reused: depth comes from a much darker spread
+     at higher opacity, and every surface keeps its ring to draw the edge the
+     shadow cannot. */
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 14px -6px rgb(0 0 0 / 0.6);
+  --elevation-card-hover: 0 2px 6px rgb(0 0 0 / 0.5), 0 18px 32px -12px rgb(0 0 0 / 0.8);
+  --elevation-bar: 0 1px 2px rgb(0 0 0 / 0.5), 0 8px 20px -10px rgb(0 0 0 / 0.7);
+  --elevation-bar-raised: 0 2px 6px rgb(0 0 0 / 0.6), 0 16px 36px -12px rgb(0 0 0 / 0.85);
 }
 
 @theme inline {
   --font-sans: var(--app-font, 'Roboto', Arial, Helvetica, sans-serif);
+
+  /* Registered so the ramp is reachable as shadow-card / shadow-bar / etc.
+     Pointing at the vars rather than inlining the values is what lets the
+     .dark block re-cut every step without touching a single component. */
+  --shadow-card: var(--elevation-card);
+  --shadow-card-hover: var(--elevation-card-hover);
+  --shadow-bar: var(--elevation-bar);
+  --shadow-bar-raised: var(--elevation-bar-raised);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

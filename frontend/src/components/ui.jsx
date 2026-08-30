@@ -81,9 +81,9 @@ export function Card({ children, className = '', interactive = false }) {
       className={cn(
         // The template's surface: a generous radius and a hairline ring rather
         // than a heavy border, so cards read as raised paper on the muted page.
-        'rounded-2xl bg-card p-6 text-card-foreground ring-1 ring-border shadow-sm',
+        'rounded-2xl bg-card p-6 text-card-foreground shadow-card ring-1 ring-border',
         interactive &&
-          'transition duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:ring-brand/20',
+          'transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover hover:ring-brand/20',
         className
       )}
     >
@@ -231,7 +231,7 @@ export function StatCard({ label, value, variant = 'blue', className = '', style
     <div
       style={style}
       className={cn(
-        'rounded-2xl p-4 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md sm:p-5',
+        'rounded-2xl p-4 shadow-card transition duration-200 hover:-translate-y-0.5 hover:shadow-card-hover sm:p-5',
         STAT_CARD_STYLES[variant] || STAT_CARD_STYLES.blue,
         className
       )}
@@ -244,7 +244,7 @@ export function StatCard({ label, value, variant = 'blue', className = '', style
 
 export function HeroStatCard({ label, value, caption }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-sidebar-gradient p-6 text-white shadow-lg">
+    <div className="relative overflow-hidden rounded-2xl bg-sidebar-gradient p-6 text-white shadow-card-hover">
       <div
         className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-gold/25 blur-3xl"
         aria-hidden="true"
