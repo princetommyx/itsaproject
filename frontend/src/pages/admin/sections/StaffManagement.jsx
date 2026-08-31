@@ -2,6 +2,8 @@ import { useState } from 'react'
 import client from '../../../api/client'
 import { useToast } from '../../../context/ToastContext'
 import { Alert, Button, Card, Input, PageHeading } from '../../../components/ui'
+import CsvImportCard from '../../../components/CsvImportCard'
+import { cn } from '../../../lib/cn'
 
 export default function StaffManagement() {
   const toast = useToast()
@@ -11,6 +13,9 @@ export default function StaffManagement() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  // Adding one account and importing many are the same job, so they live on
+  // one page behind a toggle rather than as two sidebar entries.
+  const [mode, setMode] = useState('single')
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -33,9 +38,49 @@ export default function StaffManagement() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Onboard assessors and fellow admins with an official UPSA email.">
+      <PageHeading description="Onboard assessors and fellow admins with an official UPSA email — one at a time, or a whole list at once.">
         Staff Accounts
       </PageHeading>
+
+      <div className="flex flex-wrap gap-2">
+        {[
+          { key: 'single', label: 'Add one account' },
+          { key: 'import', label: 'Import from CSV' },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setMode(tab.key)}
+            aria-pressed={mode === tab.key}
+            className={cn(
+              'rounded-lg px-3.5 py-2 text-sm font-semibold transition',
+              mode === tab.key
+                ? 'bg-brand text-brand-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'import' ? (
+        <CsvImportCard
+          endpoint="/admin/staff/import"
+          noun="staff account"
+          columns={
+            <>
+              Columns required: <code className="rounded bg-muted px-1">Staff Name</code>,{' '}
+              <code className="rounded bg-muted px-1">Email</code>,{' '}
+              <code className="rounded bg-muted px-1">Role</code>,{' '}
+              <code className="rounded bg-muted px-1">Date of Birth</code>. Role must be{' '}
+              <code className="rounded bg-muted px-1">assessor</code> or{' '}
+              <code className="rounded bg-muted px-1">admin</code>. Staff sign in with their
+              official email, and their date of birth as YYYYMMDD is the initial password — they
+              are asked to change it before they can use the system.
+            </>
+          }
+        />
+      ) : (
       <Card className="max-w-lg">
         <h2 className="mb-4 text-lg font-bold text-foreground">Onboard a Staff Account</h2>
         <p className="mb-4 text-sm text-muted-foreground">
@@ -77,6 +122,7 @@ export default function StaffManagement() {
           </Button>
         </form>
       </Card>
+      )}
     </div>
   )
 }
