@@ -80,6 +80,7 @@ const NAV_LINKS = {
     { to: '/admin/students', label: 'Students', icon: UsersIcon },
     { to: '/admin/import', label: 'Import Students', icon: UploadCloudIcon },
     { to: '/admin/staff', label: 'Staff Accounts', icon: BuildingIcon },
+  { to: '/admin/staff/import', label: 'Import Staff', icon: UploadCloudIcon },
     { section: 'System' },
     { to: '/admin/logs', label: 'Login Logs', icon: LogIcon },
     { to: '/admin/complaints', label: 'Complaints', icon: MessageIcon },

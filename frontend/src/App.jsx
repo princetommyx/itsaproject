@@ -31,6 +31,7 @@ import AdminProjectReview from './pages/admin/sections/AdminProjectReview'
 import DefenseSchedules from './pages/admin/sections/DefenseSchedules'
 import Assignments from './pages/admin/sections/Assignments'
 import ImportStudents from './pages/admin/sections/ImportStudents'
+import ImportStaff from './pages/admin/sections/ImportStaff'
 import Students from './pages/admin/sections/Students'
 import AdminStudentDetail from './pages/admin/sections/AdminStudentDetail'
 import CompareVersions from './pages/CompareVersions'
@@ -102,6 +103,7 @@ export default function App() {
                   <Route path="students/:id" element={<AdminStudentDetail />} />
                   <Route path="import" element={<ImportStudents />} />
                   <Route path="staff" element={<StaffManagement />} />
+                  <Route path="staff/import" element={<ImportStaff />} />
                   <Route path="logs" element={<LoginLogs />} />
                   <Route path="complaints" element={<Complaints />} />
                   <Route path="notifications" element={<AdminNotifications />} />

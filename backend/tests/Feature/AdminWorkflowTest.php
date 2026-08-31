@@ -288,3 +288,63 @@ it('decides on a project whose group member has no email address', function () {
     // The decision must still reach them in the app, even with nowhere to mail.
     expect($student->fresh()->notifications()->count())->toBe(1);
 });
+
+it('imports staff from a CSV using the DOB as the initial password', function () {
+    $admin = User::factory()->admin()->create();
+
+    $csv = "Staff Name,Email,Role,Date of Birth\n".
+        "Dr. Ama Serwaa,ama.serwaa@upsa.edu.gh,assessor,1980-04-12\n".
+        "Kofi Boateng,kofi.boateng@upsa.edu.gh,admin,1975-11-03\n";
+
+    $response = $this->actingAs($admin, 'sanctum')
+        ->postJson('/api/admin/staff/import', [
+            'file' => UploadedFile::fake()->createWithContent('staff.csv', $csv),
+        ]);
+
+    $response->assertOk();
+    expect($response->json('created'))->toHaveCount(2);
+    expect($response->json('errors'))->toBeEmpty();
+
+    $assessor = User::where('email', 'ama.serwaa@upsa.edu.gh')->first();
+    expect($assessor->role)->toBe('assessor');
+    // The password is the DOB as YYYYMMDD, and they must change it before use.
+    expect(Hash::check('19800412', $assessor->password))->toBeTrue();
+    expect($assessor->is_first_login)->toBeTrue();
+
+    expect(User::where('email', 'kofi.boateng@upsa.edu.gh')->first()->role)->toBe('admin');
+});
+
+it('reports bad staff rows without failing the whole import', function () {
+    $admin = User::factory()->admin()->create();
+    User::factory()->assessor()->create(['email' => 'taken@upsa.edu.gh']);
+
+    $csv = "Staff Name,Email,Role,Date of Birth\n".
+        "Good Row,good@upsa.edu.gh,assessor,1980-04-12\n".
+        "Duplicate,taken@upsa.edu.gh,assessor,1980-04-12\n".
+        "Bad Role,badrole@upsa.edu.gh,registrar,1980-04-12\n".
+        "Not An Email,nope,assessor,1980-04-12\n".
+        // A stray comma: array_combine() throws on a length mismatch, which
+        // used to 500 the entire file rather than flagging one row.
+        "Stray Comma,stray@upsa.edu.gh,assessor,1980-04-12,oops\n";
+
+    $response = $this->actingAs($admin, 'sanctum')
+        ->postJson('/api/admin/staff/import', [
+            'file' => UploadedFile::fake()->createWithContent('staff.csv', $csv),
+        ]);
+
+    $response->assertOk();
+    expect($response->json('created'))->toBe(['good@upsa.edu.gh']);
+    expect($response->json('errors'))->toHaveCount(4);
+    expect(User::where('email', 'badrole@upsa.edu.gh')->exists())->toBeFalse();
+    expect(User::where('email', 'stray@upsa.edu.gh')->exists())->toBeFalse();
+});
+
+it('does not let an assessor import staff', function () {
+    $assessor = User::factory()->assessor()->create();
+
+    $this->actingAs($assessor, 'sanctum')
+        ->postJson('/api/admin/staff/import', [
+            'file' => UploadedFile::fake()->createWithContent('staff.csv', "Staff Name,Email,Role,Date of Birth\n"),
+        ])
+        ->assertForbidden();
+});

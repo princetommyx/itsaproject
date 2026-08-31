@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/students/import', [AdminController::class, 'importStudents']);
             Route::get('/staff', [AdminController::class, 'staff']);
             Route::post('/staff', [AdminController::class, 'createStaff']);
+            Route::post('/staff/import', [AdminController::class, 'importStaff']);
             Route::get('/assessors', [AdminController::class, 'assessors']);
             Route::get('/students', [AdminController::class, 'students']);
             Route::get('/students/{student}', [AdminController::class, 'showStudent']);

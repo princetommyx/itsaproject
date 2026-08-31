@@ -99,7 +99,15 @@ class AdminController extends Controller
                 continue;
             }
 
-            $data = array_combine($header, $row);
+            $data = $this->combineRow($header, $row);
+
+            if ($data === null) {
+                $errors[] = ['row' => $index + 2, 'errors' => [
+                    'This row has '.count($row).' values but the header has '.count($header).'. Check for a stray or missing comma.',
+                ]];
+
+                continue;
+            }
 
             $name = trim($data['student name'] ?? $data['name'] ?? '');
             $universityId = trim($data['index number'] ?? $data['university_id'] ?? '');
@@ -477,6 +485,101 @@ class AdminController extends Controller
         activity_log('staff.created', $user, ['role' => $user->role, 'email' => $user->email]);
 
         return response()->json($user, 201);
+    }
+
+    /**
+     * Onboard staff in bulk from a CSV, the same way students are imported.
+     *
+     * Staff are identified by their official email rather than an index
+     * number, and like students their initial password is their date of birth
+     * as YYYYMMDD. is_first_login is true so EnsurePasswordChanged makes them
+     * set a real one before they can reach anything — that matters more here
+     * than for students, since these accounts mark work and, for admins,
+     * administer the system.
+     */
+    public function importStaff(Request $request)
+    {
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:csv,txt'],
+        ]);
+
+        $rows = array_map('str_getcsv', file($request->file('file')->getRealPath()));
+        $header = array_map(fn ($h) => strtolower(trim($h)), array_shift($rows));
+
+        $created = [];
+        $errors = [];
+
+        foreach ($rows as $index => $row) {
+            if (count(array_filter($row, fn ($v) => trim((string) $v) !== '')) === 0) {
+                continue;
+            }
+
+            $data = $this->combineRow($header, $row);
+
+            if ($data === null) {
+                $errors[] = ['row' => $index + 2, 'errors' => [
+                    'This row has '.count($row).' values but the header has '.count($header).'. Check for a stray or missing comma.',
+                ]];
+
+                continue;
+            }
+
+            $name = trim($data['staff name'] ?? $data['name'] ?? '');
+            $email = trim($data['email'] ?? '');
+            $role = strtolower(trim($data['role'] ?? ''));
+            $dob = trim($data['date of birth'] ?? $data['dob'] ?? '');
+
+            $validator = Validator::make(
+                compact('name', 'email', 'role', 'dob'),
+                [
+                    'name' => ['required', 'string', 'max:255'],
+                    'email' => ['required', 'email', 'unique:users,email'],
+                    'role' => ['required', 'in:admin,assessor'],
+                    'dob' => ['required', 'date'],
+                ],
+                [
+                    'role.in' => 'Role must be either admin or assessor.',
+                    'email.unique' => 'An account already exists with this email.',
+                ]
+            );
+
+            if ($validator->fails()) {
+                $errors[] = ['row' => $index + 2, 'errors' => $validator->errors()->all()];
+
+                continue;
+            }
+
+            $dobCarbon = \Illuminate\Support\Carbon::parse($dob);
+
+            $user = User::create([
+                'name' => $name,
+                'email' => $email,
+                'role' => $role,
+                'dob' => $dobCarbon,
+                'password' => Hash::make($dobCarbon->format('Ymd')),
+                'is_first_login' => true,
+            ]);
+
+            $created[] = $user->email;
+        }
+
+        activity_log('staff.imported', null, ['created' => count($created), 'failed' => count($errors)]);
+
+        return response()->json([
+            'created' => $created,
+            'errors' => $errors,
+        ]);
+    }
+
+    /**
+     * array_combine() throws when a row's column count differs from the
+     * header's, which turns one stray comma in a spreadsheet into a 500 for
+     * the whole file. Return null instead so the row can be reported and the
+     * rest of the import carries on.
+     */
+    private function combineRow(array $header, array $row): ?array
+    {
+        return count($header) === count($row) ? array_combine($header, $row) : null;
     }
 
     /**
