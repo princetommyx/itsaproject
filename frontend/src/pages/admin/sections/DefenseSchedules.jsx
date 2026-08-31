@@ -10,7 +10,10 @@ export default function DefenseSchedules() {
   const { data, error, mutate } = useSWR('/admin/projects')
   const isLoading = !data && !error
 
-  const projects = data?.projects || []
+  // /admin/projects responds with a bare array. Reading data.projects gave
+  // undefined every time, so this page showed "no approved projects" however
+  // many there were.
+  const projects = Array.isArray(data) ? data : (data?.projects ?? [])
   const approvedProjects = projects.filter(p => p.status === 'approved')
 
   function exportCSV() {
@@ -69,16 +72,25 @@ export default function DefenseSchedules() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <PageHeading>Defense Schedules</PageHeading>
-        <Button variant="secondary" onClick={exportCSV} disabled={approvedProjects.length === 0}>
-          Export to CSV
-        </Button>
-      </div>
+      {/* Title, description and actions all go through PageHeading, the same
+          as every other page: it publishes the title to the app bar and lays
+          the action out beside the description. Hand-rolling the row left the
+          button floating on its own above the text.
 
-      <p className="text-sm text-muted-foreground">
-        Manage defense dates for all approved projects. Saving dates will automatically notify the students.
-      </p>
+          The export is a primary button, matching the dashboard's own Export
+          Data. As `secondary` it had no visible fill — that token is
+          near-white — so it read as a stray line of text rather than a
+          control. */}
+      <PageHeading
+        description="Manage defense dates for all approved projects. Saving dates will automatically notify the students."
+        actions={
+          <Button onClick={exportCSV} disabled={approvedProjects.length === 0}>
+            Export to CSV
+          </Button>
+        }
+      >
+        Defense Schedules
+      </PageHeading>
 
       {approvedProjects.length === 0 ? (
         <Card>
@@ -103,10 +115,14 @@ export default function DefenseSchedules() {
               <DefenseScheduleCard 
                 project={project} 
                 onSaved={(updatedProject) => {
-                  mutate({
-                    ...data,
-                    projects: projects.map(p => p.id === updatedProject.id ? updatedProject : p)
-                  }, { revalidate: false })
+                  // Written back in the shape the endpoint actually returns.
+                  // Spreading an array into an object literal turns it into
+                  // {0: ..., 1: ...}, which would corrupt the cache the first
+                  // time anyone saved a date.
+                  mutate(
+                    projects.map((p) => (p.id === updatedProject.id ? updatedProject : p)),
+                    { revalidate: false }
+                  )
                 }} 
               />
             </Card>
