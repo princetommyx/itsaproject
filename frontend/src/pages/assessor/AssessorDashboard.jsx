@@ -19,7 +19,7 @@ export default function AssessorDashboard() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Projects assigned to you for review.">Assigned Projects</PageHeading>
+      <PageHeading>Assigned Projects</PageHeading>
 
       {isLoading ? (
         <>

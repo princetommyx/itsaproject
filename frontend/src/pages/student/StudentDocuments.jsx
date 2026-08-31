@@ -110,7 +110,7 @@ export default function StudentDocuments() {
     try {
       await client.delete(`/student/projects/${project.id}/documents/${document.id}`)
       dropDocument(document.id)
-      toast.success('Document removed successfully')
+      toast.success('Document removed')
     } catch {
       toast.error('Unable to remove this document', { description: 'Please try again.' })
     }

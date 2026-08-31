@@ -117,7 +117,7 @@ export default function DefenseSchedules() {
           Data. As `secondary` it had no visible fill — that token is
           near-white — so it read as a stray line of text rather than a
           control. */}
-      <PageHeading description="Manage defense dates for all approved projects. Saving dates notifies the students. Each stage exports on its own, listing only the groups scheduled for it, in the order they sit.">
+      <PageHeading description="Saving a date notifies the group. Each stage exports separately, listing only the groups scheduled for it.">
         Defense Schedules
       </PageHeading>
 

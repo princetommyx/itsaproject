@@ -11,7 +11,7 @@ export default function LoginLogs() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="A record of every sign-in across the system.">Login Logs</PageHeading>
+      <PageHeading>Login Logs</PageHeading>
       <Card>
         <h2 className="mb-4 text-lg font-bold text-foreground">Login Audit Trail</h2>
         {isLoading ? (

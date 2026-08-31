@@ -28,7 +28,7 @@ export default function ProfileShell({ subtitle, extraSections = [], children })
     <div className="space-y-5">
       {/* No breadcrumb of its own any more — the app bar carries one for every
           page, and two trails saying the same thing is worse than one. */}
-      <PageHeading description="Your account details and security settings.">Profile</PageHeading>
+      <PageHeading>Profile</PageHeading>
 
       <SectionLayout
         sections={sections}

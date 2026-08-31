@@ -4,7 +4,7 @@ import CsvImportCard from '../../../components/CsvImportCard'
 export default function ImportStudents() {
   return (
     <div className="space-y-6">
-      <PageHeading description="Bulk-create student accounts from a CSV roster.">
+      <PageHeading>
         Import Students
       </PageHeading>
 

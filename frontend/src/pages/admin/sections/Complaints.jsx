@@ -20,7 +20,7 @@ export default function Complaints() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Messages and complaints filed by students, all in one place.">Complaints</PageHeading>
+      <PageHeading>Complaints</PageHeading>
       <Card>
         <h2 className="mb-4 text-lg font-bold text-foreground">Student Complaints</h2>
         {isLoading ? (

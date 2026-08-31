@@ -64,7 +64,7 @@ export default function PasswordTab() {
         password,
         password_confirmation: confirmation,
       })
-      toast.success('Password updated successfully', {
+      toast.success('Password updated', {
         description: 'Your password has been changed successfully.',
       })
       setCurrentPassword('')

@@ -41,7 +41,7 @@ export default function AdminProjectReview() {
     try {
       await client.post(`/admin/projects/${id}/assign`, { assessor_id: selectedAssessor })
       const assessorName = (assessors || []).find((a) => String(a.id) === String(selectedAssessor))?.name
-      toast.success('Project assigned successfully', {
+      toast.success('Assessor assigned', {
         description: assessorName ? `${assessorName} has been assigned to review this project.` : undefined,
       })
       mutateProject()
@@ -63,7 +63,7 @@ export default function AdminProjectReview() {
     setSubmitting(decision)
     try {
       await client.post(`/admin/projects/${id}/decide`, { decision, feedback })
-      toast.success('Project status updated successfully', {
+      toast.success('Decision recorded', {
         description:
           decision === 'approved'
             ? 'The project has been approved and the student has been notified.'

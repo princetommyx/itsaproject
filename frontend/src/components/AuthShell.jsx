@@ -18,6 +18,7 @@ export default function AuthShell({ children, footer }) {
   const { settings } = useSettings()
   const schoolName = settings.school_name || 'University of Professional Studies, Accra'
   const shortName = settings.short_name?.trim() || 'UPSA'
+  const department = settings.department?.trim()
 
   return (
     <div className="flex min-h-dvh flex-col bg-background lg:flex-row">
@@ -56,8 +57,14 @@ export default function AuthShell({ children, footer }) {
               Management System
             </h2>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed font-medium text-white/80">
-              {schoolName}. Submit your proposal, track every revision, and see
-              your supervisor&apos;s feedback in one place.
+              {/* Was a rule-of-three marketing line ending "in one place" —
+                  the sort of sentence a landing page writes about itself.
+                  This is a sign-in screen for people who have to use the
+                  system, so it names the institution and stops. The
+                  department comes from settings, not a hardcoded string, so
+                  it stays true if another department adopts this. */}
+              {schoolName}
+              {department ? `. ${department}.` : '.'}
             </p>
           </div>
         </div>

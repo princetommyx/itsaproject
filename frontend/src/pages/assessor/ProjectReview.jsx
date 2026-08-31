@@ -37,7 +37,7 @@ export default function ProjectReview() {
     try {
       await client.post(`/assessor/projects/${id}/decide`, { decision, feedback })
       toast.success(
-        decision === 'approved' ? 'Project approved successfully' : 'Revision request sent successfully',
+        decision === 'approved' ? 'Project approved' : 'Sent back for revision',
         {
           description:
             decision === 'approved'

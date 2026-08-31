@@ -17,7 +17,7 @@ export default function StudentProfile() {
   const isLoading = !projectData && !swrError
 
   const projectSection = (
-    <SectionCard title="Project Information" description="Your topic, supervisor and progress.">
+    <SectionCard title="Project Information">
       {isLoading ? (
         <SkeletonCard lines={2} />
       ) : swrError ? (
@@ -42,7 +42,7 @@ export default function StudentProfile() {
         <p className="text-sm font-medium text-muted-foreground">
           You haven&apos;t started a project yet.{' '}
           <Link to="/student" className="font-semibold text-brand-ink hover:underline">
-            Get started
+            Create one
           </Link>
           .
         </p>

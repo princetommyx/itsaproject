@@ -108,7 +108,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Updates on your project, all in one place.">Notifications</PageHeading>
+      <PageHeading>Notifications</PageHeading>
 
       {/* A brand tint rather than blue-50. That step is an opaque light colour
           with no dark variant, so in dark mode this card kept painting itself

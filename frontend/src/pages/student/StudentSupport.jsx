@@ -29,7 +29,7 @@ export default function StudentSupport() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Send a message and track its status here.">Messages</PageHeading>
+      <PageHeading>Messages</PageHeading>
 
       <Card>
         <h2 className="mb-4 text-lg font-bold text-foreground">Send a New Message</h2>

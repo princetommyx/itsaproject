@@ -50,7 +50,7 @@ export default function Assignments() {
     try {
       await client.post(`/admin/projects/${projectId}/assign`, { assessor_id: assessorId })
       const assessorName = (assessors || []).find((a) => String(a.id) === String(assessorId))?.name
-      toast.success('Project assigned successfully', {
+      toast.success('Assessor assigned', {
         description: assessorName ? `${assessorName} has been assigned to review this project.` : undefined,
       })
       mutateProjects()

@@ -78,7 +78,7 @@ export default function CsvImportCard({ endpoint, noun, columns, onImported }) {
         description:
           failed > 0
             ? `${failed} row${failed === 1 ? '' : 's'} could not be imported — see the list below.`
-            : `Every row in the file was imported successfully.`,
+            : `No rows were rejected.`,
       })
 
       setFile(null)
@@ -169,7 +169,7 @@ export default function CsvImportCard({ endpoint, noun, columns, onImported }) {
         <div className="mt-6 space-y-3">
           <Alert variant="success">
             {result.created.length} {noun}
-            {result.created.length === 1 ? '' : 's'} imported successfully.
+            {result.created.length === 1 ? '' : 's'} imported.
           </Alert>
           {result.errors.length > 0 && (
             <div className="rounded-md border border-red-500/25 bg-red-500/10 p-3 text-sm text-red-700 dark:text-red-300">

@@ -37,7 +37,10 @@ export function PageHeading({ children, description, actions, className = '' }) 
       {description && (
         <p className="max-w-2xl text-[15px] font-medium text-muted-foreground">{description}</p>
       )}
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {/* ml-auto rather than relying on justify-between: once a page drops its
+          description, the actions are the only child and space-between pins
+          them to the left, leaving a button stranded above the content. */}
+      {actions && <div className="ml-auto flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   )
 }

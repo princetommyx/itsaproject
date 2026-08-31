@@ -23,7 +23,7 @@ export default function StaffManagement() {
     setSubmitting(true)
     try {
       await client.post('/admin/staff', { name, email, role, password })
-      toast.success(role === 'admin' ? 'Administrator added successfully' : 'Assessor added successfully', {
+      toast.success(role === 'admin' ? 'Administrator added' : 'Assessor added', {
         description: `${email} can now sign in with their new account.`,
       })
       setName('')
@@ -38,7 +38,7 @@ export default function StaffManagement() {
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Onboard assessors and fellow admins with an official UPSA email — one at a time, or a whole list at once.">
+      <PageHeading description="Assessors and admins sign in with their official UPSA email.">
         Staff Accounts
       </PageHeading>
 

@@ -96,7 +96,7 @@ function CreateProjectForm({ onCreated, onError }) {
     setSubmitting(true)
     try {
       const { data } = await client.post('/student/projects', { title, description })
-      toast.success('Project draft created successfully', {
+      toast.success('Draft created', {
         description: 'Add your group members and documents, then submit it when you’re ready for review.',
       })
       onCreated(data)
@@ -208,11 +208,11 @@ function ProjectPanel({ project, user, onChange, onError }) {
         {project.status === 'approved' && (
           <div className="mt-4">
             <Alert variant="success">
-              <strong>Your topic has been approved!</strong> Head to{' '}
+              <strong>Your topic has been approved.</strong> Upload your write-up in{' '}
               <Link to="/student/documents" className="underline">
                 My Documents
               </Link>{' '}
-              to upload your project write-up as you complete it.
+              as you complete it.
             </Alert>
           </div>
         )}
@@ -347,7 +347,7 @@ async function submitProject(project, onChange, onError, toast, setSubmitting) {
   setSubmitting(true)
   try {
     const { data } = await client.post(`/student/projects/${project.id}/submit`)
-    toast.success(isResubmission ? 'Submission resubmitted successfully' : 'Project submitted successfully', {
+    toast.success(isResubmission ? 'Project resubmitted' : 'Project submitted', {
       description: isResubmission
         ? 'Your revised project has been sent back to your supervisor for review.'
         : 'Your final-year project has been submitted for review.',
@@ -368,7 +368,7 @@ async function removeMember(projectId, memberId, onChange, onError, toast) {
   onError('')
   try {
     const { data } = await client.delete(`/student/projects/${projectId}/members/${memberId}`)
-    toast.success('Group member removed successfully')
+    toast.success('Member removed')
     onChange(data)
   } catch (err) {
     onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not remove member.')
@@ -390,7 +390,7 @@ function AddMemberForm({ projectId, onChange, onError, toast }) {
         university_id: universityId,
         name,
       })
-      toast.success('Group member added successfully', {
+      toast.success('Member added', {
         description: `${name.trim() || universityId} has been added to your project group.`,
       })
       setUniversityId('')
@@ -447,7 +447,7 @@ function EditProjectForm({ project, onChange, onError, toast }) {
     setSubmitting(true)
     try {
       const { data } = await client.put(`/student/projects/${project.id}`, { title, description })
-      toast.success('Project details saved successfully')
+      toast.success('Changes saved')
       onChange(data)
     } catch (err) {
       onError(err.response?.data?.errors ? Object.values(err.response.data.errors).flat().join(' ') : 'Could not save changes.')

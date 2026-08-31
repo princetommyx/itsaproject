@@ -58,7 +58,6 @@ export default function Overview() {
 
   const heading = (
     <PageHeading
-      description="Plan, assign, and track every final year project in one place."
       actions={
         <Button onClick={handleExport} disabled={exporting} loading={exporting}>
           {exporting ? 'Preparing…' : 'Export Data'}
