@@ -13,14 +13,20 @@ const CATEGORY_STYLES = {
   blue: 'bg-blue-500/15 text-blue-700 dark:text-blue-300',
   violet: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
   pink: 'bg-pink-500/15 text-pink-700 dark:text-pink-300',
-  gold: 'bg-amber-500/15 text-amber-700 dark:text-amber-300',
+  // 800, not 700: amber-700 on this tint over a tinted unread row measured
+  // 4.08:1, just under AA. Dark mode already passed comfortably.
+  gold: 'bg-amber-500/15 text-amber-800 dark:text-amber-300',
 }
 
+// Tints, not the 50 step. bg-violet-50 and bg-pink-50 are opaque light
+// colours with no dark variant, so in dark mode those two icons sat in bright
+// white discs while blue and gold — which already used /10 — behaved. A tint
+// composites over whatever surface is underneath, in either theme.
 const ICON_VARIANT_STYLES = {
-  blue: 'bg-blue-500/10 text-blue-600',
-  violet: 'bg-violet-50 text-violet-600',
-  pink: 'bg-pink-50 text-pink-600',
-  gold: 'bg-amber-500/10 text-amber-600',
+  blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-300',
+  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-300',
+  pink: 'bg-pink-500/10 text-pink-600 dark:text-pink-300',
+  gold: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
 }
 
 const INTRO_ITEMS = {
@@ -104,8 +110,14 @@ export default function NotificationsPage({ apiPrefix, role }) {
     <div className="space-y-6">
       <PageHeading description="Updates on your project, all in one place.">Notifications</PageHeading>
 
+      {/* A brand tint rather than blue-50. That step is an opaque light colour
+          with no dark variant, so in dark mode this card kept painting itself
+          pale grey while its text stayed light — the body copy and bullets
+          were grey on grey and essentially unreadable. An alpha tint
+          composites over --card in either theme, and follows the brand colour
+          an administrator has chosen. */}
       {showIntro && (
-        <Card className="bg-gradient-to-br from-blue-50 to-card">
+        <Card className="bg-gradient-to-br from-brand/10 to-card">
           <h2 className="text-base font-semibold text-foreground">Get notified about important project updates</h2>
           <p className="mt-1 text-sm text-muted-foreground">We'll notify you when:</p>
           <ul className="mt-3 space-y-1.5">
