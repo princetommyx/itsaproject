@@ -8,10 +8,25 @@
     <title>UPSA Final Year Project Management System</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Loaded without blocking first paint. As a plain stylesheet this sits
+         in the critical path: if fonts.googleapis.com is slow, firewalled, or
+         unreachable, the browser paints nothing until the request gives up —
+         measured at ~12.8s to first paint on a network with no route to
+         Google. media="print" takes it out of that path; the onload promotes
+         it once it arrives. The token stack falls back to Arial meanwhile, so
+         text is readable immediately either way. -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
+      media="print"
+      onload="this.media='all'; this.onload=null"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap"
+      />
+    </noscript>
       <!-- ToastMagic runtime. Copied from the composer package into public/ —
          see public/vendor/toast-magic/README.md. Configured before the script
          runs, because the runtime reads window.toastMagicConfig at load. -->

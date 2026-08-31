@@ -65,17 +65,33 @@ export function applyBranding(settings) {
     // falls back rather than leaving the app with no font at all.
     root.style.setProperty('--app-font', font.stack)
 
-    // One reused link element, so switching fonts replaces the request rather
-    // than stacking a stylesheet for every font ever previewed.
-    let link = document.getElementById(FONT_LINK_ID)
-    if (!link) {
-      link = document.createElement('link')
-      link.id = FONT_LINK_ID
-      link.rel = 'stylesheet'
-      document.head.appendChild(link)
-    }
     const href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(font.name).replace(/%20/g, '+')}:wght@${font.weights}&display=swap`
-    if (link.href !== href) link.href = href
+
+    // index.html already ships the default face. Asking for the same URL again
+    // just puts a second identical stylesheet in the document.
+    const alreadyLinked = [...document.querySelectorAll('link[rel="stylesheet"]')].some(
+      (el) => el.href === href && el.id !== FONT_LINK_ID
+    )
+
+    if (!alreadyLinked) {
+      // One reused link element, so switching fonts replaces the request rather
+      // than stacking a stylesheet for every font ever previewed. Loaded the
+      // same non-blocking way as the one in index.html — a font the admin
+      // picked must never be able to hold up first paint.
+      let link = document.getElementById(FONT_LINK_ID)
+      if (!link) {
+        link = document.createElement('link')
+        link.id = FONT_LINK_ID
+        link.rel = 'stylesheet'
+        link.media = 'print'
+        link.onload = function () {
+          this.media = 'all'
+          this.onload = null
+        }
+        document.head.appendChild(link)
+      }
+      if (link.href !== href) link.href = href
+    }
   }
 
   if (settings.school_name) document.title = `${settings.school_name} — FYP System`
