@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LoginLog;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -15,12 +16,32 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     /**
-     * A precomputed hash with no matching password, so Hash::check() always
-     * has real work to do below — otherwise an unknown identifier returns
-     * near-instantly while a known one takes a full bcrypt comparison,
-     * letting response time alone reveal which index numbers/emails exist.
+     * A hash with no matching password, so Hash::check() always has real work
+     * to do below — otherwise an unknown identifier returns near-instantly
+     * while a known one takes a full bcrypt comparison, letting response time
+     * alone reveal which index numbers/emails exist.
+     *
+     * It has to be built at the CONFIGURED cost, not frozen at one. This was a
+     * literal `$2y$12$...`, which defeated its own purpose the moment
+     * BCRYPT_ROUNDS was anything but 12: with real hashes at cost 10, an
+     * unknown account took ~265ms against a real account's ~67ms, so the
+     * timing gap it exists to close was reopened four times wider, pointing
+     * the other way. Cost 12 also made every failed login pay the most
+     * expensive comparison in the app — 1-3s on constrained hosting — which
+     * is the path a student hits when they mistype their date of birth.
+     *
+     * Cached forever per cost, so the bcrypt to build it is paid once rather
+     * than on every failed attempt.
      */
-    private const DUMMY_HASH = '$2y$12$Z6WDYnh7MUzwFDpauk24YOVhMk/ZU8CRBI0GCXIz02YpDhr3hQClC';
+    private function dummyHash(): string
+    {
+        $rounds = config('hashing.bcrypt.rounds', 10);
+
+        return Cache::rememberForever(
+            "auth.dummy_hash.bcrypt.{$rounds}",
+            fn () => Hash::make(Str::random(40))
+        );
+    }
 
     /**
      * Dual-authentication gateway: a single login field routes to either
@@ -39,7 +60,7 @@ class AuthController extends Controller
             ? User::where('email', $identifier)->first()
             : User::where('university_id', $identifier)->first();
 
-        if (! Hash::check($validated['password'], $user->password ?? self::DUMMY_HASH) || ! $user) {
+        if (! Hash::check($validated['password'], $user->password ?? $this->dummyHash()) || ! $user) {
             Log::warning('Failed login attempt', ['identifier' => $identifier, 'ip' => $request->ip()]);
 
             throw ValidationException::withMessages([
