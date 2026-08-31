@@ -346,3 +346,34 @@
     inset-inline-end: 1.75rem;
   }
 }
+
+/* In dark mode the package sets `border-color` on the toast item as a
+   shorthand, which lands after its own `border-left: 4px solid var(...)` and
+   so repaints the status stripe a flat translucent white. The result is that
+   every dark-mode toast looks identical: no green for success, no red for
+   failure, and no trace of the school's brand colour.
+
+   Restoring the left edge per status puts the meaning back and lets the info
+   stripe follow --brand-ink, so a toast matches whatever colour an
+   administrator has chosen — the same as in light mode.
+
+   Outside @layer for the same reason as the block above: the package's
+   stylesheet is unlayered, and unlayered CSS beats anything inside a layer
+   however specific. The selector also carries .theme-minimal, matching the
+   package's own, because without it the two tie on specificity and source
+   order decides — which it was losing. */
+[theme='dark'] .toast-container.theme-minimal .toast-item.toast-success {
+  border-left-color: var(--success);
+}
+
+[theme='dark'] .toast-container.theme-minimal .toast-item.toast-danger {
+  border-left-color: var(--destructive);
+}
+
+[theme='dark'] .toast-container.theme-minimal .toast-item.toast-warning {
+  border-left-color: var(--warning);
+}
+
+[theme='dark'] .toast-container.theme-minimal .toast-item.toast-info {
+  border-left-color: var(--brand-ink);
+}

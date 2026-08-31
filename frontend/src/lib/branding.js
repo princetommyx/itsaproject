@@ -159,20 +159,27 @@ export function applyToastTheme(dark) {
     color_mode: false,
   }
 
-  // Point the toast palette at our own tokens, so a toast is the same green
-  // and red as the rest of the app rather than the package's defaults — and
-  // so it follows an administrator's brand colour along with everything else.
-  const styles = getComputedStyle(document.documentElement)
-  const token = (name) => styles.getPropertyValue(name).trim()
-
+  // Point the toast palette at our own tokens by REFERENCE, not by value.
+  //
+  // These used to be read through getComputedStyle, which freezes whatever the
+  // tokens happened to be at the moment this ran — and this only runs when the
+  // light/dark theme changes, never when an administrator changes the brand
+  // colour. So toasts kept the colours from page load and quietly drifted out
+  // of step with the rest of the app. Handing the package `var(--brand)`
+  // instead means CSS resolves it at paint time: change the brand and the next
+  // toast is already the new colour, with nothing to re-run.
+  //
+  // Success, danger and warning stay on their own tokens on purpose. Those
+  // colours are the message — a green tick that turned maroon because the
+  // school picked a maroon brand would be telling the reader the wrong thing.
   window.toastMagicStyleVars = {
-    '--toast-magic-success': token('--success'),
-    '--toast-magic-danger': token('--destructive'),
-    '--toast-magic-warning': token('--warning'),
-    '--toast-magic-info': token('--brand-ink'),
-    '--toast-item-bg': token('--card'),
-    '--toast-item-color': token('--card-foreground'),
-    '--toast-close-btn-color': token('--muted-foreground'),
-    '--toast-custom-btn-color': token('--brand-ink'),
+    '--toast-magic-success': 'var(--success)',
+    '--toast-magic-danger': 'var(--destructive)',
+    '--toast-magic-warning': 'var(--warning)',
+    '--toast-magic-info': 'var(--brand-ink)',
+    '--toast-item-bg': 'var(--card)',
+    '--toast-item-color': 'var(--card-foreground)',
+    '--toast-close-btn-color': 'var(--muted-foreground)',
+    '--toast-custom-btn-color': 'var(--brand-ink)',
   }
 }
