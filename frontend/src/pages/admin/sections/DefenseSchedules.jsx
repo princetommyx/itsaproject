@@ -16,33 +16,69 @@ export default function DefenseSchedules() {
   const projects = Array.isArray(data) ? data : (data?.projects ?? [])
   const approvedProjects = projects.filter(p => p.status === 'approved')
 
-  function exportCSV() {
-    const headers = ['Project Title', 'Group Members', 'Assessor', 'Proposal Defense', 'Project Defense']
-    const rows = approvedProjects.map(p => {
-      const members = p.members.map(m => memberName(m) + (m.university_id ? ` (${m.university_id})` : '')).join('; ')
-      const assessor = p.assessor?.name || 'Unassigned'
-      const proposal = p.proposal_defense_at ? formatDateTime(p.proposal_defense_at) : 'Not scheduled'
-      const final = p.final_defense_at ? formatDateTime(p.final_defense_at) : 'Not scheduled'
-      
-      // Escape quotes and wrap in quotes for CSV
-      return [
-        `"${p.title.replace(/"/g, '""')}"`,
-        `"${members.replace(/"/g, '""')}"`,
-        `"${assessor.replace(/"/g, '""')}"`,
-        `"${proposal}"`,
-        `"${final}"`
-      ].join(',')
-    })
+  // The two defences happen months apart — a proposal is defended, then the
+  // project — so the sheet handed to students is almost never both at once.
+  // Each stage exports on its own; "Both" stays as a working overview.
+  const EXPORTS = {
+    proposal: { dateKey: 'proposal_defense_at', column: 'Proposal Defense', file: 'proposal_defense_schedule' },
+    project: { dateKey: 'final_defense_at', column: 'Project Defense', file: 'project_defense_schedule' },
+  }
 
-    const csvContent = [headers.join(','), ...rows].join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
+  const scheduled = {
+    proposal: approvedProjects.filter((p) => p.proposal_defense_at),
+    project: approvedProjects.filter((p) => p.final_defense_at),
+  }
+
+  // One place that knows CSV: quote every field and double any quote inside
+  // it. Quoting also covers commas and newlines in a project title, which a
+  // hand-joined row would otherwise split into extra columns.
+  function toCsv(headers, rows) {
+    const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+    return [headers.map(cell).join(','), ...rows.map((r) => r.map(cell).join(','))].join('\n')
+  }
+
+  function download(csv, filename) {
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }))
     const link = document.createElement('a')
     link.href = url
-    link.setAttribute('download', `defense_schedules_${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `${filename}_${new Date().toISOString().split('T')[0]}.csv`)
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
+  const groupOf = (p) =>
+    p.members.map((m) => memberName(m) + (m.university_id ? ` (${m.university_id})` : '')).join('; ')
+
+  function exportStage(key) {
+    const { dateKey, column, file } = EXPORTS[key]
+
+    // Only groups that actually have a date for this stage. The sheet goes to
+    // students, and a row reading "Not scheduled" tells them nothing except
+    // that the timetable is unfinished. Ordered by when they sit it, which is
+    // the order anyone reads a schedule in.
+    const rows = scheduled[key]
+      .slice()
+      .sort((a, b) => new Date(a[dateKey]) - new Date(b[dateKey]))
+      .map((p) => [p.title, groupOf(p), p.assessor?.name || 'Unassigned', formatDateTime(p[dateKey])])
+
+    download(toCsv(['Project Title', 'Group Members', 'Assessor', column], rows), file)
+  }
+
+  function exportBoth() {
+    const rows = approvedProjects.map((p) => [
+      p.title,
+      groupOf(p),
+      p.assessor?.name || 'Unassigned',
+      p.proposal_defense_at ? formatDateTime(p.proposal_defense_at) : 'Not scheduled',
+      p.final_defense_at ? formatDateTime(p.final_defense_at) : 'Not scheduled',
+    ])
+
+    download(
+      toCsv(['Project Title', 'Group Members', 'Assessor', 'Proposal Defense', 'Project Defense'], rows),
+      'defense_schedules'
+    )
   }
 
   if (isLoading) {
@@ -81,16 +117,42 @@ export default function DefenseSchedules() {
           Data. As `secondary` it had no visible fill — that token is
           near-white — so it read as a stray line of text rather than a
           control. */}
-      <PageHeading
-        description="Manage defense dates for all approved projects. Saving dates will automatically notify the students."
-        actions={
-          <Button onClick={exportCSV} disabled={approvedProjects.length === 0}>
-            Export to CSV
-          </Button>
-        }
-      >
+      <PageHeading description="Manage defense dates for all approved projects. Saving dates notifies the students. Each stage exports on its own, listing only the groups scheduled for it, in the order they sit.">
         Defense Schedules
       </PageHeading>
+
+      {/* Their own wrapping row rather than PageHeading's actions slot: that
+          slot is shrink-0, sized for a single button, so three of them pushed
+          the whole page into horizontal scroll on a phone. */}
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          variant="outline"
+          onClick={() => exportStage('proposal')}
+          disabled={scheduled.proposal.length === 0}
+          title={
+            scheduled.proposal.length === 0
+              ? 'No proposal defense has been scheduled yet.'
+              : `Export the ${scheduled.proposal.length} scheduled proposal defense(s).`
+          }
+        >
+          Proposal defense ({scheduled.proposal.length})
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => exportStage('project')}
+          disabled={scheduled.project.length === 0}
+          title={
+            scheduled.project.length === 0
+              ? 'No project defense has been scheduled yet.'
+              : `Export the ${scheduled.project.length} scheduled project defense(s).`
+          }
+        >
+          Project defense ({scheduled.project.length})
+        </Button>
+        <Button onClick={exportBoth} disabled={approvedProjects.length === 0}>
+          Both ({approvedProjects.length})
+        </Button>
+      </div>
 
       {approvedProjects.length === 0 ? (
         <Card>
