@@ -23,6 +23,13 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
+        <!-- Pinned so the throttling tests assert fixed numbers whatever a
+             developer has in their .env. Without these, a local override
+             (raising the limits to benchmark, say) silently turns the
+             throttle tests into tests of nothing. -->
+        <env name="LOGIN_THROTTLE_PER_ACCOUNT" value="5"/>
+        <env name="LOGIN_THROTTLE_PER_IP" value="20"/>
+        <env name="LOGIN_THROTTLE_REQUESTS_PER_IP" value="120"/>
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="DB_URL" value=""/>

@@ -11,13 +11,21 @@ use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\StudentController;
 use Illuminate\Support\Facades\Route;
 
-// Tighter than the general API limiter — these are unauthenticated,
-// credential-guessing-shaped endpoints (login, and the two password-reset
-// steps), so they get their own stricter per-IP throttle. withoutMiddleware
-// drops the general 60/min limiter here: it can never bind tighter than this
-// 10/min one, so running both just doubles the rate-limit cache round trips
-// (each check is a DB read+write with CACHE_STORE=database) for no benefit.
-Route::middleware('throttle:10,1')->withoutMiddleware('throttle:api')->group(function () {
+// A flood backstop, not the credential-guessing defence — that lives in
+// AuthController, counts only failed attempts, and is keyed on identifier+IP
+// as well as IP.
+//
+// This was throttle:10,1, which counted successes too. A university's
+// students reach the internet through a handful of NAT'd addresses, so on a
+// submission morning the whole campus shared ten sign-ins per minute and the
+// eleventh student was turned away by their own classmates. 120/min per IP
+// still stops a request flood while leaving room for a hall of people
+// legitimately signing in at once. withoutMiddleware drops the general 60/min
+// limiter, which would otherwise bind tighter and reintroduce the same
+// problem.
+Route::middleware('throttle:'.config('auth.login_throttle.requests_per_ip', 120).',1')
+    ->withoutMiddleware('throttle:api')
+    ->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/password/forgot', [AuthController::class, 'requestPasswordReset']);
     Route::post('/password/reset', [AuthController::class, 'resetPassword']);

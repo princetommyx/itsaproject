@@ -50,7 +50,14 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Was null — tokens that never expired. Every sign-in mints one and
+    // nothing ever retired it, so a student who logs in weekly for a year
+    // leaves behind a year of working credentials, and a token copied off a
+    // shared library machine stays valid forever. Seven days keeps a phone
+    // signed in across a normal week of project work while bounding how long
+    // any one leaked token is worth stealing; AuthController deletes a user's
+    // expired rows on their next sign-in, after the response.
+    'expiration' => (int) env('SANCTUM_TOKEN_EXPIRATION', 60 * 24 * 7),
 
     /*
     |--------------------------------------------------------------------------

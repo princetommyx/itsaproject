@@ -1,10 +1,12 @@
 <?php
 
+use App\Jobs\SendStudentPasswordReset;
 use App\Models\User;
 use App\Notifications\StudentPasswordResetNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Queue;
 
 it('logs a student in with their index number', function () {
     $student = User::factory()->student()->create([
@@ -76,14 +78,138 @@ it('rejects login for an identifier that does not exist, same as a wrong passwor
     ])->assertUnprocessable();
 });
 
-it('throttles repeated login attempts from the same client', function () {
-    for ($i = 0; $i < 10; $i++) {
+it('throttles repeated failed login attempts against the same account', function () {
+    for ($i = 0; $i < 5; $i++) {
         $this->postJson('/api/login', ['identifier' => 'nobody', 'password' => 'nope'])
             ->assertUnprocessable();
     }
 
     $this->postJson('/api/login', ['identifier' => 'nobody', 'password' => 'nope'])
         ->assertStatus(429);
+});
+
+// The reason the limiter counts failures rather than requests. A university's
+// students share a handful of NAT'd addresses, so counting every request meant
+// a hall of people signing in correctly locked each other out.
+it('never spends the throttle on successful logins', function () {
+    $student = User::factory()->student()->create([
+        'university_id' => 'UPSA/3000001',
+        'password' => Hash::make('correct-horse'),
+    ]);
+
+    for ($i = 0; $i < 30; $i++) {
+        $this->postJson('/api/login', [
+            'identifier' => 'UPSA/3000001',
+            'password' => 'correct-horse',
+        ])->assertOk();
+    }
+});
+
+it('forgives a student their earlier typos once they get in', function () {
+    User::factory()->student()->create([
+        'university_id' => 'UPSA/3000002',
+        'password' => Hash::make('correct-horse'),
+    ]);
+
+    foreach (['wrong-1', 'wrong-2', 'wrong-3', 'wrong-4'] as $attempt) {
+        $this->postJson('/api/login', ['identifier' => 'UPSA/3000002', 'password' => $attempt])
+            ->assertUnprocessable();
+    }
+
+    $this->postJson('/api/login', ['identifier' => 'UPSA/3000002', 'password' => 'correct-horse'])
+        ->assertOk();
+
+    // Without the clear on success, one attempt would be left and the next
+    // typo would lock them out of an account they had just proved was theirs.
+    foreach (['wrong-a', 'wrong-b', 'wrong-c', 'wrong-d'] as $attempt) {
+        $this->postJson('/api/login', ['identifier' => 'UPSA/3000002', 'password' => $attempt])
+            ->assertUnprocessable();
+    }
+});
+
+// Enumeration: everything an attacker can read without a stopwatch.
+it('answers an unknown index number exactly as it answers a wrong password', function () {
+    User::factory()->student()->create([
+        'university_id' => 'UPSA/3000003',
+        'password' => Hash::make('correct-horse'),
+    ]);
+
+    $wrongPassword = $this->postJson('/api/login', [
+        'identifier' => 'UPSA/3000003', 'password' => 'not-the-password',
+    ]);
+
+    $unknownAccount = $this->postJson('/api/login', [
+        'identifier' => 'UPSA/9999999', 'password' => 'not-the-password',
+    ]);
+
+    expect($unknownAccount->status())->toBe($wrongPassword->status())
+        ->and($unknownAccount->json())->toEqual($wrongPassword->json())
+        ->and($wrongPassword->json('message'))->toBe('Invalid index number or password.');
+});
+
+it('answers a password reset for an unknown index number identically', function () {
+    Notification::fake();
+
+    User::factory()->student()->create(['university_id' => 'UPSA/3000004']);
+
+    $known = $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/3000004']);
+    $unknown = $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/9999999']);
+
+    expect($unknown->status())->toBe($known->status())
+        ->and($unknown->json())->toEqual($known->json());
+});
+
+it('stores reset tokens hashed, never in the clear', function () {
+    Notification::fake();
+
+    $student = User::factory()->student()->create([
+        'university_id' => 'UPSA/3000005',
+        'student_email' => 'reset.probe@students.upsa.edu.gh',
+    ]);
+
+    $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/3000005'])->assertOk();
+
+    $token = null;
+    Notification::assertSentTo($student, StudentPasswordResetNotification::class, function ($notification) use (&$token) {
+        $token = (fn () => $this->token)->call($notification);
+
+        return true;
+    });
+
+    $stored = DB::table('password_reset_tokens')->where('email', $student->student_email)->value('token');
+
+    expect($stored)->not->toBe($token)
+        ->and($stored)->toBe(hash('sha256', $token));
+});
+
+// The enumeration guarantee, asserted structurally rather than by stopwatch:
+// the request itself must do no work that depends on the account existing.
+// A timing test would be flaky in CI; this one fails the moment somebody
+// moves the lookup, the token write or the mail back into the controller.
+it('does no account-dependent work while answering a reset request', function () {
+    Queue::fake();
+    Notification::fake();
+
+    $student = User::factory()->student()->create(['university_id' => 'UPSA/3000006']);
+
+    $known = $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/3000006']);
+    $unknown = $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/9999999']);
+
+    expect($unknown->status())->toBe($known->status())
+        ->and($unknown->json())->toEqual($known->json());
+
+    // One job for each, including the index number that belongs to nobody:
+    // the job decides there is no such student, the request never knew.
+    Queue::assertPushed(SendStudentPasswordReset::class, 2);
+
+    // And nothing was written or sent while answering.
+    Notification::assertNothingSent();
+    expect(DB::table('password_reset_tokens')->count())->toBe(0)
+        ->and($student->fresh()->student_email)->not->toBeNull();
+});
+
+it('issues tokens that expire', function () {
+    expect(config('sanctum.expiration'))->toBeInt()->toBeGreaterThan(0);
 });
 
 it('resets a password with a valid token', function () {

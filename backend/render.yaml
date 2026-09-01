@@ -98,8 +98,15 @@ services:
       # harmless.
       - key: CACHE_STORE
         value: file
+      # NOT sync. The password-reset endpoint answers by queueing a job and
+      # doing nothing else, so that an index number that exists and one that
+      # does not cost exactly the same to ask about. Under sync that job runs
+      # inside the request — the lookup, the token write and the Resend API
+      # call all back on the response path — which is the enumeration oracle
+      # this was built to close (it measured 89.2ms vs 19.5ms, perfectly
+      # separable). start.sh runs the worker that drains this.
       - key: QUEUE_CONNECTION
-        value: sync
+        value: database
       # REQUIRED to actually deliver emails (password resets, project
       # decision notifications). Sign up free at https://resend.com,
       # create an API key at https://resend.com/api-keys, and paste it

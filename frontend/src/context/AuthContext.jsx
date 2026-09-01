@@ -29,10 +29,18 @@ export function AuthProvider({ children }) {
         setUser(res.data)
         localStorage.setItem('user', JSON.stringify(res.data))
       })
-      .catch(() => {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        setUser(null)
+      .catch((err) => {
+        // Only a rejected token ends the session. This used to catch
+        // everything, so a dropped connection, a CORS misconfiguration or a
+        // 500 all signed the student out and made it look like their password
+        // had stopped working. A 401 is answered by the client's own
+        // interceptor; anything else leaves the cached user in place and lets
+        // the page retry.
+        if (err.response?.status === 401) {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          setUser(null)
+        }
       })
       .finally(() => setLoading(false))
   }, [])
