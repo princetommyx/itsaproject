@@ -329,6 +329,14 @@ function ProjectTable({ projects }) {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-border bg-muted/50">
+                {/* Numbers the current sort/filter, not a database id — the
+                    same project is #1 under "Recently updated" and #4 under
+                    "Title (A–Z)". That's the point: it labels this specific
+                    ordering so an admin can say "check number 3" and mean
+                    something, rather than a stable identity for the row. */}
+                <th className="px-4 py-3 text-xs font-bold tracking-wide text-muted-foreground uppercase">
+                  #
+                </th>
                 {['Project', 'Group', 'Assessor', 'Status', 'Updated'].map((h) => (
                   <th
                     key={h}
@@ -340,12 +348,15 @@ function ProjectTable({ projects }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {projects.map((project) => {
+              {projects.map((project, index) => {
                 const leader = project.members?.find((m) => m.is_leader) ?? project.members?.[0]
                 const leaderName = leader ? memberName(leader) : 'Unassigned'
 
                 return (
                   <tr key={project.id} className="transition hover:bg-muted/50">
+                    <td className="px-4 py-3 text-sm font-semibold text-muted-foreground">
+                      {index + 1}
+                    </td>
                     <td className="max-w-xs px-4 py-3">
                       <Link
                         to={`/admin/projects/${project.id}`}
@@ -389,7 +400,7 @@ function ProjectTable({ projects }) {
       </Card>
 
       <div className="space-y-3 md:hidden">
-        {projects.map((project) => {
+        {projects.map((project, index) => {
           const leader = project.members?.find((m) => m.is_leader) ?? project.members?.[0]
           const leaderName = leader ? memberName(leader) : 'Unassigned'
 
@@ -397,7 +408,11 @@ function ProjectTable({ projects }) {
             <Link key={project.id} to={`/admin/projects/${project.id}`} className="block">
               <Card interactive className="p-4">
                 <div className="mb-2 flex items-start justify-between gap-3">
-                  <h2 className="min-w-0 font-semibold break-words text-foreground">{project.title}</h2>
+                  <h2 className="min-w-0 font-semibold break-words text-foreground">
+                    {/* Same index the desktop table's # column shows — the
+                        current sort/filter's position, not the project's id. */}
+                    <span className="text-muted-foreground">{index + 1}.</span> {project.title}
+                  </h2>
                   <Badge status={project.status} />
                 </div>
                 <div className="flex items-center gap-2">
