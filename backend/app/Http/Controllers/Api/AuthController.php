@@ -249,6 +249,25 @@ class AuthController extends Controller
             'is_first_login' => false,
         ]);
 
+        // Changing a password should mean something: if the old one leaked —
+        // the shared DOB-derived default a classmate could guess, or a token
+        // copied off a library computer — every session that was signed in
+        // under it stops working the moment this succeeds. The one making
+        // this request is the exception; nobody expects "change my password"
+        // to also sign them out of the tab they're sitting in.
+        //
+        // currentAccessToken() is only null for a request that isn't really
+        // token-authenticated in the first place (every real bearer-token
+        // request resolves one) — but a route this security-sensitive
+        // should not assume that and crash on the day it's wrong. Falling
+        // back to revoking everything is still the safe answer, not a
+        // silent no-op.
+        $currentTokenId = $request->user()->currentAccessToken()?->id;
+
+        $user->tokens()
+            ->when($currentTokenId, fn ($query) => $query->where('id', '!=', $currentTokenId))
+            ->delete();
+
         return response()->json(['message' => 'Password updated.']);
     }
 
@@ -327,6 +346,14 @@ class AuthController extends Controller
         ]);
 
         DB::table('password_reset_tokens')->where('email', $user->student_email)->delete();
+
+        // Unlike changePassword, there is no session making this request —
+        // resetPassword runs on an emailed token, not a bearer token, so
+        // there is no "current one" to spare. A student resets their
+        // password because they suspect something is wrong with the
+        // account; every token that was already out there, including
+        // whatever prompted the suspicion, stops working here.
+        $user->tokens()->delete();
 
         return response()->json(['message' => 'Password has been reset.']);
     }

@@ -2,6 +2,7 @@
 
 use App\Jobs\SendStudentPasswordReset;
 use App\Models\User;
+use Laravel\Sanctum\PersonalAccessToken;
 use App\Notifications\StudentPasswordResetNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -237,6 +238,36 @@ it('resets a password with a valid token', function () {
     expect(Hash::check('new-secure-password', $student->password))->toBeTrue();
 });
 
+it('revokes every existing token when a password is reset via email', function () {
+    Notification::fake();
+
+    $student = User::factory()->student()->create(['university_id' => 'UPSA/2000010']);
+    $leaked = $student->createToken('a-device-somewhere');
+
+    $this->postJson('/api/password/forgot', ['university_id' => 'UPSA/2000010'])->assertOk();
+
+    $token = null;
+    Notification::assertSentTo($student, StudentPasswordResetNotification::class, function ($notification) use (&$token) {
+        $token = (fn () => $this->token)->call($notification);
+
+        return true;
+    });
+
+    $this->postJson('/api/password/reset', [
+        'university_id' => 'UPSA/2000010',
+        'token' => $token,
+        'password' => 'new-secure-password',
+        'password_confirmation' => 'new-secure-password',
+    ])->assertOk();
+
+    // Resetting a password is what you do when you think something is
+    // wrong with the account. Whatever token prompted that suspicion stops
+    // working the moment the reset succeeds — there is no "current
+    // session" to spare here, unlike changePassword below. Checked against
+    // the token store directly; see the changePassword test for why.
+    expect(PersonalAccessToken::findToken($leaked->plainTextToken))->toBeNull();
+});
+
 it('rejects a password reset token once it has expired', function () {
     Notification::fake();
 
@@ -261,6 +292,44 @@ it('rejects a password reset token once it has expired', function () {
         'password' => 'new-secure-password',
         'password_confirmation' => 'new-secure-password',
     ])->assertUnprocessable();
+});
+
+it('keeps the current session but revokes every other token on a password change', function () {
+    $student = User::factory()->student()->create([
+        'password' => Hash::make('old-secure-password'),
+    ]);
+
+    $current = $student->createToken('this-device');
+    $other = $student->createToken('a-different-device');
+
+    $this->withHeader('Authorization', "Bearer {$current->plainTextToken}")
+        ->postJson('/api/password/change', [
+            'current_password' => 'old-secure-password',
+            'password' => 'new-secure-password',
+            'password_confirmation' => 'new-secure-password',
+        ])->assertOk();
+
+    // Asserted against the token store directly, not by making a second
+    // simulated request with a different bearer token: Laravel's Sanctum
+    // guard caches the user it resolves for the lifetime of the test's
+    // application instance, so a later in-process call — even with a
+    // token that no longer exists — returns that cached user instead of
+    // re-authenticating. Real traffic never shares that cache; a
+    // dedicated live-server check during this session confirmed the
+    // revoked token gets a real 401 across genuinely separate requests.
+    // The database is what the endpoint actually promises, so that's
+    // what this checks.
+    //
+    // The token that made this request is not the one that leaked, and
+    // logging someone out of the tab where they just changed their own
+    // password would be a worse experience than the risk it defends
+    // against.
+    expect(PersonalAccessToken::findToken($current->plainTextToken))->not->toBeNull();
+
+    // Everything else — a token on a lost phone, a shared library
+    // computer, anything the student changed their password BECAUSE of —
+    // is gone.
+    expect(PersonalAccessToken::findToken($other->plainTextToken))->toBeNull();
 });
 
 it('blocks a first-login student from other endpoints until password is changed', function () {
