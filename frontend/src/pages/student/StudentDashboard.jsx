@@ -203,7 +203,13 @@ function ProjectPanel({ project, user, onChange, onError }) {
           </div>
         )}
 
-        {project.status === 'refine' && <RevisionPanel project={project} />}
+        {project.status === 'refine' && (
+          <RevisionPanel
+            project={project}
+            isLeader={isLeader}
+            leaderName={memberName(members.find((m) => m.is_leader) ?? {})}
+          />
+        )}
 
         {project.status === 'approved' && (
           <div className="mt-4">
@@ -282,6 +288,9 @@ function ProjectPanel({ project, user, onChange, onError }) {
                       <span className="ml-1 text-xs text-muted-foreground">{m.university_id}</span>
                     )}
                     {m.is_leader && <span className="ml-1 text-xs text-brand-ink">(Leader)</span>}
+                    {m.student_id === user.id && (
+                      <span className="ml-1 text-xs text-muted-foreground">(You)</span>
+                    )}
                     {!m.student && (
                       <span className="ml-1 text-xs text-amber-600" title="This student hasn't been added to the system yet — they'll link up automatically once they are.">
                         (Not yet registered)
@@ -477,7 +486,7 @@ function EditProjectForm({ project, onChange, onError, toast }) {
  * project, so this reads it from the history — which means the feedback stays
  * attached to the submission it was about even after the next one is filed.
  */
-function RevisionPanel({ project }) {
+function RevisionPanel({ project, isLeader, leaderName }) {
   const reviewed = [...(project.versions ?? [])]
     .filter((v) => v.status === 'revision_required')
     .sort((a, b) => b.sequence - a.sequence)[0]
@@ -496,9 +505,13 @@ function RevisionPanel({ project }) {
         </p>
       )}
       <RequiredChangesList items={reviewed?.required_changes} className="mt-4" />
+      {/* Only the group leader can edit and resubmit, so telling everyone to
+          "update your project below" left the rest of the group reading an
+          instruction with no controls under it and no idea why. */}
       <p className="mt-4 text-xs font-medium text-pink-800">
-        Your previous submission is kept on record. Update your project below and submit a new
-        version — nothing you already sent is lost.
+        {isLeader
+          ? 'Your previous submission is kept on record. Update the project below and submit a new version; nothing you already sent is lost.'
+          : `${leaderName || 'Your group leader'} submits for the group. The previous submission is kept on record, so nothing already sent is lost.`}
       </p>
     </div>
   )

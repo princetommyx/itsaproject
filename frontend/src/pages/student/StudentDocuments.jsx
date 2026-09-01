@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react'
+import { useAuth } from '../../context/AuthContext'
 import { Link } from 'react-router-dom'
 import useSWR from 'swr'
 import client from '../../api/client'
 import { useToast } from '../../context/ToastContext'
 import { downloadDocument, formatFileSize } from '../../lib/downloadDocument'
 import { DOCUMENT_TYPES, DOCUMENT_TYPE_LABELS } from '../../constants/documentTypes'
+import { memberName } from '../../lib/memberName'
 
 const ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx']
 const MAX_FILE_BYTES = 20 * 1024 * 1024
@@ -15,6 +17,7 @@ import { FileSpreadsheetIcon, UploadCloudIcon } from '../../components/icons'
 
 export default function StudentDocuments() {
   const toast = useToast()
+  const { user } = useAuth()
   const { data: projectData, error: swrError, mutate } = useSWR('/student/project')
   const [type, setType] = useState(DOCUMENT_TYPES[0].key)
   const [dragging, setDragging] = useState(false)
@@ -178,14 +181,27 @@ export default function StudentDocuments() {
     )
   }
 
-  const editable = ['draft', 'refine', 'approved'].includes(project.status)
+  // Uploading is the leader's job — the server returns 403 to anyone else. The
+  // dropzone used to render for the whole group regardless, so a member could
+  // pick a file, wait for it, and be told they were not allowed.
+  const members = project.members ?? []
+  const isLeader = members.some((m) => m.student_id === user?.id && m.is_leader)
+  const leaderName = memberName(members.find((m) => m.is_leader) ?? {})
+  const stageAllows = ['draft', 'refine', 'approved'].includes(project.status)
+  const editable = stageAllows && isLeader
   const documents = project.documents ?? []
   const byType = Object.fromEntries(DOCUMENT_TYPES.map((t) => [t.key, documents.filter((d) => d.type === t.key)]))
 
   return (
     <div className="space-y-6">
-      <PageHeading description="Upload your project proposal, then your final project work document once your topic is approved.">
-        My Documents
+      <PageHeading
+        description={
+          isLeader
+            ? 'Upload your project proposal, then your final project work document once your topic is approved.'
+            : 'Everything your group has uploaded and submitted, whoever sent it.'
+        }
+      >
+        {isLeader ? 'My Documents' : 'Group Documents'}
       </PageHeading>
 
       {editable ? (
@@ -239,10 +255,15 @@ export default function StudentDocuments() {
             />
           </div>
         </Card>
+      ) : !isLeader ? (
+        <Alert variant="info">
+          {leaderName || 'Your group leader'} uploads and submits documents for the group. Everything
+          they send is listed below.
+        </Alert>
       ) : (
         <Alert variant="info">
-          Documents can only be uploaded once your project is a draft, needs refinement, or has been approved —
-          it's currently under review, so it's locked from changes for now.
+          Documents can only be uploaded once your project is a draft, needs refinement, or has been
+          approved. It is currently under review, so it is locked from changes.
         </Alert>
       )}
 
@@ -297,7 +318,7 @@ export default function StudentDocuments() {
                     {/* Submitting is a separate, deliberate step from uploading,
                         so a wrong file can be swapped out before it ever
                         goes for review. */}
-                    {current && !current.submitted_at && (
+                    {current && isLeader && !current.submitted_at && (
                       <Button
                         variant="outline"
                         className="text-xs"
