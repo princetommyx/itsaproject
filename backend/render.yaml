@@ -84,8 +84,20 @@ services:
       # queue worker running).
       - key: SESSION_DRIVER
         value: database
+      # NOT database. Every authenticated request passes Laravel's rate
+      # limiter, and the limiter reads and writes its counter through the
+      # cache store: measured at 6 cache queries per request (5 reads + 1
+      # write, all on the same key) before the endpoint does any work of its
+      # own. On SQLite locally that is 0.6ms and invisible. Here the database
+      # is a separate Supabase host, so those 6 queries are 6 network round
+      # trips on every single API call — at a 20ms round trip that is 120ms
+      # of pure throttling overhead per request, and if the database ends up
+      # in a different region from this service it is far worse. The file
+      # store keeps the counter on the container's own disk: same throttle,
+      # no round trips. It resets on deploy, which for a rate limiter is
+      # harmless.
       - key: CACHE_STORE
-        value: database
+        value: file
       - key: QUEUE_CONNECTION
         value: sync
       # REQUIRED to actually deliver emails (password resets, project

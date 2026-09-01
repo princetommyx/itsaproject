@@ -158,14 +158,36 @@ class AdminController extends Controller
     }
 
     /**
-     * All submitted projects, for the admin's oversight/review list.
+     * The review list. Every submitted project, because the page filters,
+     * searches and sorts the whole set in the browser — an admin looking for
+     * "Ama Boateng" types a name, not a page number, and paginating this
+     * server-side would break that unless the search moved with it.
+     *
+     * What it does NOT need is every column of every row. `members.student`
+     * used to hydrate the full user account for all four members of every
+     * group — dates of birth, email addresses, timestamps, role ids — so the
+     * response could render one name. At a real cohort (209 projects, 825
+     * students) that measured 467KB and 257ms; the columns below are the ones
+     * the table and its search actually read, and `feedback` in particular is
+     * a paragraph per project that nothing on this page displays.
      */
     public function allProjects()
     {
-        return Project::with(['members.student', 'assessor'])
+        return Project::query()
+            ->with([
+                'members:id,project_id,student_id,university_id,name,is_leader',
+                // Loaded, not dropped: memberName() prefers the linked
+                // account's real name over whatever a groupmate typed, and
+                // isUnregistered() keys off whether this relation is null.
+                'members.student:id,name',
+                'assessor:id,name',
+            ])
             ->where('status', '!=', 'draft')
             ->orderByDesc('updated_at')
-            ->get();
+            ->get([
+                'id', 'title', 'description', 'status', 'stage',
+                'assessor_id', 'proposal_defense_at', 'final_defense_at', 'updated_at',
+            ]);
     }
 
     /**
