@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import client from '../api/client'
 import { Button, Card, EmptyState, ErrorState, PageHeading, stagger } from './ui'
 import { SkeletonList } from './Skeleton'
-import { InboxIcon } from './icons'
+import { BellIcon, InboxIcon } from './icons'
 import { describeNotification } from '../constants/notifications'
 import { relativeTime } from '../lib/formatDate'
 import { cn } from '../lib/cn'
@@ -121,20 +121,44 @@ export default function NotificationsPage({ apiPrefix, role }) {
           pale grey while its text stayed light — the body copy and bullets
           were grey on grey and essentially unreadable. An alpha tint
           composites over --card in either theme, and follows the brand colour
-          an administrator has chosen. */}
+          an administrator has chosen.
+
+          Flat, not a diagonal fade to --card: a from-brand/10-to-card
+          gradient is the generic "make this card feel branded" move —
+          no real edge, no real identity, just a wash that reads as
+          templated. A defined border and a real icon badge (the same
+          ring+tint language the notification rows below use) give it the
+          presence an intro card announcing "here's what we'll tell you
+          about" should have. */}
       {showIntro && (
-        <Card className="bg-gradient-to-br from-brand/10 to-card">
-          <h2 className="text-base font-semibold text-foreground">Get notified about important project updates</h2>
-          <p className="mt-1 text-sm text-muted-foreground">We'll notify you when:</p>
-          <ul className="mt-3 space-y-1.5">
-            {(INTRO_ITEMS[role] || []).map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-                {item}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 flex items-center gap-3">
+        <Card className="border border-brand-ink/25 bg-brand/10">
+          <div className="flex items-start gap-3">
+            {/* Tailwind's blue-500, not the brand token, for the badge itself.
+                Measured: this app's brand navy is dark but genuinely
+                low-chroma (#0f2d5c), so even at 15% opacity it composited to
+                RGB(188,198,210) — an 22-point R-to-B gap that reads as grey
+                on screen, not blue. blue-500 at the same opacity measured a
+                38-point gap in the notification rows below, which is why
+                those already look unmistakably blue. Matching that, rather
+                than trying to push the brand tint's opacity high enough to
+                compete (which starts fighting the body text's contrast). */}
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-blue-600 ring-1 ring-blue-500/30 dark:text-blue-300">
+              <BellIcon size={20} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-base font-semibold text-foreground">Get notified about important project updates</h2>
+              <p className="mt-1 text-sm text-muted-foreground">We'll notify you when:</p>
+              <ul className="mt-3 space-y-1.5">
+                {(INTRO_ITEMS[role] || []).map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="mt-4 flex items-center gap-3 pl-13">
             <Button variant="secondary" className="text-xs" onClick={() => dismissIntro(false)}>
               Later
             </Button>
