@@ -145,18 +145,39 @@ const FIELD_CLASSES =
   'w-full rounded-lg border bg-background px-3 py-2.5 text-[15px] font-medium text-foreground transition duration-150 placeholder:font-normal placeholder:text-muted-foreground focus:outline-none focus:ring-[3px] disabled:cursor-not-allowed disabled:bg-muted disabled:text-muted-foreground'
 
 export const Input = forwardRef(function Input({ label, error, className = '', ...props }, ref) {
+  // datetime-local has no real placeholder — the `placeholder` attribute is
+  // defined to do nothing on it. What looks like one is the browser's own
+  // "unfilled" rendering of the date/time segments, and that turns out not
+  // to be something we can rely on: it composited fine here in a desktop
+  // and an emulated-mobile browser alike, dark and legible, but the same
+  // empty field on a real Android phone photographed nearly blank — Chrome
+  // renders those segments in a low-contrast system colour on some
+  // platforms that page CSS doesn't reach. Rather than chase a per-platform
+  // colour we can't fully control, the native segments are hidden outright
+  // while empty (see the .dt-empty rule in index.css) and replaced with an
+  // ordinary bit of text we do control, styled the same as every other
+  // placeholder in the app.
+  const isEmptyDateTime = props.type === 'datetime-local' && !props.value
+
   return (
     <label className="block text-sm">
       {label && <span className="mb-1.5 block text-sm font-semibold text-foreground">{label}</span>}
-      <input
-        ref={ref}
-        className={`${FIELD_CLASSES} ${
-          error
-            ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/20'
-            : 'border-input hover:border-ring/60 focus:border-brand-ink focus:ring-ring/25'
-        } ${className}`}
-        {...props}
-      />
+      <span className="relative block">
+        <input
+          ref={ref}
+          className={`${FIELD_CLASSES} ${isEmptyDateTime ? 'dt-empty' : ''} ${
+            error
+              ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/20'
+              : 'border-input hover:border-ring/60 focus:border-brand-ink focus:ring-ring/25'
+          } ${className}`}
+          {...props}
+        />
+        {isEmptyDateTime && (
+          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-[15px] font-normal text-muted-foreground">
+            dd/mm/yyyy, --:--
+          </span>
+        )}
+      </span>
       {error && <span className="mt-1 block text-xs font-semibold text-destructive">{error}</span>}
     </label>
   )

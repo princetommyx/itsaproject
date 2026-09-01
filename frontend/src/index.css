@@ -377,3 +377,25 @@
 [theme='dark'] .toast-container.theme-minimal .toast-item.toast-info {
   border-left-color: var(--brand-ink);
 }
+
+/* An empty datetime-local's "dd/mm/yyyy, --:--" is the browser's own
+   rendering of its unfilled segments, not real placeholder text — the
+   placeholder attribute does nothing on this input type. Its colour is not
+   fully author-controlled: it read fine here in testing but photographed
+   as nearly invisible on a real Android phone, where Chrome renders those
+   segments in a low-contrast system colour our CSS can't reach. Rather
+   than chase that per-platform, the segments are hidden outright while the
+   Input component's .dt-empty class is present (only while the value is
+   actually empty) and a normal, always-legible span takes over — see
+   Input in ui.jsx. Once a value is picked the class is gone and the real
+   segments render in --foreground like any other filled field. */
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-fields-wrapper,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-text,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-month-field,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-day-field,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-year-field,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-hour-field,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-minute-field,
+input[type='datetime-local'].dt-empty::-webkit-datetime-edit-ampm-field {
+  color: transparent;
+}
