@@ -1,0 +1,171 @@
+# DigitalOcean App Platform spec for the backend.
+#
+# This exists because Render's free plan spins the service down after ~15
+# minutes idle, and the next request has to boot the whole container again —
+# 30-60+ seconds before the login/dashboard call even starts. That is what
+# was being felt as "slowness". App Platform's cheapest PAID tier
+# (apps-s-1vcpu-0.5gb, ~$5/mo) never spins down: every request hits an
+# already-warm process, the same way render.yaml's "starter" plan note
+# described but never switched to.
+#
+# HOW TO USE THIS FILE
+#
+# The safest path is DigitalOcean's own guided flow, not a blind YAML
+# upload — it auto-detects the Dockerfile and asks you to confirm the source
+# directory, which a hand-written file can get subtly wrong in a monorepo
+# like this one (backend/ and frontend/ side by side).
+#
+#   1. Add a payment method first — Apps can't be created without one
+#      (you'll see this as a pending onboarding step on the dashboard).
+#   2. Top right "Create" button -> "Apps".
+#   3. Source: GitHub -> authorize/select princetommyx/itsaproject ->
+#      branch "main" -> when it asks for the source directory, enter
+#      "backend" (NOT the repo root — that's what rootDir: backend meant
+#      on Render).
+#   4. It will detect the Dockerfile automatically. Confirm HTTP port 80.
+#   5. On the "Resources" screen there's an "Edit as YAML" / "App Spec"
+#      toggle. Switch to it and paste the `services:` block from this file
+#      (skip the `name:`/`region:` lines if the wizard already asked for
+#      those) — this fills in every env var in one paste instead of ~15
+#      separate form entries, with the placeholders below marked SECRET.
+#   6. Fill in the actual values for anything marked REPLACE_ME or SECRET
+#      below (your Postgres credentials, Resend API key, and the APP_KEY
+#      generated for you — see the comment on that key).
+#   7. Region: fra (Frankfurt) — same reasoning as Render: DigitalOcean has
+#      no African region, and Frankfurt is the closest one to Accra. Put
+#      your database in the same region if you ever move it; a request
+#      that runs several queries pays the app-to-database round trip on
+#      every one of them, and cross-continent that is ~150ms+ per query.
+#
+# After it deploys, DigitalOcean gives you a URL like
+# https://itsaproject-backend-xxxxx.ondigitalocean.app — copy it, then:
+#   - Update APP_URL below (in the App Platform dashboard, not this file)
+#     to that real URL.
+#   - Update the frontend's VITE_API_URL env var on Vercel to
+#     "<that URL>/api" and redeploy the frontend.
+#   - FRONTEND_URL below should already match your Vercel origin; if the
+#     Vercel URL is different from what's here, update it so CORS doesn't
+#     silently reject every request from the browser.
+name: itsaproject-backend
+region: fra
+services:
+  - name: backend
+    # Relative to source_dir (backend/), which is the directory the wizard
+    # asks for in step 3 above.
+    dockerfile_path: Dockerfile
+    source_dir: backend
+    github:
+      repo: princetommyx/itsaproject
+      branch: main
+      deploy_on_push: true
+    http_port: 80
+    instance_count: 1
+    # Cheapest tier that doesn't spin down. If you see the app restarting
+    # under load (check the Runtime Logs for an OOM), step up to the 1GB
+    # tier — Apache + PHP-FPM + OPcache's 128MB reservation is comfortable
+    # here for a project this size, but not generous.
+    instance_size_slug: apps-s-1vcpu-0.5gb
+    envs:
+      - key: APP_NAME
+        value: "UPSA Final Year Project Management System"
+      - key: APP_ENV
+        value: "production"
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: "REPLACE_ME" # fill in with the real *.ondigitalocean.app URL after first deploy
+
+      # Laravel uses this to encrypt sessions, signed URLs and anything
+      # Crypt::encrypt() touches, so it must be secret and must not be the
+      # same key your local .env or Render's APP_KEY uses. Unlike Render,
+      # App Platform does not auto-generate this one for you — generate
+      # your own fresh key with:
+      #   echo "base64:$(openssl rand -base64 32)"
+      # and paste the full output (base64: prefix included) as a SECRET
+      # env var named APP_KEY. Never commit the real value to this file.
+      - key: APP_KEY
+        type: SECRET
+        value: "REPLACE_ME"
+
+      # Same reasoning as Render: cost 10 rather than Laravel's default of
+      # 12. Bcrypt is deliberately slow, and cost 12 measured 1-3s per
+      # login on constrained hosting — every mistyped password would pay
+      # that.
+      - key: BCRYPT_ROUNDS
+        value: "10"
+
+      # REQUIRED: the deployed frontend's origin, for CORS. Without this,
+      # every request from the browser is silently rejected even if the
+      # backend itself is healthy.
+      - key: FRONTEND_URL
+        value: "https://itsaproject.vercel.app" # update if your Vercel URL differs
+
+      # Keeping the existing external Postgres rather than adding a
+      # DigitalOcean Managed Database — no data to migrate, no extra
+      # monthly cost, and Laravel doesn't care which host it's talking to.
+      # Copy the SAME values you have set in Render's dashboard today
+      # (Render never stored them in this repo — they only ever lived in
+      # Render's dashboard, marked sync: false).
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        type: SECRET
+        value: "REPLACE_ME" # e.g. db.xxxxxxxxxxxx.supabase.co, or ep-xxxx.neon.tech
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        type: SECRET
+        value: "REPLACE_ME"
+      - key: DB_USERNAME
+        type: SECRET
+        value: "REPLACE_ME"
+      - key: DB_PASSWORD
+        type: SECRET
+        value: "REPLACE_ME"
+      - key: DB_SSLMODE
+        value: "require"
+
+      - key: SESSION_DRIVER
+        value: "database"
+
+      # NOT database — see the comment in start.sh and the earlier
+      # performance audit. The rate limiter reads/writes its counter
+      # through the cache store on every authenticated request; on a
+      # database that's a separate host, that's several network round
+      # trips per request for no reason. The file store keeps the counter
+      # on the container's own disk.
+      - key: CACHE_STORE
+        value: "file"
+
+      # NOT sync. The password-reset endpoint answers by queueing a job
+      # and doing nothing else, so an index number that exists and one
+      # that doesn't cost exactly the same to ask about — see
+      # SendStudentPasswordReset and its tests. Under sync that job would
+      # run inside the request instead, and the enumeration timing gap
+      # this was built to close comes straight back. start.sh runs the
+      # worker that drains this queue.
+      - key: QUEUE_CONNECTION
+        value: "database"
+
+      # REQUIRED to actually deliver emails (password resets, project
+      # decision notifications). Same Resend setup as Render — sign up
+      # free at https://resend.com, create an API key, paste it below.
+      - key: MAIL_MAILER
+        value: "resend"
+      - key: MAIL_FROM_ADDRESS
+        value: "onboarding@resend.dev" # switch once you verify your own domain in Resend
+      - key: RESEND_API_KEY
+        type: SECRET
+        value: "REPLACE_ME"
+
+      # Same caveat as Render: local disk storage is NOT persistent across
+      # deploys on App Platform either — every uploaded document is lost
+      # on the next deploy. Switch to S3-compatible storage (Supabase
+      # Storage, since you already have a Supabase project for the
+      # database, or DigitalOcean Spaces, which is the same idea and
+      # stays in the fra region) before real students start uploading
+      # documents. Fill in AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY /
+      # AWS_BUCKET / AWS_DEFAULT_REGION / AWS_ENDPOINT /
+      # AWS_USE_PATH_STYLE_ENDPOINT=true and set FILESYSTEM_DISK=s3.
+      - key: FILESYSTEM_DISK
+        value: "local"
