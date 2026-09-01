@@ -47,17 +47,20 @@ export function PageHeading({ children, description, actions, className = '' }) 
 
 // Tints rather than flat pastels, so the same palette works on a light or a
 // dark card without a second set of values.
-const AVATAR_PALETTE = [
-  // The 700 step, not 600: initials are small text, and against a 15% tint the
-  // lighter step lands around 3.3:1 — under AA.
-  'bg-blue-500/15 text-blue-700 dark:text-blue-300',
-  'bg-violet-500/15 text-violet-700 dark:text-violet-300',
-  'bg-pink-500/15 text-pink-700 dark:text-pink-300',
-  'bg-amber-500/15 text-amber-700 dark:text-amber-300',
-  'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300',
-  'bg-cyan-500/15 text-cyan-700 dark:text-cyan-300',
-]
-
+/**
+ * Someone's initials in a ring.
+ *
+ * This used to hash the name into one of six pastel tints, so Kojo Appiah came
+ * out mint green and the person beside him came out pink. The colour meant
+ * nothing — it did not track role, or status, or anything a reader could act
+ * on — and a page of unrelated pastels is the house style of software nobody
+ * decided the look of.
+ *
+ * One treatment now, in the institution's own colour: whatever an
+ * administrator sets as the brand tints the disc and inks the letters, so a
+ * roster reads as one list rather than a bag of sweets. Names are told apart
+ * by the letters, which is what they were always for.
+ */
 export function Avatar({ name, className = '' }) {
   const initials = (name || '?')
     .trim()
@@ -66,12 +69,13 @@ export function Avatar({ name, className = '' }) {
     .map((part) => part[0]?.toUpperCase())
     .join('')
 
-  const hash = (name || '').split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
-  const palette = AVATAR_PALETTE[hash % AVATAR_PALETTE.length]
-
   return (
     <span
-      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${palette} ${className}`}
+      className={cn(
+        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold',
+        'bg-brand/10 text-brand-ink ring-1 ring-brand/20',
+        className
+      )}
     >
       {initials || '?'}
     </span>
