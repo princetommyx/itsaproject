@@ -29,7 +29,7 @@ export default function ResetPassword() {
         password_confirmation: confirmation,
       })
       toast.success('Password reset. Please sign in.')
-      navigate('/login')
+      navigate('/student')
     } catch (err) {
       const messages = err.response?.data?.errors
       setError(messages ? Object.values(messages).flat().join(' ') : 'Could not reset password.')
@@ -75,7 +75,7 @@ export default function ResetPassword() {
       </form>
 
       <p className="mt-6 text-xs text-muted-foreground">
-        <Link to="/login" className="text-brand-ink hover:underline">
+        <Link to="/student" className="text-brand-ink hover:underline">
           Back to login
         </Link>
       </p>

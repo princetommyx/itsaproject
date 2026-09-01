@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import LoginForm from '../components/LoginForm'
 
 /**
@@ -20,14 +19,7 @@ export default function StudentLogin() {
       passwordPlaceholder="Date of birth as YYYYMMDD, e.g. 20040720"
       identifierAutoComplete="username"
       allowedRoles={['student']}
-      wrongRoleMessage="This looks like a staff account. Please use the Staff / Admin sign-in page instead."
-    >
-      <p className="text-center text-sm font-medium text-muted-foreground">
-        Staff or administrator?{' '}
-        <Link to="/admin" className="font-semibold text-brand-ink hover:underline">
-          Sign in here
-        </Link>
-      </p>
-    </LoginForm>
+      wrongRoleMessage="This is a staff account. Assessors sign in at /assessor and administrators at /admin."
+    />
   )
 }

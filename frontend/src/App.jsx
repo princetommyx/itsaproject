@@ -7,12 +7,12 @@ import { ToastProvider } from './context/ToastContext'
 import { SettingsProvider } from './context/SettingsContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { PageMetaProvider } from './context/PageMetaContext'
-import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
 import PageLoader from './components/PageLoader'
 
 import StudentLogin from './pages/StudentLogin'
-import AdminEntry from './pages/AdminEntry'
+import RoleGate from './components/RoleGate'
+import StaffLogin from './pages/StaffLogin'
 import ChangePassword from './pages/ChangePassword'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
@@ -44,7 +44,7 @@ import AdminNotifications from './pages/admin/sections/AdminNotifications'
 function HomeRedirect() {
   const { user, loading } = useAuth()
   if (loading) return null
-  if (!user) return <Navigate to="/login" replace />
+  if (!user) return <Navigate to="/student" replace />
   if (user.is_first_login) return <Navigate to="/change-password" replace />
   return <Navigate to={`/${user.role}`} replace />
 }
@@ -65,32 +65,37 @@ export default function App() {
           <PageMetaProvider>
             <Routes>
               <Route path="/" element={<HomeRedirect />} />
-              <Route path="/login" element={<StudentLogin />} />
+              {/* The student gateway moved to /student; /login stays as a
+                  redirect so old links and bookmarks still land. */}
+              <Route path="/login" element={<Navigate to="/student" replace />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/change-password" element={<ChangePassword />} />
 
-              <Route element={<ProtectedRoute allowedRoles={['student']} />}>
+              <Route path="/student" element={<RoleGate role="student" login={<StudentLogin />} />}>
                 <Route element={<Layout />}>
-                  <Route path="/student" element={<StudentDashboard />} />
-                  <Route path="/student/notifications" element={<StudentNotifications />} />
-                  <Route path="/student/documents" element={<StudentDocuments />} />
-                  <Route path="/student/support" element={<StudentSupport />} />
-                  <Route path="/student/profile" element={<StudentProfile />} />
+                  <Route index element={<StudentDashboard />} />
+                  <Route path="notifications" element={<StudentNotifications />} />
+                  <Route path="documents" element={<StudentDocuments />} />
+                  <Route path="support" element={<StudentSupport />} />
+                  <Route path="profile" element={<StudentProfile />} />
                 </Route>
               </Route>
 
-              <Route element={<ProtectedRoute allowedRoles={['assessor']} />}>
+              {/* Assessors get their own door too. Without one they landed on the
+                  student form, which correctly refuses a staff account — and
+                  with the cross-link gone they would have had no way through. */}
+              <Route path="/assessor" element={<RoleGate role="assessor" login={<StaffLogin />} />}>
                 <Route element={<Layout />}>
-                  <Route path="/assessor" element={<AssessorDashboard />} />
-                  <Route path="/assessor/projects/:id" element={<ProjectReview />} />
-                  <Route path="/assessor/projects/:id/compare" element={<CompareVersions apiPrefix="/assessor" backTo="/assessor/projects" />} />
-                  <Route path="/assessor/notifications" element={<AssessorNotifications />} />
-                  <Route path="/assessor/profile" element={<AssessorProfile />} />
+                  <Route index element={<AssessorDashboard />} />
+                  <Route path="projects/:id" element={<ProjectReview />} />
+                  <Route path="projects/:id/compare" element={<CompareVersions apiPrefix="/assessor" backTo="/assessor/projects" />} />
+                  <Route path="notifications" element={<AssessorNotifications />} />
+                  <Route path="profile" element={<AssessorProfile />} />
                 </Route>
               </Route>
 
-              <Route path="/admin" element={<AdminEntry />}>
+              <Route path="/admin" element={<RoleGate role="admin" login={<StaffLogin />} />}>
                 <Route element={<Layout />}>
                   <Route index element={<Overview />} />
                   <Route path="projects" element={<AllProjects />} />

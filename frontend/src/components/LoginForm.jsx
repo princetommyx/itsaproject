@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import AuthShell from './AuthShell'
@@ -21,6 +21,7 @@ export default function LoginForm({
   const { login, commitSession, discardSession } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
+  const location = useLocation()
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -45,7 +46,14 @@ export default function LoginForm({
         navigate('/change-password')
       } else {
         toast.success(`Welcome back, ${user.name.split(' ')[0]}.`)
-        navigate(`/${user.role}`)
+
+        // Each role's sign-in form lives at that role's own address, so
+        // arriving at /student/documents signed out shows this form with the
+        // URL intact. Stay put in that case and let the gate render what was
+        // asked for — sending everyone to the section root instead means a
+        // link from a notification always lands one navigation short.
+        const inOwnSection = location.pathname.startsWith(`/${user.role}`)
+        if (!inOwnSection) navigate(`/${user.role}`)
       }
     } catch (err) {
       if (err.response) {

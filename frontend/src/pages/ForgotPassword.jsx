@@ -57,7 +57,7 @@ export default function ForgotPassword() {
           Already have a token?
         </Link>
         <span className="mx-2">·</span>
-        <Link to="/login" className="text-brand-ink hover:underline">
+        <Link to="/student" className="text-brand-ink hover:underline">
           Back to login
         </Link>
       </p>
