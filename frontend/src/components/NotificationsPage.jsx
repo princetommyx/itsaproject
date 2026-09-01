@@ -22,11 +22,17 @@ const CATEGORY_STYLES = {
 // colours with no dark variant, so in dark mode those two icons sat in bright
 // white discs while blue and gold — which already used /10 — behaved. A tint
 // composites over whatever surface is underneath, in either theme.
+//
+// /10 with no border read as a pale, indistinct wash rather than a badge —
+// at a glance it wasn't obvious there was a real icon in there at all. A
+// ring in the same hue gives the disc an edge to read against, the way an
+// icon badge in a real design system is drawn rather than a flat tint
+// floating on the page.
 const ICON_VARIANT_STYLES = {
-  blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-300',
-  violet: 'bg-violet-500/10 text-violet-600 dark:text-violet-300',
-  pink: 'bg-pink-500/10 text-pink-600 dark:text-pink-300',
-  gold: 'bg-amber-500/10 text-amber-600 dark:text-amber-300',
+  blue: 'bg-blue-500/15 text-blue-600 ring-1 ring-blue-500/25 dark:text-blue-300 dark:ring-blue-400/25',
+  violet: 'bg-violet-500/15 text-violet-600 ring-1 ring-violet-500/25 dark:text-violet-300 dark:ring-violet-400/25',
+  pink: 'bg-pink-500/15 text-pink-600 ring-1 ring-pink-500/25 dark:text-pink-300 dark:ring-pink-400/25',
+  gold: 'bg-amber-500/15 text-amber-600 ring-1 ring-amber-500/25 dark:text-amber-300 dark:ring-amber-400/25',
 }
 
 const INTRO_ITEMS = {
@@ -209,20 +215,25 @@ export default function NotificationsPage({ apiPrefix, role }) {
                   <button
                     onClick={() => openNotification(n)}
                     className={cn(
-                      'flex w-full items-start gap-3 px-4 py-3.5 text-left transition hover:bg-muted',
+                      'flex w-full items-start gap-3 border-l-2 border-transparent px-4 py-3.5 text-left transition hover:bg-muted',
                       // An unread row is tinted rather than merely bolder, so
                       // the block of things still needing attention is visible
-                      // without reading any of them.
-                      isUnread && 'bg-brand/[0.06]'
+                      // without reading any of them. 6% read as almost no tint
+                      // at all against a white card in light mode — every row,
+                      // read or not, looked like the same flat white strip. A
+                      // visible tint plus a coloured left edge (the way an
+                      // inbox actually marks "new") gives light mode the same
+                      // presence dark mode already had.
+                      isUnread && 'border-brand bg-brand/[0.08]'
                     )}
                   >
                     <span
                       className={cn(
-                        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
                         ICON_VARIANT_STYLES[info.variant]
                       )}
                     >
-                      <Icon size={18} />
+                      <Icon size={20} />
                     </span>
 
                     <div className="min-w-0 flex-1">

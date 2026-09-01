@@ -72,7 +72,7 @@ export default function DefenseScheduleCard({ project, onSaved }) {
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
-        <Button variant="outline" onClick={save} loading={saving} disabled={saving || !dirty}>
+        <Button onClick={save} loading={saving} disabled={saving || !dirty}>
           {saving ? 'Saving...' : 'Save Defense Dates'}
         </Button>
         {(proposal || final) && (

@@ -100,21 +100,36 @@ export function Card({ children, className = '', interactive = false }) {
 }
 
 export function Button({ children, variant = 'primary', loading = false, className = '', ...props }) {
+  // Disabled used to be every variant's own colour at 50% opacity — which
+  // dims the text and its background by the same fraction, so both fade
+  // toward the page behind them together and the button washes out to a
+  // pale, indistinct blob rather than reading as "not clickable right now".
+  // A button that's disabled because there's nothing to save yet (the
+  // defense-dates Save button, at rest) is not a rare state; it's the
+  // default one, so it needs to look deliberate rather than broken. Each
+  // variant now gets an explicit disabled treatment instead — the same
+  // muted surface every disabled input on the page already uses — so the
+  // label stays legible and the button still visibly reads as a button.
   const variants = {
-    primary: 'bg-brand text-brand-foreground shadow-sm hover:brightness-110',
-    secondary: 'bg-secondary text-secondary-foreground hover:bg-accent',
-    outline: 'border-2 border-brand-ink bg-transparent text-brand-ink hover:bg-brand/5',
-    danger: 'bg-destructive text-destructive-foreground shadow-sm hover:brightness-110',
-    success: 'bg-success text-white shadow-sm hover:brightness-110',
+    primary:
+      'bg-brand text-brand-foreground shadow-sm hover:brightness-110 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none',
+    secondary:
+      'bg-secondary text-secondary-foreground hover:bg-accent disabled:bg-muted disabled:text-muted-foreground',
+    outline:
+      'border-2 border-brand-ink bg-transparent text-brand-ink hover:bg-brand/5 disabled:border-border disabled:text-muted-foreground',
+    danger:
+      'bg-destructive text-destructive-foreground shadow-sm hover:brightness-110 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none',
+    success:
+      'bg-success text-white shadow-sm hover:brightness-110 disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none',
   }
-  // Outline and secondary both draw dark text on a light ground, so their
-  // spinner needs to be dark too.
-  const light = !['secondary', 'outline'].includes(variant)
+  // Outline, secondary and any disabled button all draw dark text on a
+  // light ground, so their spinner needs to be dark too.
+  const light = !['secondary', 'outline'].includes(variant) && !props.disabled
 
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-150 outline-none active:scale-[0.98] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100',
+        'inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-150 outline-none active:scale-[0.98] focus-visible:ring-[3px] focus-visible:ring-ring/40 disabled:cursor-not-allowed disabled:active:scale-100',
         variants[variant],
         className
       )}
