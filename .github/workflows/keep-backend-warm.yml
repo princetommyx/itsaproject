@@ -1,0 +1,40 @@
+name: Keep Render backend warm
+
+# Render's free tier spins the backend down after ~15 minutes with no
+# traffic, and the next request pays the full cold-boot cost — measured at
+# 18+ seconds in practice, sometimes worse. This exists as a stopgap while a
+# real fix (moving off Render's free tier) is blocked on a payment method,
+# not because it's the right long-term answer. It costs nothing extra to set
+# up: it runs on the repo's own free GitHub Actions minutes, no new account,
+# no card.
+#
+# Deliberately NOT 24/7. Two reasons:
+#   1. Render's own docs note they may throttle a service they detect is
+#      being kept artificially warm around the clock — pinging only during
+#      the hours the system is actually used is both honest and safer.
+#   2. There's nothing to keep warm for at 3am — a real overnight gap means
+#      the very first login of the morning still eats one cold start, which
+#      is an acceptable trade for not looking like abuse the rest of the day.
+#
+# The window below (05:00-23:00 UTC) is Ghana's own clock (UTC+0, no DST),
+# so no timezone conversion needed — adjust the hours in the cron line
+# below if the real usage pattern turns out to be narrower or wider.
+#
+# UPDATE THE URL BELOW to the real Render service URL before this does
+# anything useful — check the Render dashboard for the actual address,
+# since render.yaml's value is a placeholder, not necessarily what's live.
+
+on:
+  schedule:
+    - cron: '*/10 5-23 * * *'
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping the backend's health check
+        run: |
+          curl -fsS -o /dev/null -w "HTTP %{http_code} in %{time_total}s\n" \
+            https://itsaproject-backend.onrender.com/up \
+            || echo "Ping failed — service may be mid-cold-start or the URL above needs updating."
