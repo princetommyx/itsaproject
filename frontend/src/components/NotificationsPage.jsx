@@ -4,7 +4,7 @@ import useSWR from 'swr'
 import client from '../api/client'
 import { Button, Card, EmptyState, ErrorState, PageHeading, stagger } from './ui'
 import { SkeletonList } from './Skeleton'
-import { BellIcon, ChevronRightIcon, InboxIcon, MessageIcon } from './icons'
+import { BellIcon, ChevronRightIcon, EnvelopeIcon, InboxIcon } from './icons'
 import { describeNotification } from '../constants/notifications'
 import { relativeTime } from '../lib/formatDate'
 import { cn } from '../lib/cn'
@@ -254,7 +254,7 @@ export default function NotificationsPage({ apiPrefix, role }) {
                               title and description carry that distinction,
                               same as the reference this list follows. */}
                           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white">
-                            <MessageIcon size={18} />
+                            <EnvelopeIcon size={18} />
                           </span>
 
                           <div className="min-w-0 flex-1">

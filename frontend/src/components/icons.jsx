@@ -82,6 +82,23 @@ export function MessageIcon(props) {
   )
 }
 
+/** Boxicons bx-envelope, filled — a plain envelope with the flap traced as
+    an actual gap in the shape (evenodd), not a triangle painted in a second
+    colour to fake the notch. That means it stays correct as a hole no
+    matter what it sits on top of, instead of only working against one
+    specific background colour. */
+export function EnvelopeIcon(props) {
+  return (
+    <Icon {...props}>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M4 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H4Zm.5 2h15L12 12.5 4.5 6ZM4 8.4V18h16V8.4l-7.4 6.1a1 1 0 0 1-1.2 0L4 8.4Z"
+      />
+    </Icon>
+  )
+}
+
 /** Boxicons bx-folder */
 export function FolderIcon(props) {
   return (
