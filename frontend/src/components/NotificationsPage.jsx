@@ -253,8 +253,8 @@ export default function NotificationsPage({ apiPrefix, role }) {
                               rather than one colour+glyph per kind — the
                               title and description carry that distinction,
                               same as the reference this list follows. */}
-                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white">
-                            <EnvelopeIcon size={18} />
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-700 text-white">
+                            <EnvelopeIcon size={21} />
                           </span>
 
                           <div className="min-w-0 flex-1">
