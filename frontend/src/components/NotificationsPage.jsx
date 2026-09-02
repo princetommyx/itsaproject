@@ -242,13 +242,17 @@ export default function NotificationsPage({ apiPrefix, role }) {
                       'flex w-full items-start gap-3 border-l-2 border-transparent px-4 py-3.5 text-left transition hover:bg-muted',
                       // An unread row is tinted rather than merely bolder, so
                       // the block of things still needing attention is visible
-                      // without reading any of them. 6% read as almost no tint
-                      // at all against a white card in light mode — every row,
-                      // read or not, looked like the same flat white strip. A
-                      // visible tint plus a coloured left edge (the way an
-                      // inbox actually marks "new") gives light mode the same
-                      // presence dark mode already had.
-                      isUnread && 'border-brand bg-brand/[0.08]'
+                      // without reading any of them. This used to tint with
+                      // the brand token — measured at only a 9-point gap
+                      // between its red and blue channels once composited,
+                      // which reads as flat institutional grey, not a colour
+                      // decision. blue-500, the same hue the icon badges on
+                      // this page already use for "new" (Document Submitted,
+                      // New Project Assigned), measured 38-43 points in that
+                      // same fix and is unmistakably blue on screen — used
+                      // here too, so "unread" reads as the same idea as the
+                      // icons already say it is, not an unrelated grey.
+                      isUnread && 'border-blue-500 bg-blue-500/[0.08] dark:bg-blue-400/[0.08]'
                     )}
                   >
                     <span
