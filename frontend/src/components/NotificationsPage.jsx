@@ -4,35 +4,22 @@ import useSWR from 'swr'
 import client from '../api/client'
 import { Button, Card, EmptyState, ErrorState, PageHeading, stagger } from './ui'
 import { SkeletonList } from './Skeleton'
-import { BellIcon, InboxIcon } from './icons'
+import { BellIcon, ChevronRightIcon, InboxIcon, MessageIcon } from './icons'
 import { describeNotification } from '../constants/notifications'
 import { relativeTime } from '../lib/formatDate'
 import { cn } from '../lib/cn'
 
-const CATEGORY_STYLES = {
-  blue: 'bg-blue-500/15 text-blue-700 dark:text-blue-300',
-  violet: 'bg-violet-500/15 text-violet-700 dark:text-violet-300',
-  pink: 'bg-pink-500/15 text-pink-700 dark:text-pink-300',
-  // 800, not 700: amber-700 on this tint over a tinted unread row measured
-  // 4.08:1, just under AA. Dark mode already passed comfortably.
-  gold: 'bg-amber-500/15 text-amber-800 dark:text-amber-300',
-}
+// "Today" / "Yesterday" / a plain date for anything older — `visible` is
+// already newest-first from the server, so this only needs to notice when
+// the label changes, not re-sort anything.
+function dateGroupLabel(iso) {
+  const date = new Date(iso)
+  const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  const diffDays = Math.round((startOfDay(new Date()) - startOfDay(date)) / 86400000)
 
-// Tints, not the 50 step. bg-violet-50 and bg-pink-50 are opaque light
-// colours with no dark variant, so in dark mode those two icons sat in bright
-// white discs while blue and gold — which already used /10 — behaved. A tint
-// composites over whatever surface is underneath, in either theme.
-//
-// /10 with no border read as a pale, indistinct wash rather than a badge —
-// at a glance it wasn't obvious there was a real icon in there at all. A
-// ring in the same hue gives the disc an edge to read against, the way an
-// icon badge in a real design system is drawn rather than a flat tint
-// floating on the page.
-const ICON_VARIANT_STYLES = {
-  blue: 'bg-blue-500/15 text-blue-600 ring-1 ring-blue-500/25 dark:text-blue-300 dark:ring-blue-400/25',
-  violet: 'bg-violet-500/15 text-violet-600 ring-1 ring-violet-500/25 dark:text-violet-300 dark:ring-violet-400/25',
-  pink: 'bg-pink-500/15 text-pink-600 ring-1 ring-pink-500/25 dark:text-pink-300 dark:ring-pink-400/25',
-  gold: 'bg-amber-500/15 text-amber-600 ring-1 ring-amber-500/25 dark:text-amber-300 dark:ring-amber-400/25',
+  if (diffDays === 0) return 'Today'
+  if (diffDays === 1) return 'Yesterday'
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 }
 
 const INTRO_ITEMS = {
@@ -111,6 +98,17 @@ export default function NotificationsPage({ apiPrefix, role }) {
   }, [notifications, filter])
 
   const unreadCount = notifications?.filter((n) => !n.read_at).length ?? 0
+
+  const groups = useMemo(() => {
+    const out = []
+    for (const n of visible) {
+      const label = dateGroupLabel(n.created_at)
+      const last = out[out.length - 1]
+      if (last?.label === label) last.items.push(n)
+      else out.push({ label, items: [n] })
+    }
+    return out
+  }, [visible])
 
   return (
     <div className="space-y-6">
@@ -226,85 +224,82 @@ export default function NotificationsPage({ apiPrefix, role }) {
             }
           />
         ) : (
-          <ul className="divide-y divide-border">
-            {visible.map((n, i) => {
-              const info = describeNotification(n)
-              if (!info) return null
+          <ul>
+            {groups.map((group) => (
+              <li key={group.label}>
+                <p className="bg-muted px-4 py-2 text-xs font-bold tracking-wide text-muted-foreground uppercase">
+                  {group.label}
+                </p>
+                <ul className="divide-y divide-border">
+                  {group.items.map((n, i) => {
+                    const info = describeNotification(n)
+                    if (!info) return null
 
-              const isUnread = !n.read_at
-              const Icon = info.icon
+                    const isUnread = !n.read_at
 
-              return (
-                <li key={n.id} className="animate-fade-up" style={stagger(i)}>
-                  <button
-                    onClick={() => openNotification(n)}
-                    className={cn(
-                      'flex w-full items-start gap-3 border-l-2 border-transparent px-4 py-3.5 text-left transition hover:bg-muted',
-                      // An unread row is tinted rather than merely bolder, so
-                      // the block of things still needing attention is visible
-                      // without reading any of them. This used to tint with
-                      // the brand token — measured at only a 9-point gap
-                      // between its red and blue channels once composited,
-                      // which reads as flat institutional grey, not a colour
-                      // decision. blue-500, the same hue the icon badges on
-                      // this page already use for "new" (Document Submitted,
-                      // New Project Assigned), measured 38-43 points in that
-                      // same fix and is unmistakably blue on screen — used
-                      // here too, so "unread" reads as the same idea as the
-                      // icons already say it is, not an unrelated grey.
-                      isUnread && 'border-blue-500 bg-blue-500/[0.08] dark:bg-blue-400/[0.08]'
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        'flex h-10 w-10 shrink-0 items-center justify-center rounded-full',
-                        ICON_VARIANT_STYLES[info.variant]
-                      )}
-                    >
-                      <Icon size={20} />
-                    </span>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <p
+                    return (
+                      <li key={n.id} className="animate-fade-up" style={stagger(i)}>
+                        <button
+                          onClick={() => openNotification(n)}
                           className={cn(
-                            'truncate text-sm',
-                            isUnread ? 'font-bold text-foreground' : 'font-semibold text-muted-foreground'
+                            'flex w-full items-start gap-3 border-l-2 border-transparent px-4 py-3.5 text-left transition hover:bg-muted',
+                            // An unread row is tinted rather than merely bolder,
+                            // so the block of things still needing attention is
+                            // visible without reading any of them.
+                            isUnread && 'border-blue-500 bg-blue-500/[0.08] dark:bg-blue-400/[0.08]'
                           )}
                         >
-                          {info.title}
-                        </p>
-                        {isUnread && (
+                          {/* One icon for every kind of notification now,
+                              rather than one colour+glyph per kind — the
+                              title and description carry that distinction,
+                              same as the reference this list follows. */}
+                          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500 text-white">
+                            <MessageIcon size={18} />
+                          </span>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p
+                                className={cn(
+                                  'truncate text-sm',
+                                  isUnread ? 'font-bold text-foreground' : 'font-semibold text-muted-foreground'
+                                )}
+                              >
+                                {info.title}
+                              </p>
+                              {isUnread && (
+                                <span
+                                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500"
+                                  aria-label="Unread"
+                                />
+                              )}
+                            </div>
+                            <p className="mt-0.5 text-[15px] leading-[1.6] break-words text-muted-foreground">
+                              {info.description}
+                            </p>
+                            <p className="mt-1 text-xs whitespace-nowrap text-muted-foreground">
+                              {relativeTime(n.created_at)}
+                            </p>
+                          </div>
+
+                          {/* Decorative, not a second control — the whole row
+                              is already the click target (openNotification
+                              above), so this isn't a nested <button>, just the
+                              visual "this opens something" cue the reference
+                              draws as its own circle. */}
                           <span
-                            className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
-                            aria-label="Unread"
-                          />
-                        )}
-                      </div>
-                      <p className="mt-0.5 text-[15px] leading-[1.6] break-words text-muted-foreground">
-                        {info.description}
-                      </p>
-                    </div>
-
-                    <div className="flex shrink-0 flex-col items-end gap-1.5 pl-2">
-                      {info.category && (
-                        <span
-                          className={cn(
-                            'rounded-md px-2 py-0.5 text-[11px] font-bold',
-                            CATEGORY_STYLES[info.variant] ?? CATEGORY_STYLES.blue
-                          )}
-                        >
-                          {info.category}
-                        </span>
-                      )}
-                      <span className="text-xs whitespace-nowrap text-muted-foreground">
-                        {relativeTime(n.created_at)}
-                      </span>
-                    </div>
-                  </button>
-                </li>
-              )
-            })}
+                            aria-hidden="true"
+                            className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-muted-foreground ring-1 ring-border"
+                          >
+                            <ChevronRightIcon size={16} />
+                          </span>
+                        </button>
+                      </li>
+                    )
+                  })}
+                </ul>
+              </li>
+            ))}
           </ul>
         )}
       </Card>

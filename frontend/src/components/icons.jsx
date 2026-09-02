@@ -145,6 +145,15 @@ export function ChevronDownIcon(props) {
   )
 }
 
+/** Boxicons bx-chevron-right */
+export function ChevronRightIcon(props) {
+  return (
+    <Icon {...props}>
+      <path d="M9.293 6.293a1 1 0 0 0 0 1.414L14.586 12l-5.293 5.293a1 1 0 0 0 1.414 1.414l6-6a1 1 0 0 0 0-1.414l-6-6a1 1 0 0 0-1.414 0z"/>
+    </Icon>
+  )
+}
+
 /** Boxicons bx-log-out */
 export function LogOutIcon(props) {
   return (
